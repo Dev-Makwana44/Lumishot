@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://ccyqf1eriwngl"]
+[gd_scene load_steps=2 format=3 uid="uid://ccyqf1eriwngl"]
+
+[ext_resource type="PackedScene" uid="uid://cakxa05kasxk6" path="res://Player/Player.tscn" id="1_07yc4"]
 
 [node name="World" type="Node2D"]
 
-[node name="Label" type="Label" parent="."]
-offset_right = 40.0
-offset_bottom = 23.0
-text = "This is the world"
+[node name="Player" parent="." instance=ExtResource("1_07yc4")]
+position = Vector2(172, 184)

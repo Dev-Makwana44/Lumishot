@@ -3,22 +3,27 @@
 [ext_resource type="Script" path="res://main.gd" id="1_al1vu"]
 
 [node name="Main" type="Node2D"]
-position = Vector2(47, 112)
+position = Vector2(520, 363)
+scale = Vector2(1.275, 1.275)
 script = ExtResource("1_al1vu")
 
 [node name="Play Button" type="Button" parent="."]
+texture_filter = 2
 offset_left = 20.0
 offset_top = -75.0
 offset_right = 63.0
 offset_bottom = -44.0
+scale = Vector2(1.275, 1.275)
 text = "Play"
 metadata/_edit_use_anchors_ = true
 
 [node name="Quit Button" type="Button" parent="."]
+texture_filter = 2
 offset_left = 21.0
 offset_top = -27.0
 offset_right = 64.0
 offset_bottom = 4.0
+scale = Vector2(1.275, 1.275)
 tooltip_text = "This is how you exit the game."
 text = "Quit"
 metadata/_edit_use_anchors_ = true

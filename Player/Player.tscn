@@ -1,0 +1,73 @@
+[gd_scene load_steps=10 format=3 uid="uid://cakxa05kasxk6"]
+
+[ext_resource type="Script" path="res://Player/Player.gd" id="1_mgulk"]
+[ext_resource type="Texture2D" uid="uid://bumklc8o3q8wn" path="res://Tech Dungeon Roguelite - Asset Pack (DEMO)/Players/players blue x3.png" id="2_j5n47"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_klxtj"]
+radius = 18.0
+height = 46.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7r2de"]
+atlas = ExtResource("2_j5n47")
+region = Rect2(0, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cmxwh"]
+atlas = ExtResource("2_j5n47")
+region = Rect2(0, 288, 96, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tv7d7"]
+atlas = ExtResource("2_j5n47")
+region = Rect2(96, 288, 96, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qngpu"]
+atlas = ExtResource("2_j5n47")
+region = Rect2(192, 288, 96, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0euih"]
+atlas = ExtResource("2_j5n47")
+region = Rect2(288, 288, 96, 96)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_nk4sr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7r2de")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cmxwh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tv7d7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qngpu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0euih")
+}],
+"loop": true,
+"name": &"Run",
+"speed": 5.0
+}]
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_mgulk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_klxtj")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -24)
+sprite_frames = SubResource("SpriteFrames_nk4sr")
+animation = &"Idle"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+limit_left = 0
+limit_top = 0
+limit_right = 1150
+limit_bottom = 650

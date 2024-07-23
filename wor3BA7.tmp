@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://ccyqf1eriwngl"]
+
+[ext_resource type="Script" path="res://world.gd" id="1_1yueh"]
+[ext_resource type="PackedScene" uid="uid://cakxa05kasxk6" path="res://Player/Player.tscn" id="1_07yc4"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_1yueh")
+
+[node name="Player" parent="." instance=ExtResource("1_07yc4")]
+position = Vector2(172, 184)
+
+[node name="Panel" type="Panel" parent="."]
+visible = false
+offset_right = 40.0
+offset_bottom = 40.0

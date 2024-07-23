@@ -67,7 +67,4 @@ sprite_frames = SubResource("SpriteFrames_nk4sr")
 animation = &"Idle"
 
 [node name="Camera2D" type="Camera2D" parent="."]
-limit_left = 0
-limit_top = 0
-limit_right = 1150
-limit_bottom = 650
+zoom = Vector2(0.1, 0.1)

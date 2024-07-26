@@ -56,6 +56,7 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D"]
+z_index = 10
 script = ExtResource("1_mgulk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -67,4 +68,4 @@ sprite_frames = SubResource("SpriteFrames_nk4sr")
 animation = &"Idle"
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(0.1, 0.1)
+zoom = Vector2(0.025, 0.025)

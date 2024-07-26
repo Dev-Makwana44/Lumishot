@@ -8,3 +8,13 @@ script = ExtResource("1_1yueh")
 
 [node name="Player" parent="." instance=ExtResource("1_07yc4")]
 position = Vector2(172, 184)
+
+[node name="Panel" type="Panel" parent="."]
+visible = false
+offset_right = 40.5
+offset_bottom = 40.0
+
+[node name="Line2D" type="Line2D" parent="."]
+visible = false
+points = PackedVector2Array(0, 0, 10, 10, 256, -11, 114, 81, -29, 73, 62, -12)
+width = 5.0

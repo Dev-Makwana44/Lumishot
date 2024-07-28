@@ -154,7 +154,7 @@ class Hallway extends Area2D:
 		var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 		var right_points: PackedVector2Array = self._get_right_points()
 		right_points.reverse()
-		collision_polygon.polygon = self._get_left_points() + right_points
+		collision_polygon.set_polygon(self._get_left_points() + right_points)
 		self.add_child(collision_polygon)
 		var temp: Line2D = Line2D.new()
 		temp.default_color = Color.DARK_GOLDENROD
@@ -282,6 +282,7 @@ class CustomAStar:
 	func _estimate_cost(from_id, to_id):
 		return self._compute_cost(from_id, to_id)
 
+var hallways: Array[Hallway] = []
 @onready var player = get_node("Player")
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -289,11 +290,16 @@ func _ready():
 	while not _generate_dungeon():
 		print("Restarting dungeon generation process")
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
-	var times: Array[int] = []
-
+	#var times: Array[int] = []
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
+
+func _physics_process(delta):
+	for hallway: Hallway in hallways:
+		if hallway.get_overlapping_areas() or hallway.get_overlapping_bodies():
+			print("COLLISION")
 
 func _generate_dungeon() -> bool:
 	var rooms: Array[Room] = []
@@ -367,7 +373,7 @@ func _generate_dungeon() -> bool:
 	
 	#Create hallways:
 
-	var hallways: Array[Hallway] = []
+	hallways = []
 	var hallway_connections: Dictionary = {}
 	for room: Room in main_rooms:
 		var room_connections: Array = [[], [], [], []]
@@ -409,10 +415,16 @@ func _generate_dungeon() -> bool:
 			if room_connections[direction]:
 				hallways.append(Hallway.new(room, room_connections[direction][0]))#, rng.randi_range(300, 500), direction))
 				hallways[-1]._create_path(rng.randi_range(300, 500), direction)
+				#add_child(hallways[-1]._create_collision_polygon())
 				hallways[-1]._create_collision_polygon()
-				if hallways[-1].has_overlapping_areas():
+				if hallways[-1].has_overlapping_bodies():
 					print("HALLWAY COLLISION")
 					return false
+	
+	for room in main_rooms:
+		if room.room_type == STARTING_ROOM:
+			player.position = room._get_center()
+			break
 	
 	_create_room_nodes([], main_rooms, mst_path)
 	#_draw_mst(mst_path)

@@ -298,7 +298,7 @@ func _process(delta):
 
 func _physics_process(delta):
 	for hallway: Hallway in hallways:
-		if hallway.get_overlapping_areas() or hallway.get_overlapping_bodies():
+		if hallway.has_overlapping_areas() or hallway.has_overlapping_bodies():
 			print("COLLISION")
 
 func _generate_dungeon() -> bool:
@@ -413,11 +413,10 @@ func _generate_dungeon() -> bool:
 				hallway_connections[[room, connected_room]] = true
 		for direction: int in range(len(room_connections)):
 			if room_connections[direction]:
-				hallways.append(Hallway.new(room, room_connections[direction][0]))#, rng.randi_range(300, 500), direction))
+				hallways.append(Hallway.new(room, room_connections[direction][0]))
 				hallways[-1]._create_path(rng.randi_range(300, 500), direction)
-				#add_child(hallways[-1]._create_collision_polygon())
 				hallways[-1]._create_collision_polygon()
-				if hallways[-1].has_overlapping_bodies():
+				if hallways[-1].has_overlapping_areas():
 					print("HALLWAY COLLISION")
 					return false
 	
@@ -425,6 +424,12 @@ func _generate_dungeon() -> bool:
 		if room.room_type == STARTING_ROOM:
 			player.position = room._get_center()
 			break
+	
+	for i in range(5):
+		var collectable = load("res://Collectables/collectable.tscn")
+		var collectable_instance = collectable.instantiate()
+		collectable_instance.position = player.position + Vector2(100 * (i + 1), 0)
+		add_child(collectable_instance)
 	
 	_create_room_nodes([], main_rooms, mst_path)
 	#_draw_mst(mst_path)

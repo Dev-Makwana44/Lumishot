@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://6h76ecnym48w"]
+
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_5p8wo"]
+[ext_resource type="Texture2D" uid="uid://ex27hm7r024f" path="res://Purple Vial.png" id="1_d1m56"]
+
+[resource]
+script = ExtResource("1_5p8wo")
+item_id = 0
+item_name = "Health Potion"
+item_texture = ExtResource("1_d1m56")
+item_stack_size = 10

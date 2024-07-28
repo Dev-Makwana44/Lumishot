@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody2D
 
 
@@ -12,7 +13,9 @@ var DASH_COOLDOWN: float = 2.0
 @onready var sprite = get_node("AnimatedSprite2D")
 @onready var gun = get_node("Gun")
 @onready var camera = get_node("Camera2D")
+
 var time_since_dash: float = 3.0
+var inventory: InventoryComponent = InventoryComponent.new()
 
 func _ready():
 	pass
@@ -46,13 +49,6 @@ func _physics_process(delta):
 		time_since_dash = 0.0
 		self.velocity.x = v.x * DASH_SPEED
 		self.velocity.y = v.y * DASH_SPEED
-	
-	#if time_since_dash < 0.5:
-		#self.velocity.x = move_toward(velocity.x, v.x * DASH_SPEED, DASH_SPEED)
-		#self.velocity.y = move_toward(velocity.y, v.y * DASH_SPEED, DASH_SPEED)
-	#else:
-		#self.velocity.x = move_toward(velocity.x, v.x * SPEED, FRICTION)
-		#self.velocity.y = move_toward(velocity.y, v.y * SPEED, FRICTION)
 	
 	if time_since_dash >= DASH_DURATION:
 		self.velocity.x = min(self.velocity.x, v.x * SPEED)

@@ -2,58 +2,49 @@ extends CharacterBody2D
 
 
 #const SPEED: float = 500.0
-const SPEED: float = 1000.0
-const JUMP_VELOCITY: float = -400.0
+var SPEED: float = 1000.0
+var FRICTION: float = SPEED / 10 # Dictates how fast the player accelerates. Usually going to be SPEED / 10 but might change if player is on different surfaces
 
 
-@onready var anim = get_node("AnimatedSprite2D")
+@onready var sprite = get_node("AnimatedSprite2D")
+@onready var gun = get_node("Gun")
 @onready var camera = get_node("Camera2D")
+var time_since_dash: float
 
 func _ready():
-	anim.play("Idle")
+	pass
 
 func _physics_process(delta):
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	#
-	#var x_direction: int = Input.get_axis("ui_left", "ui_right")
-	#if x_direction:
-#
-		#velocity.x = move_toward(velocity.x, x_direction * SPEED, SPEED / 5)
-		#if x_direction == 1:
-			#anim.flip_h = false
-		#elif x_direction == -1:
-			#anim.flip_h = true
-	#else:
-		#velocity.x = move_toward(velocity.x, 0, SPEED / 10)
-	#
-	#var y_direction: int = Input.get_axis("ui_up", "ui_down") 
-	#if y_direction:
-		#velocity.y = move_toward(velocity.y, y_direction * SPEED, SPEED / 5)
-	#else:
-		#velocity.y = move_toward(velocity.y, 0, SPEED / 10)
-	#
-	#if x_direction or y_direction:
-		#anim.play("Run")
-	#else:
-		#anim.play("Idle")
-
-	var v: Vector2 = Vector2(Input.get_axis("ui_left", "ui_right"), Input.get_axis("ui_up", "ui_down")).normalized()
-	if v.x > 0:
-		anim.flip_h = false
-	elif v.x < 0:
-		anim.flip_h = true
+	
+	var global_mouse_pos: Vector2 = get_global_mouse_position()
+	gun.look_at(global_mouse_pos)
+	
+	if global_mouse_pos.x > self.position.x:
+		sprite.flip_h = false
+		gun.flip_h = false
+		gun.position = Vector2(10, 0)
+		gun.rotation_degrees += 45
+	elif global_mouse_pos.x < self.position.x:
+		sprite.flip_h = true
+		gun.flip_h = true
+		gun.position = Vector2(-10, 0)
+		gun.rotation_degrees += 135
+	
+	
+	var v: Vector2 = Vector2(int(Input.is_action_pressed("move_left")) * -1 + int(Input.is_action_pressed("move_right")), -1 * int(Input.is_action_pressed("move_up")) + int(Input.is_action_pressed("move_down")))
+	v = v.normalized() # makes it so that strafing is not faster
+	
 	if v: 
-		anim.play("Run")
+		sprite.play("Run")
 	else:
-		anim.play("Idle")
+		sprite.play("Idle")
 		
-	velocity.x = move_toward(velocity.x, v.x * SPEED, SPEED / 10)
-	velocity.y = move_toward(velocity.y, v.y * SPEED, SPEED / 10)
+	self.velocity.x = move_toward(velocity.x, v.x * SPEED, FRICTION)
+	self.velocity.y = move_toward(velocity.y, v.y * SPEED, FRICTION)
 
 	move_and_slide()
 
-func _unhandled_input(event):
+func _unhandled_input(event): # temporary keybinds to zoom in and out using P and O
 	if event is InputEventKey:
 		if event.pressed and event.keycode == KEY_P:
 			camera.zoom += Vector2(0.1, 0.1)

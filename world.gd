@@ -2,13 +2,16 @@ extends Node2D
 
 const NUMBER_OF_ROOMS_GENERATED: int = 50
 #const NUMBER_OF_ROOMS_GENERATED: int = 2
-const SPACE_BETWEEN_ROOMS: int = 1000
+const SPACE_BETWEEN_ROOMS: int = 5000
 const PERCENTAGE_OF_MAIN_ROOMS: float = 0.3
 #const PERCENTAGE_OF_MAIN_ROOMS: float = 1
+const ROOM_SIZE_MIN: int = 300 * 1.5
+const ROOM_SIZE_MAX: int = 1500 * 1.5
 const NORMAL_ROOM: int = 1
 const BOSS_ROOM: int = 2
 const LOOT_ROOM: int = 3
 const STARTING_ROOM: int = 4
+
 
 var rng = RandomNumberGenerator.new()
 
@@ -279,6 +282,7 @@ class CustomAStar:
 	func _estimate_cost(from_id, to_id):
 		return self._compute_cost(from_id, to_id)
 
+@onready var player = get_node("Player")
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var starting_time: int = Time.get_ticks_msec()
@@ -297,8 +301,8 @@ func _generate_dungeon() -> bool:
 	# Create Rooms
 	
 	for i in range(NUMBER_OF_ROOMS_GENERATED):
-		var width : int = rng.randi_range(200, 1000) * 1.5
-		var height : int = rng.randi_range(200, 1000) * 1.5
+		var width : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
+		var height : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var x_pos: int = rng.randi_range(-100, 100)
 		var y_pos: int = rng.randi_range(-100, 100)
 		rooms.append(Room.new(width, height, x_pos, y_pos))
@@ -407,6 +411,7 @@ func _generate_dungeon() -> bool:
 				hallways[-1]._create_path(rng.randi_range(300, 500), direction)
 				hallways[-1]._create_collision_polygon()
 				if hallways[-1].has_overlapping_areas():
+					print("HALLWAY COLLISION")
 					return false
 	
 	_create_room_nodes([], main_rooms, mst_path)

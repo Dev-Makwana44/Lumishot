@@ -2,7 +2,6 @@ extends Node2D
 
 const NUMBER_OF_ROOMS_GENERATED: int = 50
 #const NUMBER_OF_ROOMS_GENERATED: int = 2
-const SPACE_BETWEEN_ROOMS: int = 5000
 const PERCENTAGE_OF_MAIN_ROOMS: float = 0.3
 #const PERCENTAGE_OF_MAIN_ROOMS: float = 1
 const ROOM_SIZE_MIN: int = 300 * 1.5
@@ -14,263 +13,6 @@ const STARTING_ROOM: int = 4
 
 
 var rng = RandomNumberGenerator.new()
-
-class Room extends Area2D:
-	var size: Vector2
-	var room_type: int
-	#var room_connection_locations: Array[bool]
-	
-	func _init(width: int, height: int, x_pos: int, y_pos: int):
-		self.size = Vector2(width, height)
-		self.position = Vector2(x_pos, y_pos)
-		self.room_type = NORMAL_ROOM
-		var collision_box: CollisionShape2D = CollisionShape2D.new()
-		collision_box.shape = RectangleShape2D.new()
-		collision_box.shape.size = self.size
-		self.add_child(collision_box)
-		#self.room_connection_locations = [false, false, false, false]
-		
-	func _get_center():
-		return Vector2(self.position.x + (0.5 * self.size.x), self.position.y + (0.5 * self.size.y))
-	
-	func _is_too_close(other: Room):
-		if Rect2(self.position, self.size).intersects(Rect2(other.position, other.size)):
-			return true
-		var left: bool = other.position.x + other.size.x < self.position.x
-		var right: bool = self.position.x + self.size.x < other.position.x
-		var bottom: bool = other.position.y + other.size.y < self.position.y
-		var top: bool = self.position.y + self.size.y < other.position.y
-		var dist: float
-		if top and left:
-			dist = (Vector2(self.position.x, self.position.y + self.size.y) - Vector2(other.position.x + other.size.x, other.position.y)).length()
-		elif left and bottom:
-			dist = (Vector2(self.position.x, self.position.y) - Vector2(other.position.x + other.size.x, other.position.y + other.size.y)).length()
-		elif right and bottom:
-			dist = (Vector2(self.position.x + self.size.x, self.position.y) - Vector2(other.position.x, other.position.y + other.size.y)).length()
-		elif right and top:
-			dist = (Vector2(self.position.x + self.size.x, self.position.y + self.size.y) - Vector2(other.position.x, other.position.y)).length()
-		elif left:
-			dist = self.position.x - (other.position.x + other.size.x)
-		elif right:
-			dist = other.position.x - (self.position.x + self.size.x)
-		elif bottom:
-			dist = self.position.y - (other.position.y + other.size.y)
-		elif top:
-			dist = other.position.y - (self.position.y + self.size.y)
-		else:
-			print("ERROR: Room._is_too_close()")
-		return dist < SPACE_BETWEEN_ROOMS
-
-class Hallway extends Area2D:
-	const RIGHT: int = 0
-	const UP: int = 1
-	const LEFT: int = 2
-	const DOWN: int = 3
-	
-	var a: Room
-	var b: Room
-	var lines: Array
-	
-	func _init(a: Room, b: Room) -> void: # from a to b
-		self.a = a
-		self.b = b
-		#self.a.room_connection_locations[direction] = true
-		self.lines = []
-		#self._create_path(line_width, direction)
-	
-	func _create_path(line_width: int, starting_direction: int) -> void:
-		if starting_direction % 2 == 0: # starts horizontal
-			var overlap: int = self._overlap(a.position.y, a.position.y + a.size.y, b.position.y, b.position.y + b.size.y)
-			if overlap >= line_width:
-				var line_node: Line2D = Line2D.new()
-				line_node.default_color = Color.BLACK
-				line_node.width = line_width
-				line_node.z_index = 2
-				if b._get_center().y < a._get_center().y:
-					if starting_direction == LEFT:
-						line_node.points = PackedVector2Array([Vector2(a.position.x, b.position.y + b.size.y - overlap / 2), Vector2(b.position.x + b.size.x, b.position.y + b.size.y - overlap / 2)])
-					else:
-						line_node.points = PackedVector2Array([Vector2(a.position.x + a.size.x, b.position.y + b.size.y - overlap / 2), Vector2(b.position.x, b.position.y + b.size.y - overlap / 2)])
-				else:
-					if starting_direction == LEFT:
-						line_node.points = PackedVector2Array([Vector2(a.position.x, a.position.y + a.size.y - overlap / 2), Vector2(b.position.x + b.size.x, a.position.y + a.size.y - overlap / 2)])
-					else:
-						line_node.points = PackedVector2Array([Vector2(a.position.x + a.size.x, a.position.y + a.size.y - overlap / 2), Vector2(b.position.x, a.position.y + a.size.y - overlap / 2)])
-				lines.append(line_node)
-			else: # has to turn
-				var line_node: Line2D = Line2D.new()
-				line_node.default_color = Color.BLACK
-				line_node.width = line_width
-				line_node.z_index = 2
-				var second_line_node: Line2D = Line2D.new()
-				second_line_node.default_color = Color.BLACK
-				second_line_node.width = line_width
-				second_line_node.z_index = 2
-				if starting_direction == LEFT:
-					line_node.points = PackedVector2Array([Vector2(a.position.x, a.position.y + a.size.y / 2), Vector2(b._get_center().x - line_width / 2, a.position.y + a.size.y / 2)])
-					second_line_node.points = PackedVector2Array([line_node.points[1] + Vector2(line_width / 2, line_width / 2), Vector2(b._get_center().x, b.position.y if b._get_center().y > a._get_center().y else b.position.y + b.size.y)])
-				else:
-					line_node.points = PackedVector2Array([Vector2(a.position.x + a.size.x, a.position.y + a.size.y / 2), Vector2(b._get_center().x + line_width / 2, a.position.y + a.size.y / 2)])
-					second_line_node.points = PackedVector2Array([line_node.points[1] - Vector2(line_width / 2, line_width / 2), Vector2(b._get_center().x, b.position.y if b._get_center().y > a._get_center().y else b.position.y + b.size.y)])
-				lines.append(line_node)
-				lines.append(second_line_node)
-		else:
-			var overlap: int = self._overlap(a.position.x, a.position.x + a.size.x, b.position.x, b.position.x + b.size.x)
-			if overlap >= line_width:
-				var line_node: Line2D = Line2D.new()
-				line_node.default_color = Color.BLACK
-				line_node.width = line_width
-				line_node.z_index = 2
-				if b._get_center().x < a._get_center().x:
-					if starting_direction == DOWN:
-						line_node.points = PackedVector2Array([Vector2(b.position.x + b.size.x - overlap / 2, a.position.y + a.size.y), Vector2(b.position.x + b.size.x - overlap / 2, b.position.y)])
-					else:
-						line_node.points = PackedVector2Array([Vector2(b.position.x + b.size.x - overlap / 2, a.position.y), Vector2(b.position.x + b.size.x - overlap / 2, b.position.y + b.size.y)])
-				else:
-					if starting_direction == DOWN:
-						line_node.points = PackedVector2Array([Vector2(a.position.x + a.size.x - overlap / 2, a.position.y + a.size.y), Vector2(a.position.x + a.size.x - overlap / 2, b.position.y)])
-					else:
-						line_node.points = PackedVector2Array([Vector2(a.position.x + a.size.x - overlap / 2, a.position.y), Vector2(a.position.x + a.size.x - overlap / 2, b.position.y + b.size.y)])
-				lines.append(line_node)
-			else:
-				var line_node: Line2D = Line2D.new()
-				line_node.default_color = Color.BLACK
-				line_node.width = line_width
-				line_node.z_index = 2
-				var second_line_node: Line2D = Line2D.new()
-				second_line_node.default_color = Color.BLACK
-				second_line_node.width = line_width
-				second_line_node.z_index = 3
-				if starting_direction == DOWN:
-					line_node.points = PackedVector2Array([Vector2(a.position.x + a.size.x / 2, a.position.y + a.size.y), Vector2(a.position.x + a.size.x / 2, b.position.y + b.size.y / 2 + line_width / 2)])
-					second_line_node.points = PackedVector2Array([line_node.points[1] - Vector2(line_width / 2 * (-1 if b.position.x < a.position.x else 1), line_width / 2), Vector2(b.position.x if b.position.x > a.position.x else b.position.x + b.size.x, b.position.y + b.size.y / 2)])
-				else:
-					line_node.points = PackedVector2Array([Vector2(a.position.x + a.size.x / 2, a.position.y), Vector2(a.position.x + a.size.x / 2, b.position.y + b.size.y / 2 - line_width / 2)])
-					second_line_node.points = PackedVector2Array([line_node.points[1] + Vector2(line_width / 2 * (-1 if b.position.x > a.position.x else 1), line_width / 2), Vector2(b.position.x if b.position.x > a.position.x else b.position.x + b.size.x, b.position.y + b.size.y / 2)])
-				lines.append(line_node)
-				lines.append(second_line_node)
-	
-	func _create_collision_polygon():
-		var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
-		var right_points: PackedVector2Array = self._get_right_points()
-		right_points.reverse()
-		collision_polygon.set_polygon(self._get_left_points() + right_points)
-		self.add_child(collision_polygon)
-		var temp: Line2D = Line2D.new()
-		temp.default_color = Color.DARK_GOLDENROD
-		temp.width = 100
-		temp.z_index = 6
-		temp.points = collision_polygon.polygon
-		return temp
-	
-	func _overlap(min1, max1, min2, max2):
-		return max(0, min(max1, max2) - max(min1, min2))
-	
-	func _get_left_points() -> PackedVector2Array:
-		if len(self.lines) == 1:
-			var angle = self.lines[0].points[0].angle_to_point(self.lines[0].points[1])
-			if angle < 0:
-				angle += 2 * PI
-			angle = 2 * PI - angle
-			var direction: int = snapped(angle / (PI / 2), 1) % 4
-			
-			var vec: Vector2
-			if direction == UP:
-				vec = Vector2(-self.lines[0].width / 2, 0)
-			elif direction == DOWN:
-				vec = Vector2(self.lines[0].width / 2, 0)
-			elif direction == LEFT:
-				vec = Vector2(0, self.lines[0].width / 2)
-			else:
-				vec = Vector2(0, -self.lines[0].width / 2)
-			return PackedVector2Array([self.lines[0].points[0] + vec, self.lines[0].points[1] + vec])
-
-		else:
-			var angle = self.lines[0].points[0].angle_to_point(self.lines[0].points[1])
-			if angle < 0:
-				angle += 2 * PI
-			angle = 2 * PI - angle
-			var direction1: int = snapped(angle / (PI / 2), 1) % 4
-			
-			angle = self.lines[1].points[0].angle_to_point(self.lines[1].points[1])
-			if angle < 0:
-				angle += 2 * PI
-			angle = 2 * PI - angle
-			var direction2: int = snapped(angle / (PI / 2), 1) % 4
-			
-
-			if direction1 == LEFT and direction2 == UP:
-				return PackedVector2Array([(self.lines[0].points[0] + Vector2(0, self.lines[0].width / 2)), (self.lines[0].points[1] + Vector2(0, self.lines[0].width / 2)), (self.lines[1].points[1] - Vector2(self.lines[1].width / 2, 0))])
-			elif direction1 == LEFT and direction2 == DOWN:
-				return PackedVector2Array([(self.lines[0].points[0] + Vector2(0, self.lines[0].width / 2)), (self.lines[0].points[1] + Vector2(self.lines[0].width, self.lines[0].width / 2)), (self.lines[1].points[1] + Vector2(self.lines[1].width / 2, 0))])
-			elif direction1 == RIGHT and direction2 == UP:
-				return PackedVector2Array([(self.lines[0].points[0] - Vector2(0, self.lines[0].width / 2)), (self.lines[0].points[1] - Vector2(self.lines[0].width, self.lines[0].width / 2)), (self.lines[1].points[1] - Vector2(self.lines[1].width / 2, 0))])
-			elif direction1 == RIGHT and direction2 == DOWN:
-				return PackedVector2Array([(self.lines[0].points[0] - Vector2(0, self.lines[0].width / 2)), (self.lines[0].points[1] - Vector2(0, self.lines[0].width / 2)), (self.lines[1].points[1] + Vector2(self.lines[1].width / 2, 0))])
-			elif direction1 == UP and direction2 == LEFT:
-				return PackedVector2Array([(self.lines[0].points[0] - Vector2(self.lines[0].width / 2, 0)), (self.lines[0].points[1] - Vector2(self.lines[0].width / 2, -self.lines[0].width)), (self.lines[1].points[1] + Vector2(0, self.lines[1].width / 2))])
-			elif direction1 == UP and direction2 == RIGHT:
-				return PackedVector2Array([(self.lines[0].points[0] - Vector2(self.lines[0].width / 2, 0)), (self.lines[0].points[1] - Vector2(self.lines[0].width / 2, 0)), (self.lines[1].points[1] - Vector2(0, self.lines[1].width / 2))])
-			elif direction1 == DOWN and direction2 == LEFT:
-				return PackedVector2Array([(self.lines[0].points[0] + Vector2(self.lines[0].width / 2, 0)), (self.lines[0].points[1] + Vector2(self.lines[0].width / 2, 0)), (self.lines[1].points[1] + Vector2(0, self.lines[1].width / 2))])
-			else: #down1 and right2
-				return PackedVector2Array([(self.lines[0].points[0] + Vector2(self.lines[0].width / 2, 0)), (self.lines[0].points[1] + Vector2(self.lines[0].width / 2, -self.lines[0].width)), (self.lines[1].points[1] - Vector2(0, self.lines[1].width / 2))])
-
-	
-	func _get_right_points() -> PackedVector2Array:
-		if len(self.lines) == 1:
-			var angle = self.lines[0].points[0].angle_to_point(self.lines[0].points[1])
-			if angle < 0:
-				angle += 2 * PI
-			angle = 2 * PI - angle
-			var direction: int = snapped(angle / (PI / 2), 1) % 4
-			
-			var vec: Vector2
-			if direction == UP:
-				vec = Vector2(self.lines[0].width / 2, 0)
-			elif direction == DOWN:
-				vec = Vector2(-self.lines[0].width / 2, 0)
-			elif direction == LEFT:
-				vec = Vector2(0, -self.lines[0].width / 2)
-			else:
-				vec = Vector2(0, self.lines[0].width / 2)
-			return PackedVector2Array([self.lines[0].points[0] + vec, self.lines[0].points[1] + vec])
-		else:
-			var angle = self.lines[0].points[0].angle_to_point(self.lines[0].points[1])
-			if angle < 0:
-				angle += 2 * PI
-			angle = 2 * PI - angle
-			var direction1: int = snapped(angle / (PI / 2), 1) % 4
-			
-			angle = self.lines[1].points[0].angle_to_point(self.lines[1].points[1])
-			if angle < 0:
-				angle += 2 * PI
-			angle = 2 * PI - angle
-			var direction2: int = snapped(angle / (PI / 2), 1) % 4
-			#var dct = {}
-			#dct[0] = "RIGHT"
-			#dct[1] = "UP"
-			#dct[2] = "LEFT"
-			#dct[3] = "DOWN"
-			#print(dct[direction1])
-			#print(dct[direction2])
-			
-			if direction1 == LEFT and direction2 == UP:
-				return PackedVector2Array([(self.lines[0].points[0] - Vector2(0, self.lines[0].width / 2)), (self.lines[0].points[1] + Vector2(self.lines[0].width, -self.lines[0].width / 2)), (self.lines[1].points[1] + Vector2(self.lines[1].width / 2, 0))])
-			elif direction1 == LEFT and direction2 == DOWN:
-				return PackedVector2Array([Vector2(self.lines[0].points[0] - Vector2(0, self.lines[0].width / 2)), Vector2(self.lines[0].points[1] - Vector2(0, self.lines[0].width / 2)), Vector2(self.lines[1].points[1] - Vector2(self.lines[1].width / 2, 0))])
-			elif direction1 == RIGHT and direction2 == UP:
-				return PackedVector2Array([Vector2(self.lines[0].points[0] + Vector2(0, self.lines[0].width / 2)), Vector2(self.lines[0].points[1] + Vector2(0, self.lines[0].width / 2)), Vector2(self.lines[1].points[1] + Vector2(self.lines[1].width / 2, 0))])
-			elif direction1 == RIGHT and direction2 == DOWN:
-				return PackedVector2Array([Vector2(self.lines[0].points[0] + Vector2(0, self.lines[0].width / 2)), Vector2(self.lines[0].points[1] - Vector2(self.lines[0].width, -self.lines[0].width / 2)), Vector2(self.lines[1].points[1] - Vector2(self.lines[1].width / 2, 0))])
-			elif direction1 == UP and direction2 == LEFT:
-				return PackedVector2Array([Vector2(self.lines[0].points[0] + Vector2(self.lines[0].width / 2, 0)), Vector2(self.lines[0].points[1] + Vector2(self.lines[0].width / 2, 0)), Vector2(self.lines[1].points[1] - Vector2(0, self.lines[1].width / 2))])
-			elif direction1 == UP and direction2 == RIGHT:
-				return PackedVector2Array([Vector2(self.lines[0].points[0] + Vector2(self.lines[0].width / 2, 0)), Vector2(self.lines[0].points[1] + Vector2(self.lines[0].width / 2, self.lines[0].width)), Vector2(self.lines[1].points[1] + Vector2(0, self.lines[1].width /2))])
-			elif direction1 == DOWN and direction2 == LEFT:
-				return PackedVector2Array([Vector2(self.lines[0].points[0] - Vector2(self.lines[0].width / 2, 0)), Vector2(self.lines[0].points[1] - Vector2(self.lines[0].width / 2, self.lines[0].width)), Vector2(self.lines[1].points[1] - Vector2(0, self.lines[1].width / 2))])
-			else: #down1 and right2
-				return PackedVector2Array([Vector2(self.lines[0].points[0] - Vector2(self.lines[0].width / 2, 0)), Vector2(self.lines[0].points[1] - Vector2(self.lines[0].width / 2, 0)), Vector2(self.lines[1].points[1] + Vector2(0, self.lines[1].width / 2))])
 
 class CustomAStar:
 	extends AStar2D
@@ -284,11 +26,14 @@ class CustomAStar:
 
 var hallways: Array[Hallway] = []
 @onready var player = get_node("Player")
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	var starting_time: int = Time.get_ticks_msec()
-	while not _generate_dungeon():
-		print("Restarting dungeon generation process")
+	#while not _generate_dungeon():
+		#print("Restarting dungeon generation process")
+	while true:
+		print("generating dungeon")
+		if _generate_dungeon():
+			break
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
 	#var times: Array[int] = []
 	
@@ -412,18 +157,28 @@ func _generate_dungeon() -> bool:
 					room_connections[direction].append(connected_room)
 				hallway_connections[[room, connected_room]] = true
 		for direction: int in range(len(room_connections)):
+			if len(room_connections[direction]) > 1:
+				return false
 			if room_connections[direction]:
 				hallways.append(Hallway.new(room, room_connections[direction][0]))
-				hallways[-1]._create_path(rng.randi_range(300, 500), direction)
-				hallways[-1]._create_collision_polygon()
+				if not hallways[-1]._create_path(rng.randi_range(300, 500), direction):
+					return false
+				var temp = hallways[-1]._create_collision_polygon()
+				var polygon: Polygon2D = Polygon2D.new()
+				polygon.polygon = temp.points
+				#add_child(polygon)
 				if hallways[-1].has_overlapping_areas():
 					print("HALLWAY COLLISION")
 					return false
-	
+	var starting_room_chosen: bool = false
 	for room in main_rooms:
 		if room.room_type == STARTING_ROOM:
-			player.position = room._get_center()
-			break
+			if not starting_room_chosen:
+				player.position = room._get_center()
+				starting_room_chosen = true
+				break
+			else:
+				room.room_type = LOOT_ROOM
 	
 	for i in range(5):
 		var collectable = load("res://Collectables/collectable.tscn")
@@ -434,7 +189,7 @@ func _generate_dungeon() -> bool:
 	_create_room_nodes([], main_rooms, mst_path)
 	#_draw_mst(mst_path)
 	_draw_hallways(hallways)
-	_draw_hallway_walls(hallways)
+	#_draw_hallway_walls(hallways)
 	return true
 
 func _create_room_nodes(rooms: Array[Room], main_rooms: Array[Room], path: AStar2D) -> void:
@@ -445,8 +200,6 @@ func _create_room_nodes(rooms: Array[Room], main_rooms: Array[Room], path: AStar
 		room_node.position.x = room.position.x
 		room_node.position.y = room.position.y
 		add_child(room_node)
-	
-	var final_position: Vector2 = path.get_point_position(path.get_point_ids()[-1])
 	
 	for room in main_rooms:
 		var room_node = ColorRect.new()
@@ -478,40 +231,35 @@ func _draw_mst(path: CustomAStar) -> void:
 			add_child(line_node)
 
 func _draw_hallways(hallways: Array[Hallway]) -> void:
-	#var number_of_lines: int = 0
 	for hallway: Hallway in hallways:
 		for line_node: Line2D in hallway.lines:
 			add_child(line_node)
-			#number_of_lines += 1
-	#print("Number of hallways: " + str(number_of_lines))
 
 func _draw_hallway_walls(hallways: Array[Hallway]) -> void:
 	for hallway: Hallway in hallways:
 		var left_line_node: Line2D = Line2D.new()
-		left_line_node.default_color = Color.BROWN
+		left_line_node.default_color = Color.DIM_GRAY
 		left_line_node.width = 100
 		left_line_node.z_index = 5
 		left_line_node.points = hallway._get_left_points()
 		add_child(left_line_node)
 		var right_line_node: Line2D = Line2D.new()
-		right_line_node.default_color = Color.WHITE
+		right_line_node.default_color = Color.DIM_GRAY
 		right_line_node.width = 100
 		right_line_node.z_index = 5
 		right_line_node.points = hallway._get_right_points()
 		add_child(right_line_node)
-		#var temp: Line2D = Line2D.new()
-		#temp.default_color = Color.DARK_GOLDENROD
-		#temp.width = 100
-		#temp.z_index = 6
-		#var right = hallway._get_right_points()
-		#right.reverse()
-		#temp.points = hallway._get_left_points() + right
-		#add_child(temp)
+		
+		#var polygon_node: Polygon2D = Polygon2D.new()
+		#var left_points = hallway._get_left_points()
+		#var right_points = hallway._get_right_points()
+		#right_points.reverse()
+		#polygon_node.polygon = left_points +  right_points
+		#add_child(polygon_node)
 
 func _room_comparison(a: Room, b: Room) -> bool:
 	return a.size.x * a.size.y < b.size.x * b.size.y
 
-#func _create_mst(rooms: Array[Vector2]) -> CustomAStar:
 func _create_mst(rooms: Array) -> CustomAStar:
 	# Prim's algorithm
 	var path: CustomAStar = CustomAStar.new()

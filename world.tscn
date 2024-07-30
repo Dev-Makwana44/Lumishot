@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://ccyqf1eriwngl"]
+[gd_scene load_steps=7 format=3 uid="uid://ccyqf1eriwngl"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_1yueh"]
 [ext_resource type="PackedScene" uid="uid://cakxa05kasxk6" path="res://Player/Player.tscn" id="1_07yc4"]
 [ext_resource type="Script" path="res://UI_Container.gd" id="3_f8rko"]
 [ext_resource type="PackedScene" uid="uid://7oirikrk8nwi" path="res://UI/inventory_ui.tscn" id="3_vikf4"]
 [ext_resource type="PackedScene" uid="uid://qohoq64bw08u" path="res://UI/inventory_slot.tscn" id="5_2vdhg"]
+[ext_resource type="PackedScene" uid="uid://bpuxf3x1nl4qm" path="res://UI/crafting_ui.tscn" id="6_8mgjt"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_1yueh")
@@ -16,7 +17,7 @@ position = Vector2(172, 184)
 script = ExtResource("3_f8rko")
 
 [node name="Inventory_UI" parent="UI_Container" instance=ExtResource("3_vikf4")]
-unique_name_in_owner = true
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -29,3 +30,6 @@ offset_bottom = 84.0
 grow_horizontal = 2
 grow_vertical = 2
 inventory_slot = ExtResource("5_2vdhg")
+
+[node name="Crafting UI" parent="UI_Container" instance=ExtResource("6_8mgjt")]
+unique_name_in_owner = true

@@ -1,0 +1,128 @@
+[gd_scene load_steps=6 format=3 uid="uid://bpuxf3x1nl4qm"]
+
+[ext_resource type="Script" path="res://UI/crafting_ui.gd" id="1_7a5ht"]
+[ext_resource type="PackedScene" uid="uid://qohoq64bw08u" path="res://UI/inventory_slot.tscn" id="2_b101h"]
+[ext_resource type="Texture2D" uid="uid://c2wpw66kf1i2q" path="res://Resources/Images/Question Mark.png" id="3_2yemq"]
+[ext_resource type="Resource" uid="uid://3y4vwnypm3xt" path="res://Resources/recipes/HealthPotionRecipe.tres" id="3_nw3s1"]
+[ext_resource type="Resource" uid="uid://c05cx04vqctlu" path="res://Resources/recipes/EnergyBoostPotionRecipe.tres" id="3_y0yfh"]
+
+[node name="Crafting UI" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7a5ht")
+recipe_array = Array[Resource("res://Resources/recipes/ItemRecipe.gd")]([ExtResource("3_nw3s1"), ExtResource("3_y0yfh")])
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 2
+color = Color(0.262932, 0.262932, 0.262932, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Player Inventory BVox" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Player Inventory BVox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Inventory"
+horizontal_alignment = 1
+
+[node name="InventoryTree" type="Tree" parent="MarginContainer/HBoxContainer/Player Inventory BVox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+columns = 3
+
+[node name="Crafting Area" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/HBoxContainer/Crafting Area"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemTexture" type="TextureRect" parent="MarginContainer/HBoxContainer/Crafting Area"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(132, 132)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+texture = ExtResource("3_2yemq")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/HBoxContainer/Crafting Area"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/Crafting Area/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+theme_override_constants/h_separation = 100
+columns = 8
+
+[node name="CraftingSlot1" parent="MarginContainer/HBoxContainer/Crafting Area/ScrollContainer/GridContainer" instance=ExtResource("2_b101h")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CraftingSlot2" parent="MarginContainer/HBoxContainer/Crafting Area/ScrollContainer/GridContainer" instance=ExtResource("2_b101h")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CraftingSlot3" parent="MarginContainer/HBoxContainer/Crafting Area/ScrollContainer/GridContainer" instance=ExtResource("2_b101h")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Crafting Area"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Try different combinations, or select a learned recipe to craft.
+Order does not matter.
+Bullets are crafted in batches of 30."
+horizontal_alignment = 1
+
+[node name="CraftButton" type="Button" parent="MarginContainer/HBoxContainer/Crafting Area"]
+custom_minimum_size = Vector2(264, 64)
+layout_mode = 2
+text = "Craft"
+
+[node name="Recipes List" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Recipes List"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Recipes"
+horizontal_alignment = 1
+
+[node name="RecipeTree" type="Tree" parent="MarginContainer/HBoxContainer/Recipes List"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+columns = 3
+
+[connection signal="item_selected" from="MarginContainer/HBoxContainer/Player Inventory BVox/InventoryTree" to="." method="_on_inventory_tree_item_selected"]
+[connection signal="gui_input" from="MarginContainer/HBoxContainer/Crafting Area" to="." method="_on_crafting_area_gui_input"]
+[connection signal="gui_input" from="MarginContainer/HBoxContainer/Crafting Area/ScrollContainer/GridContainer/CraftingSlot1" to="." method="_on_crafting_slot_1_gui_input"]
+[connection signal="gui_input" from="MarginContainer/HBoxContainer/Crafting Area/ScrollContainer/GridContainer/CraftingSlot2" to="." method="_on_crafting_slot_2_gui_input"]
+[connection signal="gui_input" from="MarginContainer/HBoxContainer/Crafting Area/ScrollContainer/GridContainer/CraftingSlot3" to="." method="_on_crafting_slot_3_gui_input"]
+[connection signal="button_down" from="MarginContainer/HBoxContainer/Crafting Area/CraftButton" to="." method="_on_craft_button_button_down"]
+[connection signal="item_selected" from="MarginContainer/HBoxContainer/Recipes List/RecipeTree" to="." method="_on_recipe_tree_item_selected"]

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ex27hm7r024f"
-path="res://.godot/imported/Purple Vial.png-a8b4d3b24a095229f869fa13806e296d.ctex"
+uid="uid://clypwxtr0g5df"
+path="res://.godot/imported/Health Potion.png-b8467e9da35a2a4d984d2bd08423027d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Purple Vial.png"
-dest_files=["res://.godot/imported/Purple Vial.png-a8b4d3b24a095229f869fa13806e296d.ctex"]
+source_file="res://Resources/Images/Health Potion.png"
+dest_files=["res://.godot/imported/Health Potion.png-b8467e9da35a2a4d984d2bd08423027d.ctex"]
 
 [params]
 

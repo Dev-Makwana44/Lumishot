@@ -1,13 +1,17 @@
 extends CanvasLayer
 
-@onready var inventory_ui: InventoryUI = %Inventory_UI
+@onready var crafting_ui: Crafting_UI = %"Crafting UI"
 @onready var player: Player = $"../Player"
 
-func _unhandled_input(event) -> void:
+func _process(delta):
 	if Input.is_action_just_pressed("open_inventory"):
-		if not inventory_ui.visible:
-			inventory_ui.show()
-			inventory_ui.populate_inventory(player.inventory)
+		if not crafting_ui.visible:
+			player.game_paused = true
+			crafting_ui.show()
+			crafting_ui.inventory = player.inventory
+			crafting_ui.populate_inventory()
 		else:
-			inventory_ui.hide()
-			#inventory_ui.clean_inventory()
+			player.game_paused = false
+			crafting_ui.hide()
+			crafting_ui.clear_crafting_grid()
+			player.inventory = crafting_ui.inventory

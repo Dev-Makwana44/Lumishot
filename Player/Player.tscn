@@ -70,7 +70,6 @@ sprite_frames = SubResource("SpriteFrames_nk4sr")
 animation = &"Run"
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(0.025, 0.025)
 
 [node name="Gun" type="Sprite2D" parent="."]
 z_index = 1

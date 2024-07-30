@@ -1,9 +1,7 @@
 extends Node2D
 
 const NUMBER_OF_ROOMS_GENERATED: int = 50
-#const NUMBER_OF_ROOMS_GENERATED: int = 2
 const PERCENTAGE_OF_MAIN_ROOMS: float = 0.3
-#const PERCENTAGE_OF_MAIN_ROOMS: float = 1
 const ROOM_SIZE_MIN: int = 300 * 1.5
 const ROOM_SIZE_MAX: int = 1500 * 1.5
 const NORMAL_ROOM: int = 1
@@ -180,11 +178,17 @@ func _generate_dungeon() -> bool:
 			else:
 				room.room_type = LOOT_ROOM
 	
-	for i in range(5):
-		var collectable = load("res://Collectables/collectable.tscn")
+	for i in range(20):
+		var collectable: Resource = load("res://Collectables/collectable.tscn")
 		var collectable_instance = collectable.instantiate()
 		collectable_instance.position = player.position + Vector2(100 * (i + 1), 0)
 		add_child(collectable_instance)
+		if i % 3 == 0:
+			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Bioluminescent_Bacteria.tres"))
+		elif i % 3 == 1:
+			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Mutated_Blood.tres"))
+		else:
+			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Rabbit_Foot.tres"))
 	
 	_create_room_nodes([], main_rooms, mst_path)
 	#_draw_mst(mst_path)

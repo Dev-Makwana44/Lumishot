@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://6h76ecnym48w"]
+
+[ext_resource type="Texture2D" uid="uid://crqmo3ch4bsc3" path="res://Resources/Images/Mutated Blood.png" id="1_refxn"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="2_jg3ss"]
+
+[resource]
+script = ExtResource("2_jg3ss")
+item_id = 1
+item_name = "Mutated Blood"
+item_texture = ExtResource("1_refxn")
+item_stack_size = 10
+crafting_batch_size = 1

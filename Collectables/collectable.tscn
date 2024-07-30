@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://b86iap436pqle"]
+[gd_scene load_steps=4 format=3 uid="uid://b86iap436pqle"]
 
 [ext_resource type="Script" path="res://Collectable.gd" id="1_okohp"]
-[ext_resource type="Resource" uid="uid://6h76ecnym48w" path="res://Resources/Items/HealthPotion.tres" id="2_b606h"]
-[ext_resource type="Texture2D" uid="uid://ex27hm7r024f" path="res://Purple Vial.png" id="2_ck8on"]
+[ext_resource type="Texture2D" uid="uid://crqmo3ch4bsc3" path="res://Resources/Images/Mutated Blood.png" id="2_g6ria"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yss58"]
 radius = 7.07107
@@ -11,10 +10,9 @@ radius = 7.07107
 z_index = 9
 scale = Vector2(2, 2)
 script = ExtResource("1_okohp")
-collectable_data = ExtResource("2_b606h")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_ck8on")
+texture = ExtResource("2_g6ria")
 
 [node name="Area2D" type="Area2D" parent="."]
 

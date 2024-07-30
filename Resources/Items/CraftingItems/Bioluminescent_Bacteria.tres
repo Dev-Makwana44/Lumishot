@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://b21t6olc1i4vc"]
+
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_1nrrc"]
+[ext_resource type="Texture2D" uid="uid://d0pfccd7wp6l2" path="res://Resources/Images/Bioluminescent Bacteria.png" id="1_64h5e"]
+
+[resource]
+script = ExtResource("1_1nrrc")
+item_id = 2
+item_name = "Bioluminescent Bacteria"
+item_texture = ExtResource("1_64h5e")
+item_stack_size = 10
+crafting_batch_size = 1

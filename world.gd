@@ -9,8 +9,11 @@ const BOSS_ROOM: int = 2
 const LOOT_ROOM: int = 3
 const STARTING_ROOM: int = 4
 
+@onready var player: Player = %Player
+@onready var hud: HUD = %HUD
+@onready var ui_container: UI_CONTAINER = %UI_Container
 
-var rng = RandomNumberGenerator.new()
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 class CustomAStar:
 	extends AStar2D
@@ -23,7 +26,6 @@ class CustomAStar:
 		return self._compute_cost(from_id, to_id)
 
 var hallways: Array[Hallway] = []
-@onready var player = get_node("Player")
 func _ready():
 	var starting_time: int = Time.get_ticks_msec()
 	#while not _generate_dungeon():
@@ -36,16 +38,28 @@ func _ready():
 	#var times: Array[int] = []
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-var temp = false
-#func _process(delta):
-	#if Input.is_action_just_pressed("fire_gun") and not temp:
-		#_create_dungeon_borders(rooms, [])
-		#temp = true
-
-func _physics_process(delta):
-	for hallway: Hallway in hallways:
-		if hallway.has_overlapping_areas() or hallway.has_overlapping_bodies():
-			print("COLLISION")
+func _process(delta):
+	
+	for bullet: Bullet in get_tree().get_nodes_in_group("bullets"):
+		if bullet.get_slide_collision_count() > 1:
+			print("Bullet hit wall")
+			bullet.queue_free()
+	
+	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
+		if player.ammo[player.selected_ammo_index] > 0:
+			player.time_since_shooting = 0.0
+			var bullet: Bullet = Bullet.new()
+			self.add_child(bullet)
+			await bullet.is_node_ready()
+			bullet.position = player.position
+			var bullet_path = get_global_mouse_position() - player.position
+			bullet.set_bullet_type(player.selected_ammo_index)
+			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
+			player.ammo[player.selected_ammo_index] -= 1
+			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
+			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
+			if player.ammo[player.selected_ammo_index] == 0:
+				ui_container.select_ammo_up()
 
 var rooms: Array[Room] = []
 func _generate_dungeon() -> bool:
@@ -194,9 +208,7 @@ func _generate_dungeon() -> bool:
 			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Rabbit_Foot.tres"))
 	
 	_create_room_nodes([], main_rooms, mst_path)
-	#_draw_mst(mst_path)
 	_draw_hallways(hallways)
-	#_draw_hallway_walls(hallways)
 	rooms = main_rooms
 	_create_dungeon_borders(main_rooms, hallways)
 	return true
@@ -245,28 +257,6 @@ func _draw_hallways(hallways: Array[Hallway]) -> void:
 	for hallway: Hallway in hallways:
 		for line_node: Line2D in hallway.lines:
 			add_child(line_node)
-
-func _draw_hallway_walls(hallways: Array[Hallway]) -> void:
-	for hallway: Hallway in hallways:
-		var left_line_node: Line2D = Line2D.new()
-		left_line_node.default_color = Color.DIM_GRAY
-		left_line_node.width = 100
-		left_line_node.z_index = 5
-		left_line_node.points = hallway._get_left_points()
-		add_child(left_line_node)
-		var right_line_node: Line2D = Line2D.new()
-		right_line_node.default_color = Color.DIM_GRAY
-		right_line_node.width = 100
-		right_line_node.z_index = 5
-		right_line_node.points = hallway._get_right_points()
-		add_child(right_line_node)
-		
-		#var polygon_node: Polygon2D = Polygon2D.new()
-		#var left_points = hallway._get_left_points()
-		#var right_points = hallway._get_right_points()
-		#right_points.reverse()
-		#polygon_node.polygon = left_points +  right_points
-		#add_child(polygon_node)
 
 func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 	for room: Room in rooms:
@@ -490,3 +480,4 @@ func _create_mst(rooms: Array) -> CustomAStar:
 		path.connect_points(path.get_closest_point(p), n)
 		rooms.erase(min_p)
 	return path
+

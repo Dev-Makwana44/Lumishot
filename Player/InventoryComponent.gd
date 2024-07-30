@@ -13,6 +13,10 @@ func add_item(item: ItemData) -> void:
 		inventory_contents[item] = 1
 
 	#update_inventory_ui.emit()
+
+func add_item_with_amount(item: ItemData, amount: int) -> void:
+	inventory_contents[item] = inventory_contents.get(item, 0) + amount
+
 func add_crafted_item(item: ItemData) -> void:
 	inventory_contents[item] = inventory_contents.get(item, 0) + item.crafting_batch_size
 

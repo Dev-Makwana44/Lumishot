@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_vdi6w")
-item_id = -9
+item_id = -6
 item_name = "Cryo Bullet"
 item_texture = ExtResource("1_v224a")
 item_stack_size = 200

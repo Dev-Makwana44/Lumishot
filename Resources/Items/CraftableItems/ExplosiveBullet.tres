@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_76fbc")
-item_id = -7
+item_id = -9
 item_name = "Explosive Bullet"
 item_texture = ExtResource("1_0cxxo")
 item_stack_size = 200

@@ -11,11 +11,9 @@
 script = ExtResource("1_1yueh")
 
 [node name="Player" parent="." instance=ExtResource("1_07yc4")]
-unique_name_in_owner = true
 position = Vector2(172, 184)
 
 [node name="UI_Container" type="CanvasLayer" parent="."]
-unique_name_in_owner = true
 script = ExtResource("3_f8rko")
 
 [node name="Crafting UI" parent="UI_Container" instance=ExtResource("6_8mgjt")]
@@ -25,4 +23,3 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="HUD" parent="UI_Container" instance=ExtResource("6_2rqlw")]
-unique_name_in_owner = true

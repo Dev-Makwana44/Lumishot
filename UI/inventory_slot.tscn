@@ -25,6 +25,7 @@ offset_bottom = 32.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_yrdtr")
+expand_mode = 1
 
 [node name="StackLabel" type="Label" parent="."]
 unique_name_in_owner = true

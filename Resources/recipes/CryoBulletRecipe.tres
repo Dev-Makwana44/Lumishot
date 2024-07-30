@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=5 format=3 uid="uid://bubx3am3un813"]
+
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_f6wrk"]
+[ext_resource type="Resource" uid="uid://bvwywxdmkimm2" path="res://Resources/Items/CraftableItems/CryoBullet.tres" id="1_hrt35"]
+[ext_resource type="Resource" uid="uid://bboatjhyry42w" path="res://Resources/Items/CraftableItems/Bullet.tres" id="2_oia17"]
+[ext_resource type="Resource" uid="uid://bg51o6osbsle8" path="res://Resources/Items/CraftingItems/Cryo_Cell.tres" id="3_nhuaj"]
+
+[resource]
+script = ExtResource("1_f6wrk")
+recipe_name = "Cryo Bullets"
+recipe_final_item = ExtResource("1_hrt35")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_oia17"), ExtResource("3_nhuaj"), ExtResource("3_nhuaj")])

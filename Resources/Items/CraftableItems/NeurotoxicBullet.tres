@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://bhcacqpfwwga4"]
+
+[ext_resource type="Texture2D" uid="uid://c1ytl6nbcse1d" path="res://Resources/Images/Neurotoxic Bullet.png" id="1_31caq"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="2_ttmac"]
+
+[resource]
+script = ExtResource("2_ttmac")
+item_id = -6
+item_name = "Neurotoxic Bullet"
+item_texture = ExtResource("1_31caq")
+item_stack_size = 200
+crafting_batch_size = 50

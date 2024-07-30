@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://dflsax3wvapns"]
+
+[ext_resource type="Texture2D" uid="uid://jrl0q4bvnnon" path="res://Resources/Images/Combustion Node.png" id="1_m8pel"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_wlvpa"]
+
+[resource]
+script = ExtResource("1_wlvpa")
+item_id = 9
+item_name = "Combustion Node"
+item_texture = ExtResource("1_m8pel")
+item_stack_size = 30
+crafting_batch_size = 1

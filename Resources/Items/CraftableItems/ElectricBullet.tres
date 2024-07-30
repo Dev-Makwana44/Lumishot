@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://cltn7d8udjo4m"]
+
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_3oosr"]
+[ext_resource type="Texture2D" uid="uid://bqvc7xmqehy8a" path="res://Resources/Images/Electric Bullet.png" id="1_r7wfo"]
+
+[resource]
+script = ExtResource("1_3oosr")
+item_id = -8
+item_name = "Electric Bullet"
+item_texture = ExtResource("1_r7wfo")
+item_stack_size = 200
+crafting_batch_size = 50

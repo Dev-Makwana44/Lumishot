@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=6 format=3 uid="uid://mnu4e1ttmubq"]
+
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_lr0cp"]
+[ext_resource type="Resource" uid="uid://cqiok8tbus6ua" path="res://Resources/Items/CraftableItems/Grenade.tres" id="1_ph0jj"]
+[ext_resource type="Resource" uid="uid://bboatjhyry42w" path="res://Resources/Items/CraftableItems/Bullet.tres" id="2_ddiju"]
+[ext_resource type="Resource" uid="uid://biwa4vawh4llk" path="res://Resources/Items/CraftingItems/Heavy_Plate.tres" id="3_qmmpf"]
+[ext_resource type="Resource" uid="uid://dflsax3wvapns" path="res://Resources/Items/CraftingItems/Combustion_Node.tres" id="4_0e7jp"]
+
+[resource]
+script = ExtResource("1_lr0cp")
+recipe_name = "Grenade"
+recipe_final_item = ExtResource("1_ph0jj")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_ddiju"), ExtResource("3_qmmpf"), ExtResource("4_0e7jp")])

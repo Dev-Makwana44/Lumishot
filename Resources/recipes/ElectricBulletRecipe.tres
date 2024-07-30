@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=5 format=3 uid="uid://daq2qapvcvwg8"]
+
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_i47qs"]
+[ext_resource type="Resource" uid="uid://cltn7d8udjo4m" path="res://Resources/Items/CraftableItems/ElectricBullet.tres" id="1_jncld"]
+[ext_resource type="Resource" uid="uid://bboatjhyry42w" path="res://Resources/Items/CraftableItems/Bullet.tres" id="2_h7x8h"]
+[ext_resource type="Resource" uid="uid://bctp1fk1huequ" path="res://Resources/Items/CraftingItems/Electronics.tres" id="3_5pgec"]
+
+[resource]
+script = ExtResource("1_i47qs")
+recipe_name = "Electric Bullets"
+recipe_final_item = ExtResource("1_jncld")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_h7x8h"), ExtResource("3_5pgec"), ExtResource("3_5pgec")])

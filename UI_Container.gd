@@ -2,6 +2,7 @@ extends CanvasLayer
 
 @onready var crafting_ui: Crafting_UI = %"Crafting UI"
 @onready var player: Player = $"../Player"
+@onready var help_menu_ui = %"Help Menu"
 
 func _process(delta):
 	if Input.is_action_just_pressed("open_inventory"):
@@ -15,3 +16,8 @@ func _process(delta):
 			crafting_ui.hide()
 			crafting_ui.clear_crafting_grid()
 			player.inventory = crafting_ui.inventory
+	if Input.is_action_just_pressed("help"):
+		if not help_menu_ui.visible:
+			help_menu_ui.show()
+		else:
+			help_menu_ui.hide()

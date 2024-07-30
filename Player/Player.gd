@@ -6,8 +6,8 @@ extends CharacterBody2D
 var SPEED: float = 500.0
 var FRICTION: float = SPEED / 10 # Dictates how fast the player accelerates. Usually going to be SPEED / 10 but might change if player is on different surfaces
 var DASH_SPEED: float = 2000.0
-var DASH_DURATION: float = 0.5
-var DASH_COOLDOWN: float = 2.0
+var DASH_DURATION: float = 0.25
+var DASH_COOLDOWN: float = 1.0
 
 
 @onready var sprite = get_node("AnimatedSprite2D")

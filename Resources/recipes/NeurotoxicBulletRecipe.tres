@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=6 format=3 uid="uid://b8usoy28uy2pq"]
+
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_kon07"]
+[ext_resource type="Resource" uid="uid://bhcacqpfwwga4" path="res://Resources/Items/CraftableItems/NeurotoxicBullet.tres" id="1_re08w"]
+[ext_resource type="Resource" uid="uid://bboatjhyry42w" path="res://Resources/Items/CraftableItems/Bullet.tres" id="2_hayw4"]
+[ext_resource type="Resource" uid="uid://6h76ecnym48w" path="res://Resources/Items/CraftingItems/Mutated_Blood.tres" id="3_s46gj"]
+[ext_resource type="Resource" uid="uid://b21t6olc1i4vc" path="res://Resources/Items/CraftingItems/Bioluminescent_Bacteria.tres" id="4_2wmqp"]
+
+[resource]
+script = ExtResource("1_kon07")
+recipe_name = "Neurotoxic Bullets"
+recipe_final_item = ExtResource("1_re08w")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_hayw4"), ExtResource("3_s46gj"), ExtResource("4_2wmqp")])

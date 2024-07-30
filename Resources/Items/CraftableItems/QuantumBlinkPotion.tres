@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://ckueo7vflnwaj"]
+
+[ext_resource type="Texture2D" uid="uid://djqt2kixl4bxm" path="res://Resources/Images/Quantum Blink Potion.png" id="1_jvlv2"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_tre3p"]
+
+[resource]
+script = ExtResource("1_tre3p")
+item_id = -5
+item_name = "Quantum Blink Potion"
+item_texture = ExtResource("1_jvlv2")
+item_stack_size = 3
+crafting_batch_size = 1

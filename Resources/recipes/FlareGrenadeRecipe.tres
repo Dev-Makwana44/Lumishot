@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=6 format=3 uid="uid://c6w18ckovqkw0"]
+
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_ka3xl"]
+[ext_resource type="Resource" uid="uid://cu1tpxh73sup3" path="res://Resources/Items/CraftableItems/FlareGrenade.tres" id="1_mrh6p"]
+[ext_resource type="Resource" uid="uid://bboatjhyry42w" path="res://Resources/Items/CraftableItems/Bullet.tres" id="2_ocbpc"]
+[ext_resource type="Resource" uid="uid://b21t6olc1i4vc" path="res://Resources/Items/CraftingItems/Bioluminescent_Bacteria.tres" id="3_07rak"]
+[ext_resource type="Resource" uid="uid://biwa4vawh4llk" path="res://Resources/Items/CraftingItems/Heavy_Plate.tres" id="4_5scrw"]
+
+[resource]
+script = ExtResource("1_ka3xl")
+recipe_name = "Flare Grenade"
+recipe_final_item = ExtResource("1_mrh6p")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_ocbpc"), ExtResource("3_07rak"), ExtResource("4_5scrw")])

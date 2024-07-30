@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=5 format=3 uid="uid://doaj772x45dud"]
+
+[ext_resource type="Resource" uid="uid://bixnf48jgusoy" path="res://Resources/Items/CraftableItems/ExplosiveBullet.tres" id="1_2eegq"]
+[ext_resource type="Resource" uid="uid://bboatjhyry42w" path="res://Resources/Items/CraftableItems/Bullet.tres" id="2_w6p1j"]
+[ext_resource type="Resource" uid="uid://dflsax3wvapns" path="res://Resources/Items/CraftingItems/Combustion_Node.tres" id="3_vw0m5"]
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="4_ioo5p"]
+
+[resource]
+script = ExtResource("4_ioo5p")
+recipe_name = "Explosive Bullets"
+recipe_final_item = ExtResource("1_2eegq")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_w6p1j"), ExtResource("3_vw0m5"), ExtResource("3_vw0m5")])

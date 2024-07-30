@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=5 format=3 uid="uid://clc6rnib655w2"]
+
+[ext_resource type="Resource" uid="uid://ckueo7vflnwaj" path="res://Resources/Items/CraftableItems/QuantumBlinkPotion.tres" id="1_8w18e"]
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_nur80"]
+[ext_resource type="Resource" uid="uid://6h76ecnym48w" path="res://Resources/Items/CraftingItems/Mutated_Blood.tres" id="2_yqkih"]
+[ext_resource type="Resource" uid="uid://dcn17mjw4c3xg" path="res://Resources/Items/CraftableItems/EnergyBoostPotion.tres" id="3_r2yem"]
+
+[resource]
+script = ExtResource("1_nur80")
+recipe_name = "Quantum Blink Potion"
+recipe_final_item = ExtResource("1_8w18e")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_yqkih"), ExtResource("3_r2yem"), ExtResource("3_r2yem")])

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://bixnf48jgusoy"]
+
+[ext_resource type="Texture2D" uid="uid://dearx0bqobxpr" path="res://Resources/Images/Explosive Bullet.png" id="1_0cxxo"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="2_76fbc"]
+
+[resource]
+script = ExtResource("2_76fbc")
+item_id = -7
+item_name = "Explosive Bullet"
+item_texture = ExtResource("1_0cxxo")
+item_stack_size = 200
+crafting_batch_size = 50

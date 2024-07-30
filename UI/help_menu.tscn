@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://t7iierwocm7a"]
+
+[node name="Help Menu" type="PanelContainer"]
+custom_minimum_size = Vector2(250, 300)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Controls:
+
+Movement: WASD
+Dash: Shift
+Shoot: Left Click
+Throw Grenade: Right Click
+Switch Ammo: Scroll
+Switch Grenade: 1, 2, 3
+Change Selected Potion: E
+Drink Potion: F
+Open Crafting Menu: C
+
+Press 'H' to open/close this menu"
+
+[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "The goal of this game is to clear out these dungeons of the corrupted members of the Dawnslight, a shadow organization that has been experimenting with illegal robotics and human augmentations. Clear as many levels of the dungeons as you can while using items to craft enhanced weaponry."
+autowrap_mode = 2

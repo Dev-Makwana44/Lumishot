@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://dyn382hryh6a7"]
+
+[ext_resource type="Texture2D" uid="uid://crohwpr8ee8vx" path="res://Resources/Images/Invisibility Potion.png" id="1_i4o60"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="2_qc3yp"]
+
+[resource]
+script = ExtResource("2_qc3yp")
+item_id = -3
+item_name = "Invisibility Potion"
+item_texture = ExtResource("1_i4o60")
+item_stack_size = 3
+crafting_batch_size = 1

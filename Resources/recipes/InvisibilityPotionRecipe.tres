@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=5 format=3 uid="uid://clwgyht52lsr"]
+
+[ext_resource type="Resource" uid="uid://dyn382hryh6a7" path="res://Resources/Items/CraftableItems/InvisibilityPotion.tres" id="1_cpnif"]
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_lxa4d"]
+[ext_resource type="Resource" uid="uid://6h76ecnym48w" path="res://Resources/Items/CraftingItems/Mutated_Blood.tres" id="2_lfyxm"]
+[ext_resource type="Resource" uid="uid://cei1tls8lsuyd" path="res://Resources/Items/CraftingItems/Camouflage_Cell.tres" id="3_oki4d"]
+
+[resource]
+script = ExtResource("1_lxa4d")
+recipe_name = "Invisibility Potion"
+recipe_final_item = ExtResource("1_cpnif")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_lfyxm"), ExtResource("3_oki4d"), ExtResource("3_oki4d")])

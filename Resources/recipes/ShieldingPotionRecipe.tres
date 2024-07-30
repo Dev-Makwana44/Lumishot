@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=5 format=3 uid="uid://j3osyqqwe0o6"]
+
+[ext_resource type="Resource" uid="uid://4yri8aqbescn" path="res://Resources/Items/CraftableItems/ShieldingPotion.tres" id="1_tgti1"]
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_yswfg"]
+[ext_resource type="Resource" uid="uid://6h76ecnym48w" path="res://Resources/Items/CraftingItems/Mutated_Blood.tres" id="2_oh65t"]
+[ext_resource type="Resource" uid="uid://biwa4vawh4llk" path="res://Resources/Items/CraftingItems/Heavy_Plate.tres" id="3_caadb"]
+
+[resource]
+script = ExtResource("1_yswfg")
+recipe_name = "Shielding Potion"
+recipe_final_item = ExtResource("1_tgti1")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_oh65t"), ExtResource("3_caadb"), ExtResource("3_caadb")])

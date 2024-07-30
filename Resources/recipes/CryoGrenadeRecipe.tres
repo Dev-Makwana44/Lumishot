@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=6 format=3 uid="uid://bcsqk6aacdxdi"]
+
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_j0boj"]
+[ext_resource type="Resource" uid="uid://dbr623uodypfl" path="res://Resources/Items/CraftableItems/CryoGrenade.tres" id="1_rc66f"]
+[ext_resource type="Resource" uid="uid://bboatjhyry42w" path="res://Resources/Items/CraftableItems/Bullet.tres" id="2_y0xu8"]
+[ext_resource type="Resource" uid="uid://biwa4vawh4llk" path="res://Resources/Items/CraftingItems/Heavy_Plate.tres" id="3_v2dve"]
+[ext_resource type="Resource" uid="uid://bg51o6osbsle8" path="res://Resources/Items/CraftingItems/Cryo_Cell.tres" id="4_i10xf"]
+
+[resource]
+script = ExtResource("1_j0boj")
+recipe_name = "Cryo Grenade"
+recipe_final_item = ExtResource("1_rc66f")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_y0xu8"), ExtResource("3_v2dve"), ExtResource("4_i10xf")])

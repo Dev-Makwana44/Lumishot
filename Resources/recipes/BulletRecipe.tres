@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemRecipe" load_steps=4 format=3 uid="uid://dhlwd2hgsng04"]
+
+[ext_resource type="Script" path="res://Resources/recipes/ItemRecipe.gd" id="1_0b672"]
+[ext_resource type="Resource" uid="uid://bboatjhyry42w" path="res://Resources/Items/CraftableItems/Bullet.tres" id="1_bar3g"]
+[ext_resource type="Resource" uid="uid://l4ivc2rvtd4y" path="res://Resources/Items/CraftingItems/Iron.tres" id="2_riwsw"]
+
+[resource]
+script = ExtResource("1_0b672")
+recipe_name = "Bullet"
+recipe_final_item = ExtResource("1_bar3g")
+recipe_materials = Array[Resource("res://Resources/Items/ItemData.gd")]([ExtResource("2_riwsw"), ExtResource("2_riwsw"), ExtResource("2_riwsw")])

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://bvwywxdmkimm2"]
+
+[ext_resource type="Texture2D" uid="uid://bah0graaf111h" path="res://Resources/Images/Cryo Bullet.png" id="1_v224a"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_vdi6w"]
+
+[resource]
+script = ExtResource("1_vdi6w")
+item_id = -9
+item_name = "Cryo Bullet"
+item_texture = ExtResource("1_v224a")
+item_stack_size = 200
+crafting_batch_size = 50

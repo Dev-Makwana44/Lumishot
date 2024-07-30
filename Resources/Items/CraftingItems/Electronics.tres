@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://bctp1fk1huequ"]
+
+[ext_resource type="Texture2D" uid="uid://dtm3kc51ikur7" path="res://Resources/Images/Electronics.png" id="1_f5x80"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_jwdp0"]
+
+[resource]
+script = ExtResource("1_jwdp0")
+item_id = 7
+item_name = "Electronics"
+item_texture = ExtResource("1_f5x80")
+item_stack_size = 30
+crafting_batch_size = 1

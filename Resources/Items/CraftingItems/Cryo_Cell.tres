@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://bg51o6osbsle8"]
+
+[ext_resource type="Texture2D" uid="uid://dpjvg3lnjpaa1" path="res://Resources/Images/Cryo Cell.png" id="1_esl70"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_pagh8"]
+
+[resource]
+script = ExtResource("1_pagh8")
+item_id = 6
+item_name = "Cryo Cell"
+item_texture = ExtResource("1_esl70")
+item_stack_size = 20
+crafting_batch_size = 1

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://cu1tpxh73sup3"]
+
+[ext_resource type="Texture2D" uid="uid://c1c87qsk8yl82" path="res://Resources/Images/Flare Grenade.png" id="1_5n58f"]
+[ext_resource type="Script" path="res://Resources/Items/ItemData.gd" id="1_v5pgv"]
+
+[resource]
+script = ExtResource("1_v5pgv")
+item_id = -12
+item_name = "Flare Grenade"
+item_texture = ExtResource("1_5n58f")
+item_stack_size = 5
+crafting_batch_size = 1

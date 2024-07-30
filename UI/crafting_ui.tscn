@@ -1,10 +1,21 @@
-[gd_scene load_steps=6 format=3 uid="uid://bpuxf3x1nl4qm"]
+[gd_scene load_steps=17 format=3 uid="uid://bpuxf3x1nl4qm"]
 
 [ext_resource type="Script" path="res://UI/crafting_ui.gd" id="1_7a5ht"]
 [ext_resource type="PackedScene" uid="uid://qohoq64bw08u" path="res://UI/inventory_slot.tscn" id="2_b101h"]
 [ext_resource type="Texture2D" uid="uid://c2wpw66kf1i2q" path="res://Resources/Images/Question Mark.png" id="3_2yemq"]
 [ext_resource type="Resource" uid="uid://3y4vwnypm3xt" path="res://Resources/recipes/HealthPotionRecipe.tres" id="3_nw3s1"]
 [ext_resource type="Resource" uid="uid://c05cx04vqctlu" path="res://Resources/recipes/EnergyBoostPotionRecipe.tres" id="3_y0yfh"]
+[ext_resource type="Resource" uid="uid://clwgyht52lsr" path="res://Resources/recipes/InvisibilityPotionRecipe.tres" id="4_lj5fc"]
+[ext_resource type="Resource" uid="uid://j3osyqqwe0o6" path="res://Resources/recipes/ShieldingPotionRecipe.tres" id="5_ccr7e"]
+[ext_resource type="Resource" uid="uid://clc6rnib655w2" path="res://Resources/recipes/QuantumBlinkPotionRecipe.tres" id="6_xbnp2"]
+[ext_resource type="Resource" uid="uid://dhlwd2hgsng04" path="res://Resources/recipes/BulletRecipe.tres" id="7_d0beq"]
+[ext_resource type="Resource" uid="uid://doaj772x45dud" path="res://Resources/recipes/ExplosiveBulletRecipe.tres" id="8_acexe"]
+[ext_resource type="Resource" uid="uid://bubx3am3un813" path="res://Resources/recipes/CryoBulletRecipe.tres" id="9_1mnn4"]
+[ext_resource type="Resource" uid="uid://b8usoy28uy2pq" path="res://Resources/recipes/NeurotoxicBulletRecipe.tres" id="10_7qkdh"]
+[ext_resource type="Resource" uid="uid://daq2qapvcvwg8" path="res://Resources/recipes/ElectricBulletRecipe.tres" id="11_ubmwp"]
+[ext_resource type="Resource" uid="uid://mnu4e1ttmubq" path="res://Resources/recipes/GrenadeRecipe.tres" id="12_elmfu"]
+[ext_resource type="Resource" uid="uid://bcsqk6aacdxdi" path="res://Resources/recipes/CryoGrenadeRecipe.tres" id="13_pwano"]
+[ext_resource type="Resource" uid="uid://c6w18ckovqkw0" path="res://Resources/recipes/FlareGrenadeRecipe.tres" id="14_0qo32"]
 
 [node name="Crafting UI" type="PanelContainer"]
 anchors_preset = 15
@@ -13,7 +24,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7a5ht")
-recipe_array = Array[Resource("res://Resources/recipes/ItemRecipe.gd")]([ExtResource("3_nw3s1"), ExtResource("3_y0yfh")])
+recipe_array = Array[Resource("res://Resources/recipes/ItemRecipe.gd")]([ExtResource("3_nw3s1"), ExtResource("3_y0yfh"), ExtResource("4_lj5fc"), ExtResource("5_ccr7e"), ExtResource("6_xbnp2"), ExtResource("7_d0beq"), ExtResource("8_acexe"), ExtResource("9_1mnn4"), ExtResource("10_7qkdh"), ExtResource("11_ubmwp"), ExtResource("12_elmfu"), ExtResource("13_pwano"), ExtResource("14_0qo32")])
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 2

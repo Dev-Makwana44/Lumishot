@@ -20,7 +20,7 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 	if a.room_connection_locations[starting_direction]:
 		return false
 	else:
-		a.room_connection_locations[starting_direction] = true
+		a.room_connection_locations[starting_direction] = self
 	if starting_direction % 2 == 0: # starts horizontal
 		if starting_direction == LEFT and b.room_connection_locations[RIGHT]:
 			return false
@@ -28,7 +28,7 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 			return false
 		var overlap: int = self._overlap(a.position.y, a.position.y + a.size.y, b.position.y, b.position.y + b.size.y)
 		if overlap >= line_width:
-			b.room_connection_locations[RIGHT if starting_direction == LEFT else LEFT] = true
+			b.room_connection_locations[RIGHT if starting_direction == LEFT else LEFT] = self
 			var line_node: Line2D = Line2D.new()
 			line_node.default_color = Color.BLACK
 			line_node.width = line_width
@@ -53,12 +53,12 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 				if b.room_connection_locations[DOWN]:
 					return false
 				else:
-					b.room_connection_locations[DOWN] = true
+					b.room_connection_locations[DOWN] = self
 			else:
 				if b.room_connection_locations[UP]:
 					return false
 				else:
-					b.room_connection_locations[UP] = true
+					b.room_connection_locations[UP] = self
 			var line_node: Line2D = Line2D.new()
 			line_node.default_color = Color.BLACK
 			line_node.width = line_width
@@ -82,7 +82,7 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 			return false
 		var overlap: int = self._overlap(a.position.x, a.position.x + a.size.x, b.position.x, b.position.x + b.size.x)
 		if overlap >= line_width:
-			b.room_connection_locations[UP if starting_direction == DOWN else DOWN] = true
+			b.room_connection_locations[UP if starting_direction == DOWN else DOWN] = self
 			var line_node: Line2D = Line2D.new()
 			line_node.default_color = Color.BLACK
 			line_node.width = line_width
@@ -103,16 +103,16 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 				#return false
 			#elif a.position.x < b.position.x and b.room_connection_locations[LEFT]:
 				#return false
-			if position.x > b.position.x:
+			if a.position.x > b.position.x:
 				if b.room_connection_locations[RIGHT]:
 					return false
 				else:
-					b.room_connection_locations[RIGHT] = true
+					b.room_connection_locations[RIGHT] = self
 			else:
 				if b.room_connection_locations[LEFT]:
 					return false
 				else:
-					b.room_connection_locations[LEFT] = true
+					b.room_connection_locations[LEFT] = self
 			var line_node: Line2D = Line2D.new()
 			line_node.default_color = Color.BLACK
 			line_node.width = line_width

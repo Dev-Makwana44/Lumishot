@@ -9,7 +9,7 @@ const SPACE_BETWEEN_ROOMS: int = 1000
 
 var size: Vector2
 var room_type: int
-var room_connection_locations: Array[bool]
+var room_connection_locations: Array[Hallway]
 
 func _init(width: int, height: int, x_pos: int, y_pos: int):
 	self.size = Vector2(width, height)
@@ -19,7 +19,7 @@ func _init(width: int, height: int, x_pos: int, y_pos: int):
 	collision_box.shape = RectangleShape2D.new()
 	collision_box.shape.size = self.size
 	self.add_child(collision_box)
-	self.room_connection_locations = [false, false, false, false]
+	self.room_connection_locations = [null, null, null, null]
 	
 func _get_center():
 	return Vector2(self.position.x + (0.5 * self.size.x), self.position.y + (0.5 * self.size.y))

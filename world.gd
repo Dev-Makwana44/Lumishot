@@ -36,17 +36,20 @@ func _ready():
 	#var times: Array[int] = []
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+var temp = false
+#func _process(delta):
+	#if Input.is_action_just_pressed("fire_gun") and not temp:
+		#_create_dungeon_borders(rooms, [])
+		#temp = true
 
 func _physics_process(delta):
 	for hallway: Hallway in hallways:
 		if hallway.has_overlapping_areas() or hallway.has_overlapping_bodies():
 			print("COLLISION")
 
+var rooms: Array[Room] = []
 func _generate_dungeon() -> bool:
-	var rooms: Array[Room] = []
-	
+	rooms = []	
 	# Create Rooms
 	
 	for i in range(NUMBER_OF_ROOMS_GENERATED):
@@ -194,6 +197,8 @@ func _generate_dungeon() -> bool:
 	#_draw_mst(mst_path)
 	_draw_hallways(hallways)
 	#_draw_hallway_walls(hallways)
+	rooms = main_rooms
+	_create_dungeon_borders(main_rooms, hallways)
 	return true
 
 func _create_room_nodes(rooms: Array[Room], main_rooms: Array[Room], path: AStar2D) -> void:
@@ -213,11 +218,13 @@ func _create_room_nodes(rooms: Array[Room], main_rooms: Array[Room], path: AStar
 		room_node.position.y = room.position.y
 		#room_node.color = Color(0, 255, 0)
 		if room.room_type == BOSS_ROOM:
-			room_node.color = Color(255, 0, 0)
+			room_node.color = Color.RED
 		elif room.room_type == STARTING_ROOM:
-			room_node.color = Color(0, 0, 255)
+			room_node.color = Color.BLUE
+		elif room.room_type == LOOT_ROOM:
+			room_node.color = Color.ORANGE
 		else:
-			room_node.color = Color(0, 255, 0)
+			room_node.color = Color.GREEN
 		add_child(room_node)
 
 func _draw_mst(path: CustomAStar) -> void:
@@ -260,6 +267,202 @@ func _draw_hallway_walls(hallways: Array[Hallway]) -> void:
 		#right_points.reverse()
 		#polygon_node.polygon = left_points +  right_points
 		#add_child(polygon_node)
+
+func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
+	for room: Room in rooms:
+		if room.room_connection_locations[Hallway.UP] == null:
+			var static_body: StaticBody2D = StaticBody2D.new()
+			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			collision_polygon.polygon = PackedVector2Array([room.position, room.position + Vector2(room.size.x, 0)])
+			static_body.add_child(collision_polygon)
+			add_child(static_body)
+			var line: Line2D = Line2D.new()
+			line.width = 25
+			line.z_index = 6
+			line.default_color = Color.GRAY
+			line.points = collision_polygon.polygon
+			add_child(line)
+		else:
+			var static_body: StaticBody2D = StaticBody2D.new()
+			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			if room == room.room_connection_locations[Hallway.UP].a:
+				collision_polygon.polygon = PackedVector2Array([room.position, room.room_connection_locations[Hallway.UP]._get_left_points()[0]])
+			else:
+				collision_polygon.polygon = PackedVector2Array([room.position, room.room_connection_locations[Hallway.UP]._get_right_points()[-1]])
+			static_body.add_child(collision_polygon)
+			add_child(static_body)
+			var static_body2: StaticBody2D = StaticBody2D.new()
+			var collision_polygon2: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon2.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			if room == room.room_connection_locations[Hallway.UP].a:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.UP]._get_right_points()[0], room.position + Vector2(room.size.x, 0)])
+			else:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.UP]._get_left_points()[-1], room.position + Vector2(room.size.x, 0)])
+			static_body2.add_child(collision_polygon2)
+			add_child(static_body2)
+			var line: Line2D = Line2D.new()
+			line.width = 25
+			line.z_index = 6
+			line.default_color = Color.GRAY
+			line.points = collision_polygon.polygon
+			add_child(line)
+			var line2: Line2D = Line2D.new()
+			line2.width = 25
+			line2.z_index = 6
+			line2.default_color = Color.GRAY
+			line2.points = collision_polygon2.polygon
+			add_child(line2)
+		
+		if room.room_connection_locations[Hallway.RIGHT] == null:
+			var static_body: StaticBody2D = StaticBody2D.new()
+			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			collision_polygon.polygon = PackedVector2Array([room.position + Vector2(room.size.x, 0), room.position + room.size])
+			static_body.add_child(collision_polygon)
+			add_child(static_body)
+			var line: Line2D = Line2D.new()
+			line.width = 25
+			line.z_index = 6
+			line.default_color = Color.GRAY
+			line.points = collision_polygon.polygon
+			add_child(line)
+		else:
+			var static_body: StaticBody2D = StaticBody2D.new()
+			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			if room == room.room_connection_locations[Hallway.RIGHT].a:
+				collision_polygon.polygon = PackedVector2Array([room.position + Vector2(room.size.x, 0), room.room_connection_locations[Hallway.RIGHT]._get_left_points()[0]])
+			else:
+				collision_polygon.polygon = PackedVector2Array([room.position + Vector2(room.size.x, 0), room.room_connection_locations[Hallway.RIGHT]._get_right_points()[-1]])
+			static_body.add_child(collision_polygon)
+			add_child(static_body)
+			var static_body2: StaticBody2D = StaticBody2D.new()
+			var collision_polygon2: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon2.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			if room == room.room_connection_locations[Hallway.RIGHT].a:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.RIGHT]._get_right_points()[0], room.position + room.size])
+			else:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.RIGHT]._get_left_points()[-1], room.position + room.size])
+			static_body2.add_child(collision_polygon2)
+			add_child(static_body2)
+			var line: Line2D = Line2D.new()
+			line.width = 25
+			line.z_index = 6
+			line.default_color = Color.GRAY
+			line.points = collision_polygon.polygon
+			add_child(line)
+			var line2: Line2D = Line2D.new()
+			line2.width = 25
+			line2.z_index = 6
+			line2.default_color = Color.GRAY
+			line2.points = collision_polygon2.polygon
+			add_child(line2)
+		if room.room_connection_locations[Hallway.DOWN] == null:
+			var static_body: StaticBody2D = StaticBody2D.new()
+			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			collision_polygon.polygon = PackedVector2Array([room.position + room.size, room.position + Vector2(0, room.size.y)])
+			static_body.add_child(collision_polygon)
+			add_child(static_body)
+			var line: Line2D = Line2D.new()
+			line.width = 25
+			line.z_index = 6
+			line.default_color = Color.GRAY
+			line.points = collision_polygon.polygon
+			add_child(line)
+		else:
+			var static_body: StaticBody2D = StaticBody2D.new()
+			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			if room == room.room_connection_locations[Hallway.DOWN].a:
+				collision_polygon.polygon = PackedVector2Array([room.position + room.size, room.room_connection_locations[Hallway.DOWN]._get_left_points()[0]])
+			else:
+				collision_polygon.polygon = PackedVector2Array([room.position + room.size, room.room_connection_locations[Hallway.DOWN]._get_right_points()[-1]])
+			static_body.add_child(collision_polygon)
+			add_child(static_body)
+			var static_body2: StaticBody2D = StaticBody2D.new()
+			var collision_polygon2: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon2.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			if room == room.room_connection_locations[Hallway.DOWN].a:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.DOWN]._get_right_points()[0], room.position + Vector2(0, room.size.y)])
+			else:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.DOWN]._get_left_points()[-1], room.position + Vector2(0, room.size.y)])
+			static_body2.add_child(collision_polygon2)
+			add_child(static_body2)
+			var line: Line2D = Line2D.new()
+			line.width = 25
+			line.z_index = 6
+			line.default_color = Color.GRAY
+			line.points = collision_polygon.polygon
+			add_child(line)
+			var line2: Line2D = Line2D.new()
+			line2.width = 25
+			line2.z_index = 6
+			line2.default_color = Color.GRAY
+			line2.points = collision_polygon2.polygon
+			add_child(line2)
+		if room.room_connection_locations[Hallway.LEFT] == null:
+			var static_body: StaticBody2D = StaticBody2D.new()
+			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			collision_polygon.polygon = PackedVector2Array([room.position + Vector2(0, room.size.y), room.position])
+			static_body.add_child(collision_polygon)
+			add_child(static_body)
+			var line: Line2D = Line2D.new()
+			line.width = 25
+			line.z_index = 6
+			line.default_color = Color.GRAY
+			line.points = collision_polygon.polygon
+			add_child(line)
+		else:
+			var static_body: StaticBody2D = StaticBody2D.new()
+			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			if room == room.room_connection_locations[Hallway.LEFT].a:
+				collision_polygon.polygon = PackedVector2Array([room.position + Vector2(0, room.size.y), room.room_connection_locations[Hallway.LEFT]._get_left_points()[0]])
+			else:
+				collision_polygon.polygon = PackedVector2Array([room.position + Vector2(0, room.size.y), room.room_connection_locations[Hallway.LEFT]._get_right_points()[-1]])
+			static_body.add_child(collision_polygon)
+			add_child(static_body)
+			var static_body2: StaticBody2D = StaticBody2D.new()
+			var collision_polygon2: CollisionPolygon2D = CollisionPolygon2D.new()
+			collision_polygon2.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+			if room == room.room_connection_locations[Hallway.LEFT].a:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.LEFT]._get_right_points()[0], room.position])
+			else:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.LEFT]._get_left_points()[-1], room.position])
+			static_body2.add_child(collision_polygon2)
+			add_child(static_body2)
+			var line: Line2D = Line2D.new()
+			line.width = 25
+			line.z_index = 6
+			line.default_color = Color.GRAY
+			line.points = collision_polygon.polygon
+			add_child(line)
+			var line2: Line2D = Line2D.new()
+			line2.width = 25
+			line2.z_index = 6
+			line2.default_color = Color.GRAY
+			line2.points = collision_polygon2.polygon
+			add_child(line2)
+
+	for hallway: Hallway in hallways:
+		for side: PackedVector2Array in [hallway._get_left_points(), hallway._get_right_points()]:
+			for index: int in range(len(side) - 1):
+				var static_body: StaticBody2D = StaticBody2D.new()
+				var collision: CollisionPolygon2D = CollisionPolygon2D.new()
+				collision.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+				collision.polygon = PackedVector2Array([side[index], side[index + 1]])
+				static_body.add_child(collision)
+				add_child(static_body)
+				var line: Line2D = Line2D.new()
+				line.width = 25
+				line.z_index = 6
+				line.default_color = Color.GRAY
+				line.points = PackedVector2Array([side[index], side[index + 1]])
+				add_child(line)
 
 func _room_comparison(a: Room, b: Room) -> bool:
 	return a.size.x * a.size.y < b.size.x * b.size.y

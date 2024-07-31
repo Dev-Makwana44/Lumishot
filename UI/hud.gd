@@ -10,6 +10,8 @@ extends PanelContainer
 @onready var potion_slot: InventorySlot = %"Potion Slot"
 @onready var potion_label: Label = %"Potion Label"
 
+@onready var health_label: Label = %"Health Label"
+
 func set_ammo(item: ItemData, amount: int):
 	if item == null:
 		ammo_slot.set_item_data(null, 1)

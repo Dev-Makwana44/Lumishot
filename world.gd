@@ -9,11 +9,13 @@ const BOSS_ROOM: int = 2
 const LOOT_ROOM: int = 3
 const STARTING_ROOM: int = 4
 
+@onready var turret: Turret = %Turret
 @onready var player: Player = %Player
 @onready var hud: HUD = %HUD
 @onready var ui_container: UI_CONTAINER = %UI_Container
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var current_room: Room = null
 
 class CustomAStar:
 	extends AStar2D
@@ -36,10 +38,20 @@ func _ready():
 			break
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
 	#var times: Array[int] = []
-	
+
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	for bullet: Bullet in get_tree().get_nodes_in_group("bullets"):
+	if current_room == null:
+		for room: Room in rooms:
+			if room._point_inside(player.position):
+				current_room = room
+				break
+	else:
+		if not current_room._point_inside(player.position):
+			current_room = null
+			
+	for bullet: Bullet in get_tree().get_nodes_in_group("player_bullets"):
 		var bullet_in_room: bool = false
 		for room: Room in rooms:
 			if room._point_inside(bullet.position):
@@ -47,25 +59,39 @@ func _process(delta):
 				break
 		if not bullet_in_room:
 			bullet.queue_free()
-			print("Bullet out of rooms")
+	
+	for bullet: Bullet in get_tree().get_nodes_in_group("enemy_bullets"):
+		var bullet_in_room: bool = false
+		for room: Room in rooms:
+			if room._point_inside(bullet.position):
+				bullet_in_room = true
+				break
+		if not bullet_in_room:
+			bullet.queue_free()
+	
+	#for turret: Turret in get_tree().get_nodes_in_group("turrets"):
+		#if turret.turret_face.frame == 7 and not turret.fired_this_animation:
+			#turret.fired_this_animation = false
+			#print("turret fired")
 	
 	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
 		if player.ammo[player.selected_ammo_index] > 0:
-			player.time_since_shooting = 0.0
-			var bullet: Bullet = Bullet.new()
-			self.add_child(bullet)
-			await bullet.is_node_ready()
-			bullet.position = player.position
-			var bullet_path = get_global_mouse_position() - player.position
-			bullet.set_bullet_type(player.selected_ammo_index)
-			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
-			bullet.z_index = 10
-			bullet.add_to_group("bullets")
-			player.ammo[player.selected_ammo_index] -= 1
-			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
-			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
-			if player.ammo[player.selected_ammo_index] == 0:
-				ui_container.select_ammo_up()
+			if current_room != null:
+				player.time_since_shooting = 0.0
+				var bullet: Bullet = Bullet.new()
+				self.add_child(bullet)
+				await bullet.is_node_ready()
+				bullet.position = player.position
+				var bullet_path = get_global_mouse_position() - player.position
+				bullet.set_bullet_type(player.selected_ammo_index)
+				bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
+				bullet.z_index = 10
+				bullet.add_to_group("player_bullets")
+				player.ammo[player.selected_ammo_index] -= 1
+				player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
+				hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
+				if player.ammo[player.selected_ammo_index] == 0:
+					ui_container.select_ammo_up()
 
 	if Input.is_action_just_pressed("use_potion"):
 		if player.potions[player.selected_potion_index] > 0:
@@ -78,13 +104,12 @@ func _process(delta):
 
 	if Input.is_action_just_pressed("throw_grenade"):
 		if player.grenades[player.selected_grenade_index] > 0:
-			var grenade: Grenade = Grenade.new()
+			var grenade_path = get_global_mouse_position() - player.position
+			var grenade: Grenade = Grenade.new(player.selected_grenade_index, atan2(grenade_path.y, grenade_path.x))#, get_global_mouse_position())
 			self.add_child(grenade)
 			await grenade.is_node_ready()
 			grenade.position = player.position
-			grenade.set_grenade_type(player.selected_grenade_index)
-			var grenade_path = get_global_mouse_position() - player.position
-			grenade.angle = atan2(grenade_path.y, grenade_path.x)
+			#grenade.set_grenade_type(player.selected_grenade_index)
 			grenade.z_index = 10
 			grenade.add_to_group("grenades")
 			player.grenades[player.selected_grenade_index] -= 1
@@ -92,6 +117,9 @@ func _process(delta):
 			hud.set_grenade(hud.grenade_slot.item_data, player.grenades[player.selected_grenade_index])
 			if player.grenades[player.selected_grenade_index] == 0:
 				ui_container.select_grenade()
+	
+	if player.health != int(ui_container.hud.health_label.text):
+		ui_container.hud.health_label.text = str(player.health)
 		
 var rooms: Array[Room] = []
 func _generate_dungeon() -> bool:
@@ -222,7 +250,10 @@ func _generate_dungeon() -> bool:
 		if room.room_type == STARTING_ROOM:
 			if not starting_room_chosen:
 				player.position = room._get_center()
+				turret.position = player.position + Vector2(50, 0)
+				turret.add_to_group("turrets")
 				starting_room_chosen = true
+				print(room._get_center())
 				break
 			else:
 				room.room_type = LOOT_ROOM

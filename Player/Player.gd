@@ -33,6 +33,7 @@ const QUANTUM_BLINK_DURATION: float = 5.0
 const SHIELDING_DURATION: float = 10.0
 const INVISIBILITY_DURATION: float = 15.0
 const SPEED_BOOST_DURATION: float = 10.0
+const DAMAGE_FLASH_DURATION: float = 5.0
 var FIRE_RATE: float = 0.1
 const MAX_HEALTH: int = 100
 
@@ -41,6 +42,7 @@ const MAX_HEALTH: int = 100
 @onready var gun: Sprite2D = get_node("Gun")
 @onready var camera: Camera2D = get_node("Camera2D")
 @onready var light: PointLight2D = get_node("Cone Light2")
+@onready var area: Area2D = get_node("Area2D")
 
 var time_since_dash: float = DASH_COOLDOWN
 var time_since_shooting: float = FIRE_RATE
@@ -48,6 +50,7 @@ var time_since_quantum_blink: float = QUANTUM_BLINK_DURATION
 var time_since_shielding: float = SHIELDING_DURATION
 var time_since_invisibility: float = INVISIBILITY_DURATION
 var time_since_speed_boost: float = SPEED_BOOST_DURATION
+var time_since_damage: float = DAMAGE_FLASH_DURATION
 var inventory: InventoryComponent = InventoryComponent.new()
 var game_paused: bool = false
 var ammo: Array[int] = [0, 0, 0, 0, 0]
@@ -56,11 +59,11 @@ var potions: Array[int] = [0, 0, 0, 0, 0]
 var selected_ammo_index: int = 0
 var selected_grenade_index: int = 0
 var selected_potion_index: int = 0
-
 var invisible: bool = false
 var shielding: bool = false
 var quantum_blinking: bool = false
 var speed_boost: bool = false
+var damage_flash: bool = false
 
 var health: int = MAX_HEALTH
 
@@ -70,6 +73,7 @@ func _ready():
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ExplosiveBullet.tres") as ItemData, 100)
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Grenade.tres") as ItemData, 3)
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoGrenade.tres") as ItemData, 3)
+	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/FlareGrenade.tres") as ItemData, 3)
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/HealthPotion.tres") as ItemData, 3)
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData, 3)
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/QuantumBlinkPotion.tres") as ItemData, 3)
@@ -114,36 +118,43 @@ func _physics_process(delta):
 			self.velocity.x = move_toward(velocity.x, v.x * SPEED, FRICTION)
 			self.velocity.y = move_toward(velocity.y, v.y * SPEED, FRICTION)
 		
+		if self.damage_flash:
+			time_since_damage += delta
+			if time_since_damage >= DAMAGE_FLASH_DURATION:
+				self.modulate.g *= 2
+				self.modulate.b *= 2
+				self.damage_flash = false
+		
 		time_since_dash += delta
 		time_since_shooting += delta
 		
-		if speed_boost:
-			time_since_speed_boost += delta
-			if time_since_speed_boost >= SPEED_BOOST_DURATION:
+		if self.speed_boost:
+			self.time_since_speed_boost += delta
+			if self.time_since_speed_boost >= SPEED_BOOST_DURATION:
 				speed_boost = false
 				SPEED /= 2
 				DASH_SPEED /= 2
 				FIRE_RATE *= 2
 		
-		if invisible:
-			time_since_invisibility += delta
+		if self.invisible:
+			self.time_since_invisibility += delta
 			if time_since_invisibility >= INVISIBILITY_DURATION:
-				invisible = false
+				self.invisible = false
 				self.modulate.a *= 2
 		
-		if shielding:
-			time_since_shielding += delta
+		if self.shielding:
+			self.time_since_shielding += delta
 			if time_since_shielding >= SHIELDING_DURATION:
-				shielding = false
+				self.shielding = false
 				self.modulate.g *= 2
 				self.modulate.b = 1
 		
-		if quantum_blinking:
-			time_since_quantum_blink += delta
+		if self.quantum_blinking:
+			self.time_since_quantum_blink += delta
 			if time_since_quantum_blink >= QUANTUM_BLINK_DURATION:
-				quantum_blinking = false
+				self.quantum_blinking = false
 				self.modulate.r *= 2
-
+		
 		move_and_slide()
 		
 		
@@ -155,7 +166,13 @@ func _unhandled_input(event): # temporary keybinds to zoom in and out using P an
 		elif event.pressed and event.keycode == KEY_O:
 			camera.zoom -= Vector2(0.1, 0.1)
 		
-			
+func take_damage(damage: int) -> void:
+	self.health -= damage
+	time_since_damage = 0.0
+	self.modulate.g /= 2
+	self.modulate.b /= 2
+	self.damage_flash = true
+
 func set_inventory(inv: InventoryComponent) -> void:
 	self.inventory = inv
 	self.ammo = [0, 0, 0, 0, 0]
@@ -171,7 +188,7 @@ func set_inventory(inv: InventoryComponent) -> void:
 
 func use_potion() -> bool:
 	if selected_potion_index == 0 and self.health < MAX_HEALTH:
-		self.health = max(self.health + 25, MAX_HEALTH)
+		self.health = min(self.health + 25, MAX_HEALTH)
 		return true
 	elif selected_potion_index == 1 and not speed_boost:
 		speed_boost = true
@@ -197,3 +214,8 @@ func use_potion() -> bool:
 		self.modulate.r /= 2
 		return true
 	return false
+
+func _on_area_2d_area_entered(area):
+	if area.get_parent() is Bullet and area.get_parent().is_in_group("enemy_bullets"):
+		area.get_parent().queue_free()
+		self.take_damage(5)

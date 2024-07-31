@@ -103,5 +103,8 @@ position = Vector2(0, -4)
 scale = Vector2(-1.28167, 1.18417)
 shape = SubResource("CapsuleShape2D_kg17a")
 
+[node name="Health Bar" type="Line2D" parent="."]
+points = PackedVector2Array(-24, 25, 28, 25)
+
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

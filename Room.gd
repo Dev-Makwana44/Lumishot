@@ -11,6 +11,8 @@ var size: Vector2
 var room_type: int
 var room_connection_locations: Array[Hallway]
 
+var enemies: Dictionary = {}
+
 func _init(width: int, height: int, x_pos: int, y_pos: int):
 	self.size = Vector2(width, height)
 	self.position = Vector2(x_pos, y_pos)

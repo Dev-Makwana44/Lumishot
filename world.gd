@@ -9,13 +9,16 @@ const BOSS_ROOM: int = 2
 const LOOT_ROOM: int = 3
 const STARTING_ROOM: int = 4
 
-@onready var turret: Turret = %Turret
+const turret_scene: PackedScene = preload("res://Enemies/turret.tscn")
+
+#@onready var turret: Turret = %Turret
 @onready var player: Player = %Player
 @onready var hud: HUD = %HUD
 @onready var ui_container: UI_CONTAINER = %UI_Container
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-var current_room: Room = null
+var new_walls: Array
+var time_since_entering_room: float = 0.0
 
 class CustomAStar:
 	extends AStar2D
@@ -28,6 +31,8 @@ class CustomAStar:
 		return self._compute_cost(from_id, to_id)
 
 var hallways: Array[Hallway] = []
+
+
 func _ready():
 	var starting_time: int = Time.get_ticks_msec()
 	#while not _generate_dungeon():
@@ -42,14 +47,29 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if current_room == null:
+	#if current_room == null:
+		#for room: Room in rooms:
+			#if room._point_inside(player.position):
+				#current_room = room
+				#break
+	#else:
+		#if not current_room._point_inside(player.position):
+			#current_room = null
+	time_since_entering_room += delta
+	if player.room == null:
 		for room: Room in rooms:
 			if room._point_inside(player.position):
-				current_room = room
+				player.room = room
+				time_since_entering_room = 0.0
 				break
 	else:
-		if not current_room._point_inside(player.position):
-			current_room = null
+		if player.room.room_type != STARTING_ROOM and time_since_entering_room > 0.5 and time_since_entering_room < 1.0 and new_walls != null and len(new_walls) == 0:
+			new_walls = close_room(player.room)
+		if not player.room._point_inside(player.position):
+			player.room = null
+			#if new_walls != null and len(new_walls) > 0 and time_since_entering_room > 0.5:
+				#self.remove_child(new_walls[0])
+				#self.remove_child(new_walls[1])
 			
 	for bullet: Bullet in get_tree().get_nodes_in_group("player_bullets"):
 		var bullet_in_room: bool = false
@@ -67,16 +87,24 @@ func _process(delta):
 				bullet_in_room = true
 				break
 		if not bullet_in_room:
+			if bullet.bullet_type == 1:
+				for enemy in bullet.explosion_radius.get_overlapping_areas():
+					if enemy.get_parent() is Enemy:
+						enemy.get_parent().damage(10)
 			bullet.queue_free()
 	
-	#for turret: Turret in get_tree().get_nodes_in_group("turrets"):
-		#if turret.turret_face.frame == 7 and not turret.fired_this_animation:
-			#turret.fired_this_animation = false
-			#print("turret fired")
+	for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
+		if enemy.health <= 0:
+			enemy.room.enemies.erase(enemy)
+			if len(enemy.room.enemies) == 0:
+				self.remove_child(new_walls[0])
+				self.remove_child(new_walls[1])
+			enemy.drop_loot()
+			enemy.queue_free()
 	
 	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
 		if player.ammo[player.selected_ammo_index] > 0:
-			if current_room != null:
+			if player.room != null:
 				player.time_since_shooting = 0.0
 				var bullet: Bullet = Bullet.new()
 				self.add_child(bullet)
@@ -250,13 +278,18 @@ func _generate_dungeon() -> bool:
 		if room.room_type == STARTING_ROOM:
 			if not starting_room_chosen:
 				player.position = room._get_center()
-				turret.position = player.position + Vector2(50, 0)
-				turret.add_to_group("turrets")
+				#turret.position = player.position + Vector2(50, 0)
+				#turret.add_to_group("enemies")
+				#turret.add_to_group("robots")
 				starting_room_chosen = true
-				print(room._get_center())
 				break
 			else:
 				room.room_type = LOOT_ROOM
+	
+	for room in main_rooms:
+		if room.room_type == NORMAL_ROOM:
+			#print("spawning enemies")
+			spawn_enemies(room)
 	
 	for i in range(5):
 		var collectable: Resource = load("res://Collectables/collectable.tscn")
@@ -299,6 +332,8 @@ func _create_room_nodes(rooms: Array[Room], main_rooms: Array[Room], path: AStar
 			room_node.color = Color.BLUE
 		elif room.room_type == LOOT_ROOM:
 			room_node.color = Color.ORANGE
+		elif room.room_type == NORMAL_ROOM:
+			room_node.color = Color.BLUE_VIOLET
 		else:
 			room_node.color = Color.GREEN
 		add_child(room_node)
@@ -518,6 +553,21 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 				line.points = PackedVector2Array([side[index], side[index + 1]])
 				add_child(line)
 
+func close_room(room: Room) -> Array:
+	var static_body: StaticBody2D = StaticBody2D.new()
+	var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
+	collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
+	collision_polygon.polygon = PackedVector2Array([room.position, room.position + Vector2(room.size.x, 0), room.position + room.size, room.position + Vector2(0, room.size.y)])
+	static_body.add_child(collision_polygon)
+	self.add_child(static_body)
+	var line: Line2D = Line2D.new()
+	line.width = 25
+	line.z_index = 6
+	line.default_color = Color.GRAY
+	line.points = collision_polygon.polygon + PackedVector2Array([collision_polygon.polygon[0]])
+	add_child(line)
+	return [static_body, line]
+
 func _room_comparison(a: Room, b: Room) -> bool:
 	return a.size.x * a.size.y < b.size.x * b.size.y
 
@@ -545,3 +595,28 @@ func _create_mst(rooms: Array) -> CustomAStar:
 		rooms.erase(min_p)
 	return path
 
+func spawn_enemies(spawning_room: Room) -> void:
+	for i in range(rng.randi_range(5, 10)):
+	#for i in range(5):
+		var x_pos = rng.randi_range(spawning_room.position.x + 10, spawning_room.position.x + spawning_room.size.x - 10)
+		var y_pos = rng.randi_range(spawning_room.position.y + 10, spawning_room.position.y + spawning_room.size.y - 10)
+		if not spawning_room._point_inside(Vector2(x_pos, y_pos)):
+			print("ERROR")
+		if rng.randi_range(0, 1) == 0:
+			var turret: Turret = turret_scene.instantiate()
+			self.add_child(turret)
+			turret.position = Vector2(x_pos, y_pos)
+			turret.add_to_group("robots")
+			turret.add_to_group("enemies")
+			turret.run = true
+			turret.room = spawning_room
+			spawning_room.enemies[turret] = true
+		else:
+			var turret: Turret = turret_scene.instantiate()
+			self.add_child(turret)
+			turret.position = Vector2(x_pos, y_pos)
+			turret.add_to_group("enemies")
+			turret.add_to_group("robots")
+			turret.run = true
+			turret.room = spawning_room
+			spawning_room.enemies[turret] = true

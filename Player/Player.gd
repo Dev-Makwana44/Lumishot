@@ -33,7 +33,7 @@ const QUANTUM_BLINK_DURATION: float = 5.0
 const SHIELDING_DURATION: float = 10.0
 const INVISIBILITY_DURATION: float = 15.0
 const SPEED_BOOST_DURATION: float = 10.0
-const DAMAGE_FLASH_DURATION: float = 5.0
+const DAMAGE_FLASH_DURATION: float = 1.0
 var FIRE_RATE: float = 0.1
 const MAX_HEALTH: int = 100
 
@@ -43,6 +43,7 @@ const MAX_HEALTH: int = 100
 @onready var camera: Camera2D = get_node("Camera2D")
 @onready var light: PointLight2D = get_node("Cone Light2")
 @onready var area: Area2D = get_node("Area2D")
+#@onraedy var health_bar
 
 var time_since_dash: float = DASH_COOLDOWN
 var time_since_shooting: float = FIRE_RATE
@@ -66,19 +67,22 @@ var speed_boost: bool = false
 var damage_flash: bool = false
 
 var health: int = MAX_HEALTH
+var room: Room = null
 
 func _ready():
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 100)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoBullet.tres") as ItemData, 100)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ExplosiveBullet.tres") as ItemData, 100)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Grenade.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoGrenade.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/FlareGrenade.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/HealthPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/QuantumBlinkPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ShieldingPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/EnergyBoostPotion.tres") as ItemData, 3)
+	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoBullet.tres") as ItemData, 100)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ExplosiveBullet.tres") as ItemData, 100)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ElectricBullet.tres") as ItemData, 100)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/NeurotoxicBullet.tres") as ItemData, 100)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Grenade.tres") as ItemData, 3)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoGrenade.tres") as ItemData, 3)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/FlareGrenade.tres") as ItemData, 3)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/HealthPotion.tres") as ItemData, 3)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData, 3)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/QuantumBlinkPotion.tres") as ItemData, 3)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ShieldingPotion.tres") as ItemData, 3)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/EnergyBoostPotion.tres") as ItemData, 3)
 	set_inventory(self.inventory)
 
 func _physics_process(delta):
@@ -167,11 +171,13 @@ func _unhandled_input(event): # temporary keybinds to zoom in and out using P an
 			camera.zoom -= Vector2(0.1, 0.1)
 		
 func take_damage(damage: int) -> void:
-	self.health -= damage
-	time_since_damage = 0.0
-	self.modulate.g /= 2
-	self.modulate.b /= 2
-	self.damage_flash = true
+	if not quantum_blinking:
+		self.health -= damage if not shielding else damage * 0.5
+		time_since_damage = 0.0
+		if not self.damage_flash:
+			self.modulate.g /= 2
+			self.modulate.b /= 2
+			self.damage_flash = true
 
 func set_inventory(inv: InventoryComponent) -> void:
 	self.inventory = inv
@@ -216,6 +222,6 @@ func use_potion() -> bool:
 	return false
 
 func _on_area_2d_area_entered(area):
-	if area.get_parent() is Bullet and area.get_parent().is_in_group("enemy_bullets"):
+	if area.get_parent() is Bullet and area.get_parent().is_in_group("enemy_bullets") and area.name == "Collision Box":
 		area.get_parent().queue_free()
 		self.take_damage(5)

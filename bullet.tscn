@@ -9,6 +9,7 @@ height = 28.0
 
 [node name="Bullet" type="CharacterBody2D"]
 z_index = 7
+z_as_relative = false
 script = ExtResource("1_yhha3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

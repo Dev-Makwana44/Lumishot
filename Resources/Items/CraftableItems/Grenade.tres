@@ -8,5 +8,5 @@ script = ExtResource("1_plyjf")
 item_id = -11
 item_name = "Grenade"
 item_texture = ExtResource("1_q0hnk")
-item_stack_size = 5
-crafting_batch_size = 1
+item_stack_size = 10
+crafting_batch_size = 3

@@ -14,20 +14,64 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("1_gl1n7")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Info Container" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/separation = -15
+
+[node name="Ammo Info" type="VBoxContainer" parent="Info Container"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 theme_override_constants/separation = 0
 
-[node name="Ammo Label" type="Label" parent="VBoxContainer"]
+[node name="Ammo Label" type="Label" parent="Info Container/Ammo Info"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "ERROR"
 horizontal_alignment = 1
 
-[node name="Ammo Slot" parent="VBoxContainer" instance=ExtResource("1_tkbju")]
+[node name="Ammo Slot" parent="Info Container/Ammo Info" instance=ExtResource("1_tkbju")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="Grenade Info" type="VBoxContainer" parent="Info Container"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/separation = 0
+
+[node name="Grenade Label" type="Label" parent="Info Container/Grenade Info"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ERROR"
+horizontal_alignment = 1
+
+[node name="Grenade Slot" parent="Info Container/Grenade Info" instance=ExtResource("1_tkbju")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="Potion Info" type="VBoxContainer" parent="Info Container"]
+custom_minimum_size = Vector2(175, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/separation = 0
+
+[node name="Potion Label" type="Label" parent="Info Container/Potion Info"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ERROR"
+horizontal_alignment = 1
+
+[node name="Potion Slot" parent="Info Container/Potion Info" instance=ExtResource("1_tkbju")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4

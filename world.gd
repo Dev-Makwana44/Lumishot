@@ -55,6 +55,7 @@ func _process(delta):
 			var bullet_path = get_global_mouse_position() - player.position
 			bullet.set_bullet_type(player.selected_ammo_index)
 			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
+			bullet.z_index = 10
 			player.ammo[player.selected_ammo_index] -= 1
 			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
 			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
@@ -195,7 +196,7 @@ func _generate_dungeon() -> bool:
 			else:
 				room.room_type = LOOT_ROOM
 	
-	for i in range(20):
+	for i in range(5):
 		var collectable: Resource = load("res://Collectables/collectable.tscn")
 		var collectable_instance = collectable.instantiate()
 		collectable_instance.position = player.position + Vector2(100 * (i + 1), 0)
@@ -206,6 +207,7 @@ func _generate_dungeon() -> bool:
 			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Mutated_Blood.tres"))
 		else:
 			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Rabbit_Foot.tres"))
+		#collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Iron.tres"))
 	
 	_create_room_nodes([], main_rooms, mst_path)
 	_draw_hallways(hallways)

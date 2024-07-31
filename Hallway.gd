@@ -30,7 +30,7 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 		if overlap >= line_width:
 			b.room_connection_locations[RIGHT if starting_direction == LEFT else LEFT] = self
 			var line_node: Line2D = Line2D.new()
-			line_node.default_color = Color.BLACK
+			line_node.default_color = Color.DIM_GRAY
 			line_node.width = line_width
 			line_node.z_index = 2
 			if b._get_center().y < a._get_center().y:
@@ -60,11 +60,11 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 				else:
 					b.room_connection_locations[UP] = self
 			var line_node: Line2D = Line2D.new()
-			line_node.default_color = Color.BLACK
+			line_node.default_color = Color.DIM_GRAY
 			line_node.width = line_width
 			line_node.z_index = 2
 			var second_line_node: Line2D = Line2D.new()
-			second_line_node.default_color = Color.BLACK
+			second_line_node.default_color = Color.DIM_GRAY
 			second_line_node.width = line_width
 			second_line_node.z_index = 2
 			if starting_direction == LEFT:
@@ -84,7 +84,7 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 		if overlap >= line_width:
 			b.room_connection_locations[UP if starting_direction == DOWN else DOWN] = self
 			var line_node: Line2D = Line2D.new()
-			line_node.default_color = Color.BLACK
+			line_node.default_color = Color.DIM_GRAY
 			line_node.width = line_width
 			line_node.z_index = 2
 			if b._get_center().x < a._get_center().x:
@@ -114,11 +114,11 @@ func _create_path(line_width: int, starting_direction: int) -> bool:
 				else:
 					b.room_connection_locations[LEFT] = self
 			var line_node: Line2D = Line2D.new()
-			line_node.default_color = Color.BLACK
+			line_node.default_color = Color.DIM_GRAY
 			line_node.width = line_width
 			line_node.z_index = 2
 			var second_line_node: Line2D = Line2D.new()
-			second_line_node.default_color = Color.BLACK
+			second_line_node.default_color = Color.DIM_GRAY
 			second_line_node.width = line_width
 			second_line_node.z_index = 3
 			if starting_direction == DOWN:

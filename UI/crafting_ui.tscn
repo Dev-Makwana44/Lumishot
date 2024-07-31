@@ -106,7 +106,9 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "Try different combinations, or select a learned recipe to craft.
 Order does not matter.
-Bullets are crafted in batches of 30."
+Bullets are crafted in batches of 30, potions in batches of 3.
+Click on an item in inventory to add it to the crafting slots.
+Click on a crafting slot to remove the item there."
 horizontal_alignment = 1
 
 [node name="CraftButton" type="Button" parent="MarginContainer/HBoxContainer/Crafting Area"]

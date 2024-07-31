@@ -1,10 +1,12 @@
-[gd_scene load_steps=13 format=3 uid="uid://cakxa05kasxk6"]
+[gd_scene load_steps=15 format=3 uid="uid://cakxa05kasxk6"]
 
 [ext_resource type="Script" path="res://Player/Player.gd" id="1_mgulk"]
 [ext_resource type="Texture2D" uid="uid://bumklc8o3q8wn" path="res://Tech Dungeon Roguelite - Asset Pack (DEMO)/Players/players blue x3.png" id="2_j5n47"]
 [ext_resource type="Texture2D" uid="uid://dour3wsh5630m" path="res://Player/Gun.png" id="3_j3kcd"]
 [ext_resource type="Texture2D" uid="uid://bg26pv11k0q33" path="res://Resources/Lighting/circle.png" id="5_6a88h"]
+[ext_resource type="AudioStream" uid="uid://s5dvv1ob5odx" path="res://sfx/pickup.mp3" id="6_te1m1"]
 [ext_resource type="Texture2D" uid="uid://bp0ce7tvptbig" path="res://Resources/Lighting/cone light 2.jpg" id="7_f2eov"]
+[ext_resource type="AudioStream" uid="uid://b6fxlyoeevqec" path="res://sfx/footstep.wav" id="7_gbyrh"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_klxtj"]
 radius = 18.0
@@ -89,3 +91,11 @@ shadow_enabled = true
 shadow_filter = 2
 texture = ExtResource("7_f2eov")
 offset = Vector2(157, 2)
+
+[node name="pickup" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_te1m1")
+max_distance = 1e+09
+
+[node name="footstep" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_gbyrh")
+max_distance = 1e+07

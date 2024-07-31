@@ -6,25 +6,19 @@
 [ext_resource type="PackedScene" uid="uid://t7iierwocm7a" path="res://UI/help_menu.tscn" id="5_3jgu8"]
 [ext_resource type="PackedScene" uid="uid://tng4oxoyfv3d" path="res://UI/hud.tscn" id="6_2rqlw"]
 [ext_resource type="PackedScene" uid="uid://bpuxf3x1nl4qm" path="res://UI/crafting_ui.tscn" id="6_8mgjt"]
-[ext_resource type="AudioStream" uid="uid://cvrrd44cxo6q8" path="res://sfx/gunshot.mp3" id="7_l8s2e"]
-[ext_resource type="AudioStream" uid="uid://s5dvv1ob5odx" path="res://sfx/pickup.mp3" id="8_ewlmh"]
-[ext_resource type="AudioStream" uid="uid://c2xsu7l4lmle" path="res://music/TomC_ItchSFX_Soundtrack_SpecOps.mp3" id="9_n24yp"]
+[ext_resource type="PackedScene" uid="uid://ct7ols0jco0sy" path="res://UI/loss_screen.tscn" id="7_hnyfh"]
+[ext_resource type="AudioStream" uid="uid://cvrrd44cxo6q8" path="res://sfx/gunshot.mp3" id="7_vfxup"]
+[ext_resource type="PackedScene" uid="uid://c4v0ab5iil7a" path="res://UI/level_completion_screen.tscn" id="8_0bkmx"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_1yueh")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0.201527, 0.201527, 0.201527, 1)
+color = Color(0.129558, 0.129558, 0.129558, 1)
 
 [node name="Player" parent="." instance=ExtResource("1_07yc4")]
 unique_name_in_owner = true
 position = Vector2(172, 184)
-
-[node name="gunshot" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("7_l8s2e")
-volume_db = 10.0
-max_distance = 1e+06
-attenuation = 0.0228764
 
 [node name="UI_Container" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
@@ -39,11 +33,12 @@ unique_name_in_owner = true
 [node name="HUD" parent="UI_Container" instance=ExtResource("6_2rqlw")]
 unique_name_in_owner = true
 
-[node name="pickup" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("8_ewlmh")
-max_distance = 1e+09
+[node name="Loss Screen" parent="UI_Container" instance=ExtResource("7_hnyfh")]
+unique_name_in_owner = true
 
-[node name="music" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("9_n24yp")
-autoplay = true
-max_distance = 1e+07
+[node name="Level Completion Screen" parent="UI_Container" instance=ExtResource("8_0bkmx")]
+unique_name_in_owner = true
+
+[node name="gunshot" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_vfxup")
+max_distance = 1e+10

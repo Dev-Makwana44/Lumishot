@@ -163,16 +163,14 @@ func _physics_process(delta):
 				self.quantum_blinking = false
 				self.modulate.r *= 2
 		
-		move_and_slide()
-		
-		
+		move_and_slide()		
 
-func _unhandled_input(event): # temporary keybinds to zoom in and out using P and O
-	if event is InputEventKey:
-		if event.pressed and event.keycode == KEY_P:
-			camera.zoom += Vector2(0.1, 0.1)
-		elif event.pressed and event.keycode == KEY_O:
-			camera.zoom -= Vector2(0.1, 0.1)
+#func _unhandled_input(event):
+	#if event is InputEventKey:
+		#if event.pressed and event.keycode == KEY_P:
+			#camera.zoom += Vector2(0.1, 0.1)
+		#elif event.pressed and event.keycode == KEY_O:
+			#camera.zoom -= Vector2(0.1, 0.1)
 		
 func take_damage(damage: int) -> void:
 	if not quantum_blinking:

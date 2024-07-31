@@ -131,7 +131,7 @@ polygon = PackedVector2Array(0, 0, 1050, -540, 1050, 540)
 
 [node name="Cone Light2" type="PointLight2D" parent="Face"]
 scale = Vector2(4.38758, 3.53425)
-energy = 0.5
+energy = 0.25
 range_z_max = 9
 shadow_enabled = true
 shadow_filter = 2
@@ -150,6 +150,9 @@ shape = SubResource("RectangleShape2D_a7blq")
 points = PackedVector2Array(-16, 20, 16, 20)
 width = 2.0
 default_color = Color(0, 1, 0, 1)
+
+[node name="sentry_turn" type="AudioStreamPlayer2D" parent="."]
+max_distance = 1e+10
 
 [connection signal="area_entered" from="Collision Box" to="." method="_on_collision_box_area_entered"]
 [connection signal="frame_changed" from="Face" to="." method="_on_face_frame_changed"]

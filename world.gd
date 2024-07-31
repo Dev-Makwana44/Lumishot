@@ -1,6 +1,6 @@
 extends Node2D
 
-const NUMBER_OF_ROOMS_GENERATED: int = 50
+var NUMBER_OF_ROOMS_GENERATED: int = 50
 const PERCENTAGE_OF_MAIN_ROOMS: float = 0.3
 const ROOM_SIZE_MIN: int = 300 * 1.5
 const ROOM_SIZE_MAX: int = 1500 * 1.5
@@ -15,11 +15,17 @@ const turret_scene: PackedScene = preload("res://Enemies/turret.tscn")
 @onready var player: Player = %Player
 @onready var hud: HUD = %HUD
 @onready var ui_container: UI_CONTAINER = %UI_Container
+@onready var loss_screen: LossScreen = %"Loss Screen"
+@onready var level_completion_screen: LevelCompletionScreen = %"Level Completion Screen"
 @onready var gunshot = $gunshot
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var new_walls: Array
 var time_since_entering_room: float = 0.0
+var level: int = 0
+var hallways: Array[Hallway] = []
+var level_cleared: bool = false
+
 
 class CustomAStar:
 	extends AStar2D
@@ -31,23 +37,38 @@ class CustomAStar:
 	func _estimate_cost(from_id, to_id):
 		return self._compute_cost(from_id, to_id)
 
-var hallways: Array[Hallway] = []
-
-
 func _ready():
-	var starting_time: int = Time.get_ticks_msec()
-	#while not _generate_dungeon():
-		#print("Restarting dungeon generation process")
 	while true:
 		print("generating dungeon")
-		if _generate_dungeon():
+		if _generate_dungeon(level):
 			break
-	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
-	#var times: Array[int] = []
-
-
+	loss_screen.hide()
+	level_completion_screen.hide()
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	if level_cleared and level_completion_screen.continue_game:
+		level += 1
+		_ready()
+		player.game_paused = false
+	elif player.health <= 0 and loss_screen.restart_game:
+		level = 0
+		for enemy in get_tree().get_nodes_in_group("enemies"):
+			enemy.queue_free()
+		#_ready()
+		for room: Room in rooms:
+			if room.room_type == STARTING_ROOM:
+				player.position = room._get_center()
+			elif room.room_type == BOSS_ROOM:
+				spawn_enemies(room, level + 5)
+			else:
+				spawn_enemies(room, level)
+		player.inventory = InventoryComponent.new()
+		player.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
+		player.set_inventory(player.inventory)
+		player.game_paused = false
+		loss_screen.hide()
+
 	#if current_room == null:
 		#for room: Room in rooms:
 			#if room._point_inside(player.position):
@@ -64,7 +85,7 @@ func _process(delta):
 				time_since_entering_room = 0.0
 				break
 	else:
-		if player.room.room_type != STARTING_ROOM and time_since_entering_room > 0.5 and time_since_entering_room < 1.0 and new_walls != null and len(new_walls) == 0:
+		if player.room.room_type != STARTING_ROOM and time_since_entering_room > 0.5 and time_since_entering_room < 1.0 and new_walls != null and len(new_walls) == 0 and len(player.room.enemies) > 0:
 			new_walls = close_room(player.room)
 		if not player.room._point_inside(player.position):
 			player.room = null
@@ -98,32 +119,25 @@ func _process(delta):
 		if enemy.health <= 0:
 			enemy.room.enemies.erase(enemy)
 			if len(enemy.room.enemies) == 0:
-				self.remove_child(new_walls[0])
-				self.remove_child(new_walls[1])
+				if len(new_walls) > 0:
+					self.remove_child(new_walls[0])
+					self.remove_child(new_walls[1])
+					new_walls = []
+				#time_since_entering_room = 0.0
 			enemy.drop_loot()
 			enemy.queue_free()
+			var enemies_in_dungeon: bool = false
+			for room: Room in rooms:
+				if len(room.enemies) > 0:
+					enemies_in_dungeon = true
+					break
+			if not enemies_in_dungeon and player.health > 0:
+				player.game_paused = true
+				level_completion_screen.show()
+				level_cleared = true
 	
 	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
-		if player.ammo[player.selected_ammo_index] > 0:
-
-			player.time_since_shooting = 0.0
-			var bullet: Bullet = Bullet.new()
-			self.add_child(bullet)
-			await bullet.is_node_ready()
-			bullet.position = player.position
-			var bullet_path = get_global_mouse_position() - player.position
-			bullet.set_bullet_type(player.selected_ammo_index)
-			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
-			bullet.z_index = 10
-			player.ammo[player.selected_ammo_index] -= 1
-			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
-			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
-			
-			gunshot.play()
-			
-			if player.ammo[player.selected_ammo_index] == 0:
-				ui_container.select_ammo_up()
-
+		if player.ammo[player.selected_ammo_index] > 0 and not player.game_paused:
 			if player.room != null:
 				player.time_since_shooting = 0.0
 				var bullet: Bullet = Bullet.new()
@@ -140,9 +154,10 @@ func _process(delta):
 				hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
 				if player.ammo[player.selected_ammo_index] == 0:
 					ui_container.select_ammo_up()
+				gunshot.play()
 
 	if Input.is_action_just_pressed("use_potion"):
-		if player.potions[player.selected_potion_index] > 0:
+		if player.potions[player.selected_potion_index] > 0 and not player.game_paused:
 			if player.use_potion():
 				player.potions[player.selected_potion_index] -= 1
 				player.inventory.remove_items([hud.potion_slot.item_data])
@@ -150,9 +165,8 @@ func _process(delta):
 				if player.potions[player.selected_potion_index] == 0:
 					ui_container.select_potion()
 
-
 	if Input.is_action_just_pressed("throw_grenade"):
-		if player.grenades[player.selected_grenade_index] > 0:
+		if player.grenades[player.selected_grenade_index] > 0 and not player.game_paused:
 			var grenade_path = get_global_mouse_position() - player.position
 			var grenade: Grenade = Grenade.new(player.selected_grenade_index, atan2(grenade_path.y, grenade_path.x))#, get_global_mouse_position())
 			self.add_child(grenade)
@@ -168,14 +182,19 @@ func _process(delta):
 				ui_container.select_grenade()
 	
 	if player.health != int(ui_container.hud.health_label.text):
+		if player.health <= 0:
+			loss_screen.show()
+			player.game_paused = true
+			for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
+				enemy.run = false
 		ui_container.hud.health_label.text = str(player.health)
 		
 var rooms: Array[Room] = []
-func _generate_dungeon() -> bool:
+func _generate_dungeon(level: int) -> bool:
 	rooms = []	
 	# Create Rooms
 	
-	for i in range(NUMBER_OF_ROOMS_GENERATED):
+	for i in range(NUMBER_OF_ROOMS_GENERATED + 10 * level):
 		var width : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var height : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var x_pos: int = rng.randi_range(-100, 100)
@@ -287,42 +306,43 @@ func _generate_dungeon() -> bool:
 				hallways.append(Hallway.new(room, room_connections[direction][0]))
 				if not hallways[-1]._create_path(rng.randi_range(300, 500), direction):
 					return false
-				var temp = hallways[-1]._create_collision_polygon()
-				var polygon: Polygon2D = Polygon2D.new()
-				polygon.polygon = temp.points
+				#var temp = hallways[-1]._create_collision_polygon()
+				#var polygon: Polygon2D = Polygon2D.new()
+				#polygon.polygon = temp.points
 				#add_child(polygon)
-				if hallways[-1].has_overlapping_areas():
-					print("HALLWAY COLLISION")
-					return false
+				#if hallways[-1].has_overlapping_areas():
+					#print("HALLWAY COLLISION")
+					#return false
 	var starting_room_chosen: bool = false
 	for room in main_rooms:
 		if room.room_type == STARTING_ROOM:
 			if not starting_room_chosen:
 				player.position = room._get_center()
-				#turret.position = player.position + Vector2(50, 0)
-				#turret.add_to_group("enemies")
-				#turret.add_to_group("robots")
 				starting_room_chosen = true
 				break
 			else:
-				room.room_type = LOOT_ROOM
+				room.room_type = NORMAL_ROOM
 	
 	for room in main_rooms:
 		if room.room_type == NORMAL_ROOM:
 			#print("spawning enemies")
-			spawn_enemies(room)
+			spawn_enemies(room, level)
 	
-	for i in range(5):
-		var collectable: Resource = load("res://Collectables/collectable.tscn")
-		var collectable_instance = collectable.instantiate()
-		collectable_instance.position = player.position + Vector2(100 * (i + 1), 0)
-		add_child(collectable_instance)
-		if i % 3 == 0:
-			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Bioluminescent_Bacteria.tres"))
-		elif i % 3 == 1:
-			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Mutated_Blood.tres"))
-		else:
-			collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Rabbit_Foot.tres"))
+	for room in main_rooms:
+		if room.room_type == BOSS_ROOM:
+			spawn_enemies(room, level + 5)
+	
+	#for i in range(5):
+		#var collectable: Resource = load("res://Collectables/collectable.tscn")
+		#var collectable_instance = collectable.instantiate()
+		#collectable_instance.position = player.position + Vector2(100 * (i + 1), 0)
+		#add_child(collectable_instance)
+		#if i % 3 == 0:
+			#collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Bioluminescent_Bacteria.tres"))
+		#elif i % 3 == 1:
+			#collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Mutated_Blood.tres"))
+		#else:
+			#collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Rabbit_Foot.tres"))
 		#collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Iron.tres"))
 	
 	_create_room_nodes([], main_rooms, mst_path)
@@ -339,6 +359,7 @@ func _create_room_nodes(rooms: Array[Room], main_rooms: Array[Room], path: AStar
 		room_node.position.x = room.position.x
 		room_node.position.y = room.position.y
 		add_child(room_node)
+		room_node.add_to_group("dungeon")
 	
 	for room in main_rooms:
 		var room_node = ColorRect.new()
@@ -349,15 +370,16 @@ func _create_room_nodes(rooms: Array[Room], main_rooms: Array[Room], path: AStar
 		#room_node.color = Color(0, 255, 0)
 		if room.room_type == BOSS_ROOM:
 			room_node.color = Color.RED
-		elif room.room_type == STARTING_ROOM:
-			room_node.color = Color.BLUE
-		elif room.room_type == LOOT_ROOM:
-			room_node.color = Color.ORANGE
-		elif room.room_type == NORMAL_ROOM:
-			room_node.color = Color.BLUE_VIOLET
+		#elif room.room_type == STARTING_ROOM:
+			#room_node.color = Color.BLUE
+		#elif room.room_type == LOOT_ROOM:
+			#room_node.color = Color.ORANGE
+		#elif room.room_type == NORMAL_ROOM:
+			#room_node.color = Color.BLUE_VIOLET
 		else:
-			room_node.color = Color.GREEN
+			room_node.color = Color.DIM_GRAY
 		add_child(room_node)
+		room_node.add_to_group("dungeon")
 
 func _draw_mst(path: CustomAStar) -> void:
 	for p in path.get_point_ids():
@@ -377,6 +399,7 @@ func _draw_hallways(hallways: Array[Hallway]) -> void:
 	for hallway: Hallway in hallways:
 		for line_node: Line2D in hallway.lines:
 			add_child(line_node)
+			line_node.add_to_group("dungeon")
 
 func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 	for room: Room in rooms:
@@ -575,6 +598,7 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 				add_child(line)
 
 func close_room(room: Room) -> Array:
+	print("room")
 	var static_body: StaticBody2D = StaticBody2D.new()
 	var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 	collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
@@ -616,8 +640,8 @@ func _create_mst(rooms: Array) -> CustomAStar:
 		rooms.erase(min_p)
 	return path
 
-func spawn_enemies(spawning_room: Room) -> void:
-	for i in range(rng.randi_range(5, 10)):
+func spawn_enemies(spawning_room: Room, level: int) -> void:
+	for i in range(rng.randi_range(2 + level, 7 + level)):
 	#for i in range(5):
 		var x_pos = rng.randi_range(spawning_room.position.x + 10, spawning_room.position.x + spawning_room.size.x - 10)
 		var y_pos = rng.randi_range(spawning_room.position.y + 10, spawning_room.position.y + spawning_room.size.y - 10)

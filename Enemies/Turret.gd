@@ -6,6 +6,7 @@ extends Enemy
 @onready var collision_box: Area2D = $"Collision Box"
 @onready var bullet_spawn_locations: Line2D = $"Face/Bullet Spawn Locations"
 @onready var health_bar: Line2D = $"Health Bar"
+@onready var sentry_turn = $sentry_turn
 
 const COLLECTABLE_ITEM: PackedScene = preload("res://Collectables/collectable.tscn")
 
@@ -83,7 +84,7 @@ func _physics_process(delta):
 		elif rotation_difference < -PI:
 			rotation_difference += 2 * PI
 		turret_face.rotation += min(rotation_speed * delta, abs(rotation_difference)) * sign(rotation_difference)
-
+		sentry_turn.play()
 
 func _on_face_frame_changed():
 	if turret_face.frame == 7 and not fired_this_animation:

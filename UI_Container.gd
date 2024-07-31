@@ -5,6 +5,8 @@ extends CanvasLayer
 @onready var crafting_ui: Crafting_UI = %"Crafting UI"
 @onready var help_menu_ui = %"Help Menu"
 @onready var hud: HUD = %HUD
+@onready var loss_screen: LossScreen = %"Loss Screen"
+@onready var level_completion_screen: LevelCompletionScreen = %"Level Completion Screen"
 
 
 var bullets_data: Dictionary = {
@@ -36,7 +38,7 @@ func _ready() -> void:
 
 func _process(delta) -> void:
 	if Input.is_action_just_pressed("open_inventory"):
-		if not crafting_ui.visible:
+		if not crafting_ui.visible and (player.room == null or len(player.room.enemies) == 0) and not level_completion_screen.visible and not loss_screen.visible:
 			player.game_paused = true
 			hud.hide()
 			help_menu_ui.hide()
@@ -51,7 +53,7 @@ func _process(delta) -> void:
 			player.set_inventory(crafting_ui.inventory)
 			hud.set_ammo(bullets_data[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
 			
-	if Input.is_action_just_pressed("help"):
+	if Input.is_action_just_pressed("help") and not level_completion_screen.visible and not loss_screen.visible:
 		if not help_menu_ui.visible:
 			help_menu_ui.show()
 		else:

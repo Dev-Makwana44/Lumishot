@@ -6,12 +6,12 @@ var inventory_contents: Dictionary = {}
 
 
 func add_item(item: ItemData) -> void:
-	if inventory_contents.has(item):
-		if inventory_contents[item] < item.item_stack_size:
-			inventory_contents[item] += 1
-	else:
-		inventory_contents[item] = 1
-
+	#if inventory_contents.has(item):
+		#if inventory_contents[item] < item.item_stack_size:
+			#inventory_contents[item] += 1
+	#else:
+		#inventory_contents[item] = 1
+	inventory_contents[item] = inventory_contents.get(item, 0) + 1
 	#update_inventory_ui.emit()
 
 func add_item_with_amount(item: ItemData, amount: int) -> void:

@@ -12,6 +12,7 @@ const STARTING_ROOM: int = 4
 @onready var player: Player = %Player
 @onready var hud: HUD = %HUD
 @onready var ui_container: UI_CONTAINER = %UI_Container
+@onready var gunshot = $gunshot
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
@@ -59,6 +60,9 @@ func _process(delta):
 			player.ammo[player.selected_ammo_index] -= 1
 			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
 			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
+			
+			gunshot.play()
+			
 			if player.ammo[player.selected_ammo_index] == 0:
 				ui_container.select_ammo_up()
 

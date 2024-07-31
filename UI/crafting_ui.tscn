@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bpuxf3x1nl4qm"]
+[gd_scene load_steps=25 format=3 uid="uid://bpuxf3x1nl4qm"]
 
 [ext_resource type="Script" path="res://UI/crafting_ui.gd" id="1_7a5ht"]
 [ext_resource type="PackedScene" uid="uid://qohoq64bw08u" path="res://UI/inventory_slot.tscn" id="2_b101h"]
@@ -16,6 +16,14 @@
 [ext_resource type="Resource" uid="uid://mnu4e1ttmubq" path="res://Resources/recipes/GrenadeRecipe.tres" id="12_elmfu"]
 [ext_resource type="Resource" uid="uid://bcsqk6aacdxdi" path="res://Resources/recipes/CryoGrenadeRecipe.tres" id="13_pwano"]
 [ext_resource type="Resource" uid="uid://c6w18ckovqkw0" path="res://Resources/recipes/FlareGrenadeRecipe.tres" id="14_0qo32"]
+[ext_resource type="AudioStream" uid="uid://n770r5n3w2dj" path="res://sfx/broken.mp3" id="17_fahdx"]
+[ext_resource type="AudioStream" uid="uid://c84tcouyx4vck" path="res://sfx/craft.mp3" id="18_gaahm"]
+[ext_resource type="AudioStream" uid="uid://ba17v4ifnedec" path="res://sfx/unsuccessful.mp3" id="18_nop40"]
+[ext_resource type="AudioStream" uid="uid://587h6sye45k1" path="res://sfx/select.mp3" id="19_njp83"]
+[ext_resource type="AudioStream" uid="uid://b2o170aphouf8" path="res://sfx/place.mp3" id="20_xhq3h"]
+[ext_resource type="AudioStream" uid="uid://bqu08ue06srxx" path="res://sfx/unlock.mp3" id="22_ql31q"]
+[ext_resource type="AudioStream" uid="uid://1kmhdicuap2j" path="res://sfx/open.mp3" id="23_2ryyc"]
+[ext_resource type="AudioStream" uid="uid://d0321dbc7aj0t" path="res://sfx/close.mp3" id="24_p2hof"]
 
 [node name="Crafting UI" type="PanelContainer"]
 anchors_preset = 15
@@ -57,18 +65,22 @@ layout_mode = 2
 size_flags_vertical = 3
 columns = 3
 
+[node name="TitleLabel" type="Label" parent="MarginContainer/HBoxContainer/Player Inventory BVox/InventoryTree"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 304.0
+offset_top = -40.0
+offset_right = 864.0
+offset_bottom = 5.0
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Crafting Area" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 alignment = 1
-
-[node name="TitleLabel" type="Label" parent="MarginContainer/HBoxContainer/Crafting Area"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="ItemTexture" type="TextureRect" parent="MarginContainer/HBoxContainer/Crafting Area"]
 unique_name_in_owner = true
@@ -131,6 +143,38 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 columns = 3
+
+[node name="broken" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("17_fahdx")
+max_distance = 1e+11
+
+[node name="craft" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("18_gaahm")
+max_distance = 1e+07
+
+[node name="select" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("19_njp83")
+max_distance = 1e+10
+
+[node name="unsuccessful" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("18_nop40")
+max_distance = 1e+07
+
+[node name="place" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("20_xhq3h")
+max_distance = 1e+10
+
+[node name="unlock" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("22_ql31q")
+max_distance = 1e+13
+
+[node name="open" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("23_2ryyc")
+max_distance = 1e+10
+
+[node name="close" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("24_p2hof")
+max_distance = 1e+11
 
 [connection signal="item_selected" from="MarginContainer/HBoxContainer/Player Inventory BVox/InventoryTree" to="." method="_on_inventory_tree_item_selected"]
 [connection signal="gui_input" from="MarginContainer/HBoxContainer/Crafting Area" to="." method="_on_crafting_area_gui_input"]

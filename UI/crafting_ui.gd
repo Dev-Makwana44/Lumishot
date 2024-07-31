@@ -8,6 +8,14 @@ extends PanelContainer
 @onready var title_label: Label = %TitleLabel
 @onready var crafting_slots: Array[InventorySlot] = [%CraftingSlot1, %CraftingSlot2, %CraftingSlot3]
 @onready var item_texture: TextureRect = %ItemTexture
+@onready var broken = $broken
+@onready var craft = $craft
+@onready var select = $select
+@onready var unsuccessful = $unsuccessful
+@onready var place = $place
+@onready var unlock = $unlock
+@onready var open = $open
+@onready var close = $close
 
 var cross_mark = load("res://Resources/Images/Cross.png") as CompressedTexture2D
 var check_mark = load("res://Resources/Images/Check.png") as CompressedTexture2D
@@ -26,6 +34,9 @@ func _ready() -> void:
 	build_recipe_dictionary()
 	build_recipe_tree()
 	build_discovered_dictionary()
+	
+	open.play()
+	
 	for slot: InventorySlot in crafting_slots:
 		slot.set_item_data(null, 1)
 
@@ -146,21 +157,33 @@ func crafting_slot_click(index: int) -> void:
 	if crafting_slots[index].item_data != null:
 		inventory.add_item(crafting_slots[index].item_data)
 		populate_inventory()
+		
+	place.play()
+		
 	crafting_slots[index].set_item_data(null, 1)
 	title_label.text = ""
 	item_texture.texture = question_mark
 	#recipe_tree.deselect_all()
 
 func _on_craft_button_button_down():
+	
+	select.play()
+	
 	var craftable_item: ItemData = check_crafting_recipes()
 	if craftable_item != null:
 		inventory.add_crafted_item(craftable_item)
 		populate_inventory()
 		for slot in crafting_slots:
 			slot.set_item_data(null, 1)
+			
+		craft.play()
+			
 		item_texture.texture = question_mark
 		if discovered_recipes[craftable_item.item_name] == false:
 			discovered_recipes[craftable_item.item_name] = true
+			
+			unlock.play()
+			
 			var tree_item: TreeItem = recipe_tree.get_root()
 			while true:
 				if tree_item == null:
@@ -169,3 +192,7 @@ func _on_craft_button_button_down():
 					tree_item.set_icon(1, check_mark)
 					break
 				tree_item = tree_item.get_next_in_tree()
+				
+	else:
+		
+		unsuccessful.play()

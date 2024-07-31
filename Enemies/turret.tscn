@@ -1,0 +1,155 @@
+[gd_scene load_steps=19 format=3 uid="uid://cfsodffdvsin7"]
+
+[ext_resource type="Script" path="res://Enemies/Turret.gd" id="1_3qx31"]
+[ext_resource type="Texture2D" uid="uid://cuhoxwjnj7otv" path="res://Enemies/Images/Turret Base.png" id="2_jo06s"]
+[ext_resource type="Texture2D" uid="uid://dtm3kc51ikur7" path="res://Resources/Images/Electronics.png" id="2_wxoii"]
+[ext_resource type="Texture2D" uid="uid://cm1fsuu10csid" path="res://Enemies/Images/Turret Face.png" id="3_jj76x"]
+[ext_resource type="Texture2D" uid="uid://bp0ce7tvptbig" path="res://Resources/Lighting/cone light 2.jpg" id="5_8c18m"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a7blq"]
+size = Vector2(32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nrlff"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gujha"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bcaux"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2mooq"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x8f2p"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1n1jb"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 160, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lu7ju"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 192, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_edg2l"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 224, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h84lv"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 256, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3f8xt"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 288, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7lvqf"]
+atlas = ExtResource("3_jj76x")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pxcbx"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nrlff")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gujha")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bcaux")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2mooq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x8f2p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1n1jb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lu7ju")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_edg2l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h84lv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3f8xt")
+}],
+"loop": true,
+"name": &"firing",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7lvqf")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="Turret" type="CharacterBody2D"]
+z_index = 4
+scale = Vector2(3, 3)
+script = ExtResource("1_3qx31")
+
+[node name="Temp" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0.205117, 0.205117, 0.205117, 1)
+position = Vector2(863.5, -95.25)
+scale = Vector2(120.906, 59.9844)
+texture = ExtResource("2_wxoii")
+
+[node name="Collision Box" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collision Box"]
+shape = SubResource("RectangleShape2D_a7blq")
+
+[node name="Base" type="Sprite2D" parent="."]
+texture = ExtResource("2_jo06s")
+
+[node name="Face" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_pxcbx")
+animation = &"firing"
+
+[node name="Search Area" type="Area2D" parent="Face"]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Face/Search Area"]
+scale = Vector2(0.75, 0.75)
+polygon = PackedVector2Array(0, 0, 1050, -540, 1050, 540)
+
+[node name="Cone Light2" type="PointLight2D" parent="Face"]
+scale = Vector2(4.38758, 3.53425)
+energy = 0.5
+range_z_max = 9
+shadow_enabled = true
+shadow_filter = 2
+texture = ExtResource("5_8c18m")
+offset = Vector2(157, 2)
+
+[node name="Bullet Spawn Locations" type="Line2D" parent="Face"]
+points = PackedVector2Array(16, -5, 16, 5)
+width = 0.0
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("RectangleShape2D_a7blq")
+
+[node name="Health Bar" type="Line2D" parent="."]
+points = PackedVector2Array(-16, 20, 16, 20)
+width = 2.0
+default_color = Color(0, 1, 0, 1)
+
+[connection signal="area_entered" from="Collision Box" to="." method="_on_collision_box_area_entered"]
+[connection signal="frame_changed" from="Face" to="." method="_on_face_frame_changed"]

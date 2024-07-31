@@ -1,5 +1,8 @@
 [gd_scene load_steps=15 format=3 uid="uid://cakxa05kasxk6"]
 
+[gd_scene load_steps=14 format=3 uid="uid://cakxa05kasxk6"]
+
+
 [ext_resource type="Script" path="res://Player/Player.gd" id="1_mgulk"]
 [ext_resource type="Texture2D" uid="uid://bumklc8o3q8wn" path="res://Tech Dungeon Roguelite - Asset Pack (DEMO)/Players/players blue x3.png" id="2_j5n47"]
 [ext_resource type="Texture2D" uid="uid://dour3wsh5630m" path="res://Player/Gun.png" id="3_j3kcd"]
@@ -7,10 +10,6 @@
 [ext_resource type="AudioStream" uid="uid://s5dvv1ob5odx" path="res://sfx/pickup.mp3" id="6_te1m1"]
 [ext_resource type="Texture2D" uid="uid://bp0ce7tvptbig" path="res://Resources/Lighting/cone light 2.jpg" id="7_f2eov"]
 [ext_resource type="AudioStream" uid="uid://b6fxlyoeevqec" path="res://sfx/footstep.wav" id="7_gbyrh"]
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_klxtj"]
-radius = 18.0
-height = 46.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7r2de"]
 atlas = ExtResource("2_j5n47")
@@ -60,12 +59,17 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_klxtj"]
+radius = 18.0
+height = 46.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kg17a"]
+radius = 2.6674
+height = 11.5019
+
 [node name="Player" type="CharacterBody2D"]
 z_index = 10
 script = ExtResource("1_mgulk")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CapsuleShape2D_klxtj")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -24)
@@ -92,6 +96,7 @@ shadow_filter = 2
 texture = ExtResource("7_f2eov")
 offset = Vector2(157, 2)
 
+
 [node name="pickup" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("6_te1m1")
 max_distance = 1e+09
@@ -99,3 +104,22 @@ max_distance = 1e+09
 [node name="footstep" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("7_gbyrh")
 max_distance = 1e+07
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -11)
+shape = SubResource("CapsuleShape2D_klxtj")
+
+[node name="Area2D" type="Area2D" parent="."]
+scale = Vector2(4.38758, 3.53425)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, -4)
+scale = Vector2(-1.28167, 1.18417)
+shape = SubResource("CapsuleShape2D_kg17a")
+
+[node name="Health Bar" type="Line2D" parent="."]
+points = PackedVector2Array(-24, 25, 28, 25)
+
+[connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+

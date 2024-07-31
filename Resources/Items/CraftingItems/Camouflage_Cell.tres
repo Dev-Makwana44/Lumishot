@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_8uuta")
 item_id = 5
-item_name = ""
+item_name = "Camouflage Cell"
 item_texture = ExtResource("1_2jujg")
-item_stack_size = 2
+item_stack_size = 5
 crafting_batch_size = 1

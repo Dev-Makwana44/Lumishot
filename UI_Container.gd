@@ -50,6 +50,7 @@ func _process(delta) -> void:
 			crafting_ui.clear_crafting_grid()
 			player.set_inventory(crafting_ui.inventory)
 			hud.set_ammo(bullets_data[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
+			
 	if Input.is_action_just_pressed("help"):
 		if not help_menu_ui.visible:
 			help_menu_ui.show()

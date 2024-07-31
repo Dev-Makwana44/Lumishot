@@ -1,0 +1,35 @@
+[gd_scene load_steps=8 format=3 uid="uid://ccyqf1eriwngl"]
+
+[ext_resource type="Script" path="res://world.gd" id="1_1yueh"]
+[ext_resource type="PackedScene" uid="uid://cakxa05kasxk6" path="res://Player/Player.tscn" id="1_07yc4"]
+[ext_resource type="Script" path="res://UI_Container.gd" id="3_f8rko"]
+[ext_resource type="PackedScene" uid="uid://cfsodffdvsin7" path="res://Enemies/turret.tscn" id="3_yby3v"]
+[ext_resource type="PackedScene" uid="uid://t7iierwocm7a" path="res://UI/help_menu.tscn" id="5_3jgu8"]
+[ext_resource type="PackedScene" uid="uid://tng4oxoyfv3d" path="res://UI/hud.tscn" id="6_2rqlw"]
+[ext_resource type="PackedScene" uid="uid://bpuxf3x1nl4qm" path="res://UI/crafting_ui.tscn" id="6_8mgjt"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_1yueh")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.201527, 0.201527, 0.201527, 1)
+
+[node name="Player" parent="." instance=ExtResource("1_07yc4")]
+unique_name_in_owner = true
+position = Vector2(172, 184)
+
+[node name="Turret" parent="." instance=ExtResource("3_yby3v")]
+unique_name_in_owner = true
+
+[node name="UI_Container" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_f8rko")
+
+[node name="Crafting UI" parent="UI_Container" instance=ExtResource("6_8mgjt")]
+unique_name_in_owner = true
+
+[node name="Help Menu" parent="UI_Container" instance=ExtResource("5_3jgu8")]
+unique_name_in_owner = true
+
+[node name="HUD" parent="UI_Container" instance=ExtResource("6_2rqlw")]
+unique_name_in_owner = true

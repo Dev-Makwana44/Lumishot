@@ -39,11 +39,15 @@ func _ready():
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	
 	for bullet: Bullet in get_tree().get_nodes_in_group("bullets"):
-		if bullet.get_slide_collision_count() > 1:
-			print("Bullet hit wall")
+		var bullet_in_room: bool = false
+		for room: Room in rooms:
+			if room._point_inside(bullet.position):
+				bullet_in_room = true
+				break
+		if not bullet_in_room:
 			bullet.queue_free()
+			print("Bullet out of rooms")
 	
 	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
 		if player.ammo[player.selected_ammo_index] > 0:
@@ -56,12 +60,39 @@ func _process(delta):
 			bullet.set_bullet_type(player.selected_ammo_index)
 			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
 			bullet.z_index = 10
+			bullet.add_to_group("bullets")
 			player.ammo[player.selected_ammo_index] -= 1
 			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
 			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
 			if player.ammo[player.selected_ammo_index] == 0:
 				ui_container.select_ammo_up()
 
+	if Input.is_action_just_pressed("use_potion"):
+		if player.potions[player.selected_potion_index] > 0:
+			if player.use_potion():
+				player.potions[player.selected_potion_index] -= 1
+				player.inventory.remove_items([hud.potion_slot.item_data])
+				hud.set_potion(hud.potion_slot.item_data, player.potions[player.selected_potion_index])
+				if player.potions[player.selected_potion_index] == 0:
+					ui_container.select_potion()
+
+	if Input.is_action_just_pressed("throw_grenade"):
+		if player.grenades[player.selected_grenade_index] > 0:
+			var grenade: Grenade = Grenade.new()
+			self.add_child(grenade)
+			await grenade.is_node_ready()
+			grenade.position = player.position
+			grenade.set_grenade_type(player.selected_grenade_index)
+			var grenade_path = get_global_mouse_position() - player.position
+			grenade.angle = atan2(grenade_path.y, grenade_path.x)
+			grenade.z_index = 10
+			grenade.add_to_group("grenades")
+			player.grenades[player.selected_grenade_index] -= 1
+			player.inventory.remove_items([hud.grenade_slot.item_data])
+			hud.set_grenade(hud.grenade_slot.item_data, player.grenades[player.selected_grenade_index])
+			if player.grenades[player.selected_grenade_index] == 0:
+				ui_container.select_grenade()
+		
 var rooms: Array[Room] = []
 func _generate_dungeon() -> bool:
 	rooms = []	

@@ -154,28 +154,7 @@ func _unhandled_input(event): # temporary keybinds to zoom in and out using P an
 			camera.zoom += Vector2(0.1, 0.1)
 		elif event.pressed and event.keycode == KEY_O:
 			camera.zoom -= Vector2(0.1, 0.1)
-	if Input.is_action_just_pressed("use_potion"):
-		if selected_potion_index == 0:
-			self.health = max(self.health + 25, MAX_HEALTH)
-		elif selected_potion_index == 1:
-			speed_boost = true
-			time_since_speed_boost = 0.0
-			SPEED *= 2
-			DASH_SPEED *= 2
-			FIRE_RATE /= 2
-		elif selected_potion_index == 2:
-			invisible = true
-			time_since_invisibility = 0.0
-			self.modulate.a /= 2
-		elif selected_potion_index == 3:
-			shielding = true
-			time_since_shielding = 0.0
-			self.modulate.g /= 2
-			self.modulate.b = 0
-		elif selected_potion_index == 4:
-			quantum_blinking = true
-			time_since_quantum_blink = 0.0
-			self.modulate.r /= 2
+		
 			
 func set_inventory(inv: InventoryComponent) -> void:
 	self.inventory = inv
@@ -189,3 +168,32 @@ func set_inventory(inv: InventoryComponent) -> void:
 			self.grenades[self.grenade_indices[item.item_name]] += self.inventory.inventory_contents[item]
 		elif item.item_name.ends_with("Potion"):
 			self.potions[self.potion_indices[item.item_name]] += self.inventory.inventory_contents[item]
+
+func use_potion() -> bool:
+	if selected_potion_index == 0 and self.health < MAX_HEALTH:
+		self.health = max(self.health + 25, MAX_HEALTH)
+		return true
+	elif selected_potion_index == 1 and not speed_boost:
+		speed_boost = true
+		time_since_speed_boost = 0.0
+		SPEED *= 2
+		DASH_SPEED *= 2
+		FIRE_RATE /= 2
+		return true
+	elif selected_potion_index == 2 and not invisible:
+		invisible = true
+		time_since_invisibility = 0.0
+		self.modulate.a /= 2
+		return true
+	elif selected_potion_index == 3 and not shielding:
+		shielding = true
+		time_since_shielding = 0.0
+		self.modulate.g /= 2
+		self.modulate.b = 0
+		return true
+	elif selected_potion_index == 4 and not quantum_blinking:
+		quantum_blinking = true
+		time_since_quantum_blink = 0.0
+		self.modulate.r /= 2
+		return true
+	return false

@@ -15,6 +15,7 @@ const turret_scene: PackedScene = preload("res://Enemies/turret.tscn")
 @onready var player: Player = %Player
 @onready var hud: HUD = %HUD
 @onready var ui_container: UI_CONTAINER = %UI_Container
+@onready var gunshot = $gunshot
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var new_walls: Array
@@ -104,6 +105,25 @@ func _process(delta):
 	
 	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
 		if player.ammo[player.selected_ammo_index] > 0:
+
+			player.time_since_shooting = 0.0
+			var bullet: Bullet = Bullet.new()
+			self.add_child(bullet)
+			await bullet.is_node_ready()
+			bullet.position = player.position
+			var bullet_path = get_global_mouse_position() - player.position
+			bullet.set_bullet_type(player.selected_ammo_index)
+			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
+			bullet.z_index = 10
+			player.ammo[player.selected_ammo_index] -= 1
+			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
+			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
+			
+			gunshot.play()
+			
+			if player.ammo[player.selected_ammo_index] == 0:
+				ui_container.select_ammo_up()
+
 			if player.room != null:
 				player.time_since_shooting = 0.0
 				var bullet: Bullet = Bullet.new()
@@ -129,6 +149,7 @@ func _process(delta):
 				hud.set_potion(hud.potion_slot.item_data, player.potions[player.selected_potion_index])
 				if player.potions[player.selected_potion_index] == 0:
 					ui_container.select_potion()
+
 
 	if Input.is_action_just_pressed("throw_grenade"):
 		if player.grenades[player.selected_grenade_index] > 0:

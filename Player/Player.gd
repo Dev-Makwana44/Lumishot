@@ -42,8 +42,11 @@ const MAX_HEALTH: int = 100
 @onready var gun: Sprite2D = get_node("Gun")
 @onready var camera: Camera2D = get_node("Camera2D")
 @onready var light: PointLight2D = get_node("Cone Light2")
+
+@onready var footstep = $footstep
 @onready var area: Area2D = get_node("Area2D")
-#@onraedy var health_bar
+#@onready var health_bar
+
 
 var time_since_dash: float = DASH_COOLDOWN
 var time_since_shooting: float = FIRE_RATE
@@ -108,6 +111,7 @@ func _physics_process(delta):
 		
 		if v: 
 			sprite.play("Run")
+			footstep.play()
 		else:
 			sprite.play("Idle")
 		

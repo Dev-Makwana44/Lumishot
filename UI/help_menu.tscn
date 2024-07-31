@@ -1,4 +1,7 @@
-[gd_scene format=3 uid="uid://t7iierwocm7a"]
+[gd_scene load_steps=3 format=3 uid="uid://t7iierwocm7a"]
+
+[ext_resource type="AudioStream" uid="uid://1kmhdicuap2j" path="res://sfx/open.mp3" id="1_vjm1r"]
+[ext_resource type="AudioStream" uid="uid://d0321dbc7aj0t" path="res://sfx/close.mp3" id="2_nd4cp"]
 
 [node name="Help Menu" type="PanelContainer"]
 custom_minimum_size = Vector2(250, 300)
@@ -48,3 +51,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "The goal of this game is to clear out these dungeons of the corrupted members of the Dawnslight, a shadow organization that has been experimenting with illegal robotics and human augmentations. Clear as many levels of the dungeons as you can while using items to craft enhanced weaponry."
 autowrap_mode = 2
+
+[node name="open" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("1_vjm1r")
+max_distance = 1e+10
+
+[node name="close" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_nd4cp")
+max_distance = 1e+11

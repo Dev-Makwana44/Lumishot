@@ -1,15 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://35deajhkcfxx"]
+[gd_scene load_steps=7 format=3 uid="uid://35deajhkcfxx"]
 
 [ext_resource type="Script" path="res://main menu/main_menu.gd" id="1_tahd6"]
-
-[sub_resource type="SystemFont" id="SystemFont_mrtsr"]
-font_names = PackedStringArray("Impact")
-
-[sub_resource type="SystemFont" id="SystemFont_c53na"]
-font_names = PackedStringArray("Impact")
-
-[sub_resource type="SystemFont" id="SystemFont_6xlr0"]
-font_names = PackedStringArray("Impact")
+[ext_resource type="AudioStream" uid="uid://dqsd77tj87fir" path="res://music/documentary-inspiration-163922.mp3" id="2_1hcsc"]
+[ext_resource type="FontFile" uid="uid://djfqna8l66slf" path="res://fonts/AlphaProta-Italic.ttf" id="2_xm3t7"]
+[ext_resource type="FontFile" uid="uid://ci4nxgjkl7m43" path="res://fonts/PixelMiddle.ttf" id="4_rxcqo"]
+[ext_resource type="AudioStream" uid="uid://1kmhdicuap2j" path="res://sfx/open.mp3" id="5_j546q"]
+[ext_resource type="AudioStream" uid="uid://d0321dbc7aj0t" path="res://sfx/close.mp3" id="6_pp3ct"]
 
 [node name="Main_Menu" type="Control"]
 layout_mode = 3
@@ -19,6 +15,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_tahd6")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.0297546, 0.112905, 1)
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_1hcsc")
+autoplay = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -35,8 +44,8 @@ theme_override_constants/margin_bottom = 12
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="Separator" type="Control" parent="MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 10)
+[node name="HeaderMargin" type="Control" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 
 [node name="Title Label" type="Label" parent="MarginContainer/VBoxContainer"]
@@ -46,8 +55,8 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/shadow_offset_x = -5
 theme_override_constants/shadow_offset_y = 5
 theme_override_constants/outline_size = 12
-theme_override_fonts/font = SubResource("SystemFont_mrtsr")
-theme_override_font_sizes/font_size = 64
+theme_override_fonts/font = ExtResource("2_xm3t7")
+theme_override_font_sizes/font_size = 150
 text = "Lumishot"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -61,22 +70,37 @@ layout_mode = 2
 theme_override_constants/separation = 64
 alignment = 1
 
-[node name="Separator2" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="TitleButtonSeparator" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="Start Button" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-custom_minimum_size = Vector2(120, 32)
+custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
-theme_override_fonts/font = SubResource("SystemFont_c53na")
-theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0.784314, 1)
+theme_override_colors/font_hover_color = Color(0.594923, 0.615058, 0.82478, 1)
+theme_override_fonts/font = ExtResource("4_rxcqo")
+theme_override_font_sizes/font_size = 60
 text = "Play Game"
 
 [node name="Quit Button" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
-theme_override_fonts/font = SubResource("SystemFont_6xlr0")
-theme_override_font_sizes/font_size = 24
-text = "Quit Game
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 1, 1)
+theme_override_colors/font_hover_color = Color(0.725823, 0.317173, 0.337948, 1)
+theme_override_fonts/font = ExtResource("4_rxcqo")
+theme_override_font_sizes/font_size = 60
+text = "Quit
 "
+
+[node name="open" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_j546q")
+max_distance = 1e+10
+
+[node name="close" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_pp3ct")
+max_distance = 1e+11
 
 [connection signal="button_up" from="MarginContainer/HBoxContainer/VBoxContainer/Start Button" to="." method="_on_start_button_button_up"]
 [connection signal="button_up" from="MarginContainer/HBoxContainer/VBoxContainer/Quit Button" to="." method="_on_quit_button_button_up"]

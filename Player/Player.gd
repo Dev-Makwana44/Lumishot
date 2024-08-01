@@ -44,9 +44,9 @@ const MAX_HEALTH: int = 100
 @onready var light: PointLight2D = get_node("Cone Light2")
 
 @onready var footstep = $footstep
+@onready var hurt = $hurt
 @onready var area: Area2D = get_node("Area2D")
-#@onready var health_bar
-
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 var time_since_dash: float = DASH_COOLDOWN
 var time_since_shooting: float = FIRE_RATE
@@ -87,6 +87,9 @@ func _ready():
 	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ShieldingPotion.tres") as ItemData, 3)
 	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/EnergyBoostPotion.tres") as ItemData, 3)
 	set_inventory(self.inventory)
+	#footstep.stream.loop_mode = AudioStream.
+	#footstep.play()
+	#footstep.playing = true
 
 func _physics_process(delta):
 	if not game_paused:
@@ -111,7 +114,9 @@ func _physics_process(delta):
 		
 		if v: 
 			sprite.play("Run")
-			footstep.play()
+			if sprite.frame % 2 == 1:
+				footstep.pitch_scale = rng.randfn(1.0, 0.1)
+				footstep.play()
 		else:
 			sprite.play("Idle")
 		
@@ -176,6 +181,8 @@ func take_damage(damage: int) -> void:
 	if not quantum_blinking:
 		self.health -= damage if not shielding else damage * 0.5
 		time_since_damage = 0.0
+		hurt.pitch_scale = rng.randfn(1.0, 0.05)
+		hurt.play()
 		if not self.damage_flash:
 			self.modulate.g /= 2
 			self.modulate.b /= 2

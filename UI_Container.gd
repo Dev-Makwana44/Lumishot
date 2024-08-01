@@ -38,20 +38,21 @@ func _ready() -> void:
 
 func _process(delta) -> void:
 	if Input.is_action_just_pressed("open_inventory"):
-		if not crafting_ui.visible and (player.room == null or len(player.room.enemies) == 0) and not level_completion_screen.visible and not loss_screen.visible:
-			player.game_paused = true
-			hud.hide()
-			help_menu_ui.hide()
-			crafting_ui.show()
-			crafting_ui.inventory = player.inventory
-			crafting_ui.populate_inventory()
-		else:
-			player.game_paused = false
-			hud.show()
-			crafting_ui.hide()
-			crafting_ui.clear_crafting_grid()
-			player.set_inventory(crafting_ui.inventory)
-			hud.set_ammo(bullets_data[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
+		if (player.room == null or len(player.room.enemies) == 0):
+			if not crafting_ui.visible and not level_completion_screen.visible and not loss_screen.visible:
+				player.game_paused = true
+				hud.hide()
+				help_menu_ui.hide()
+				crafting_ui.show()
+				crafting_ui.inventory = player.inventory
+				crafting_ui.populate_inventory()
+			else:
+				player.game_paused = false
+				hud.show()
+				crafting_ui.hide()
+				crafting_ui.clear_crafting_grid()
+				player.set_inventory(crafting_ui.inventory)
+				hud.set_ammo(bullets_data[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
 			
 	if Input.is_action_just_pressed("help") and not level_completion_screen.visible and not loss_screen.visible:
 		if not help_menu_ui.visible:

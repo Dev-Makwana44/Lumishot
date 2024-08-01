@@ -5,7 +5,7 @@ const NORMAL_ROOM: int = 1
 const BOSS_ROOM: int = 2
 const LOOT_ROOM: int = 3
 const STARTING_ROOM: int = 4
-const SPACE_BETWEEN_ROOMS: int = 250
+var SPACE_BETWEEN_ROOMS: int = 250
 
 var size: Vector2
 var room_type: int
@@ -13,7 +13,7 @@ var room_connection_locations: Array[Hallway]
 
 var enemies: Dictionary = {}
 
-func _init(width: int, height: int, x_pos: int, y_pos: int):
+func _init(width: int, height: int, x_pos: int, y_pos: int, level: int):
 	self.size = Vector2(width, height)
 	self.position = Vector2(x_pos, y_pos)
 	self.room_type = NORMAL_ROOM
@@ -22,6 +22,7 @@ func _init(width: int, height: int, x_pos: int, y_pos: int):
 	collision_box.shape.size = self.size
 	self.add_child(collision_box)
 	self.room_connection_locations = [null, null, null, null]
+	SPACE_BETWEEN_ROOMS += 50 * level
 	
 func _get_center():
 	return Vector2(self.position.x + (0.5 * self.size.x), self.position.y + (0.5 * self.size.y))

@@ -1,11 +1,12 @@
-[gd_scene load_steps=15 format=3 uid="uid://cakxa05kasxk6"]
+[gd_scene load_steps=16 format=3 uid="uid://cakxa05kasxk6"]
 
 [ext_resource type="Script" path="res://Player/Player.gd" id="1_mgulk"]
 [ext_resource type="Texture2D" uid="uid://bumklc8o3q8wn" path="res://Tech Dungeon Roguelite - Asset Pack (DEMO)/Players/players blue x3.png" id="2_j5n47"]
 [ext_resource type="Texture2D" uid="uid://dour3wsh5630m" path="res://Player/Gun.png" id="3_j3kcd"]
 [ext_resource type="Texture2D" uid="uid://bg26pv11k0q33" path="res://Resources/Lighting/circle.png" id="5_6a88h"]
-[ext_resource type="AudioStream" uid="uid://b6fxlyoeevqec" path="res://sfx/footstep.wav" id="6_w2k0e"]
+[ext_resource type="AudioStream" uid="uid://nitvvwa70kep" path="res://sfx/footstep (2).mp3" id="6_43y7b"]
 [ext_resource type="Texture2D" uid="uid://bp0ce7tvptbig" path="res://Resources/Lighting/cone light 2.jpg" id="7_f2eov"]
+[ext_resource type="AudioStream" uid="uid://bggok6ieq4ts6" path="res://sfx/hurt.mp3" id="7_g322s"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7r2de"]
 atlas = ExtResource("2_j5n47")
@@ -105,8 +106,11 @@ scale = Vector2(-1.28167, 1.18417)
 shape = SubResource("CapsuleShape2D_kg17a")
 
 [node name="footstep" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("6_w2k0e")
+stream = ExtResource("6_43y7b")
 max_distance = 1e+10
+
+[node name="hurt" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_g322s")
 
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

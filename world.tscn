@@ -14,7 +14,7 @@
 script = ExtResource("1_1yueh")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0.129558, 0.129558, 0.129558, 1)
+color = Color(0, 0, 0, 1)
 
 [node name="Player" parent="." instance=ExtResource("1_07yc4")]
 unique_name_in_owner = true

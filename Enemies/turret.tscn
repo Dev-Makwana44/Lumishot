@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cfsodffdvsin7"]
+[gd_scene load_steps=20 format=3 uid="uid://cfsodffdvsin7"]
 
 [ext_resource type="Script" path="res://Enemies/Turret.gd" id="1_3qx31"]
 [ext_resource type="Texture2D" uid="uid://cuhoxwjnj7otv" path="res://Enemies/Images/Turret Base.png" id="2_jo06s"]
@@ -99,6 +99,10 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_3pbm7"]
+closed = false
+polygon = PackedVector2Array(-11, -16, 11, -16, 11, -15, 15, -15, 15, -11, 16, -11, 16, 11, 15, 11, 15, 15, 11, 15, 11, 16, -11, 16, -11, 15, -15, 15, -15, 11, -16, 11, -16, -11, -15, -11, -15, -15, -11, -15)
+
 [node name="Turret" type="CharacterBody2D"]
 z_index = 4
 scale = Vector2(3, 3)
@@ -130,6 +134,7 @@ scale = Vector2(0.75, 0.75)
 polygon = PackedVector2Array(0, 0, 1050, -540, 1050, 540)
 
 [node name="Cone Light2" type="PointLight2D" parent="Face"]
+light_mask = 2
 scale = Vector2(4.38758, 3.53425)
 energy = 0.25
 range_z_max = 9
@@ -153,6 +158,10 @@ default_color = Color(0, 1, 0, 1)
 
 [node name="sentry_turn" type="AudioStreamPlayer2D" parent="."]
 max_distance = 1e+10
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
+visible = false
+occluder = SubResource("OccluderPolygon2D_3pbm7")
 
 [connection signal="area_entered" from="Collision Box" to="." method="_on_collision_box_area_entered"]
 [connection signal="frame_changed" from="Face" to="." method="_on_face_frame_changed"]

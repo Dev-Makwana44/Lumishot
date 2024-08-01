@@ -22,7 +22,7 @@ const turret_scene: PackedScene = preload("res://Enemies/turret.tscn")
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var new_walls: Array
 var time_since_entering_room: float = 0.0
-var level: int = 0
+var level: int = 1
 var hallways: Array[Hallway] = []
 var level_cleared: bool = false
 
@@ -44,6 +44,8 @@ func _ready():
 			break
 	loss_screen.hide()
 	level_completion_screen.hide()
+	for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
+		enemy.run = false
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -154,6 +156,7 @@ func _process(delta):
 				hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
 				if player.ammo[player.selected_ammo_index] == 0:
 					ui_container.select_ammo_up()
+				gunshot.pitch_scale = rng.randfn(1.0, 0.01)
 				gunshot.play()
 
 	if Input.is_action_just_pressed("use_potion"):
@@ -194,12 +197,12 @@ func _generate_dungeon(level: int) -> bool:
 	rooms = []	
 	# Create Rooms
 	
-	for i in range(NUMBER_OF_ROOMS_GENERATED + 10 * level):
+	for i in range(NUMBER_OF_ROOMS_GENERATED + 5 * level):
 		var width : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var height : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var x_pos: int = rng.randi_range(-100, 100)
 		var y_pos: int = rng.randi_range(-100, 100)
-		rooms.append(Room.new(width, height, x_pos, y_pos))
+		rooms.append(Room.new(width, height, x_pos, y_pos, level))
 	
 	# Separate Rooms
 	
@@ -416,6 +419,14 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			line.default_color = Color.GRAY
 			line.points = collision_polygon.polygon
 			add_child(line)
+			var occluder: LightOccluder2D = LightOccluder2D.new()
+			occluder.occluder = OccluderPolygon2D.new()
+			occluder.occluder.closed = false
+			occluder.occluder.polygon = collision_polygon.polygon
+			add_child(occluder)
+			static_body.add_to_group("dungeon")
+			line.add_to_group("dungeon")
+			occluder.add_to_group("dungeon")
 		else:
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
@@ -447,6 +458,22 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			line2.default_color = Color.GRAY
 			line2.points = collision_polygon2.polygon
 			add_child(line2)
+			var occluder: LightOccluder2D = LightOccluder2D.new()
+			occluder.occluder = OccluderPolygon2D.new()
+			occluder.occluder.closed = false
+			occluder.occluder.polygon = collision_polygon.polygon
+			add_child(occluder)
+			var occluder2: LightOccluder2D = LightOccluder2D.new()
+			occluder2.occluder = OccluderPolygon2D.new()
+			occluder2.occluder.closed = false
+			occluder2.occluder.polygon = collision_polygon2.polygon
+			add_child(occluder2)
+			static_body.add_to_group("dungeon")
+			line.add_to_group("dungeon")
+			occluder.add_to_group("dungeon")
+			static_body2.add_to_group("dungeon")
+			line2.add_to_group("dungeon")
+			occluder2.add_to_group("dungeon")
 		
 		if room.room_connection_locations[Hallway.RIGHT] == null:
 			var static_body: StaticBody2D = StaticBody2D.new()
@@ -461,6 +488,14 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			line.default_color = Color.GRAY
 			line.points = collision_polygon.polygon
 			add_child(line)
+			var occluder: LightOccluder2D = LightOccluder2D.new()
+			occluder.occluder = OccluderPolygon2D.new()
+			occluder.occluder.closed = false
+			occluder.occluder.polygon = collision_polygon.polygon
+			add_child(occluder)
+			static_body.add_to_group("dungeon")
+			line.add_to_group("dungeon")
+			occluder.add_to_group("dungeon")
 		else:
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
@@ -492,6 +527,22 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			line2.default_color = Color.GRAY
 			line2.points = collision_polygon2.polygon
 			add_child(line2)
+			var occluder: LightOccluder2D = LightOccluder2D.new()
+			occluder.occluder = OccluderPolygon2D.new()
+			occluder.occluder.closed = false
+			occluder.occluder.polygon = collision_polygon.polygon
+			add_child(occluder)
+			var occluder2: LightOccluder2D = LightOccluder2D.new()
+			occluder2.occluder = OccluderPolygon2D.new()
+			occluder2.occluder.closed = false
+			occluder2.occluder.polygon = collision_polygon2.polygon
+			add_child(occluder2)
+			static_body.add_to_group("dungeon")
+			line.add_to_group("dungeon")
+			occluder.add_to_group("dungeon")
+			static_body2.add_to_group("dungeon")
+			line2.add_to_group("dungeon")
+			occluder2.add_to_group("dungeon")
 		if room.room_connection_locations[Hallway.DOWN] == null:
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
@@ -505,6 +556,14 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			line.default_color = Color.GRAY
 			line.points = collision_polygon.polygon
 			add_child(line)
+			var occluder: LightOccluder2D = LightOccluder2D.new()
+			occluder.occluder = OccluderPolygon2D.new()
+			occluder.occluder.closed = false
+			occluder.occluder.polygon = collision_polygon.polygon
+			add_child(occluder)
+			static_body.add_to_group("dungeon")
+			line.add_to_group("dungeon")
+			occluder.add_to_group("dungeon")
 		else:
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
@@ -536,6 +595,22 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			line2.default_color = Color.GRAY
 			line2.points = collision_polygon2.polygon
 			add_child(line2)
+			var occluder: LightOccluder2D = LightOccluder2D.new()
+			occluder.occluder = OccluderPolygon2D.new()
+			occluder.occluder.closed = false
+			occluder.occluder.polygon = collision_polygon.polygon
+			add_child(occluder)
+			var occluder2: LightOccluder2D = LightOccluder2D.new()
+			occluder2.occluder = OccluderPolygon2D.new()
+			occluder2.occluder.closed = false
+			occluder2.occluder.polygon = collision_polygon2.polygon
+			add_child(occluder2)
+			static_body.add_to_group("dungeon")
+			line.add_to_group("dungeon")
+			occluder.add_to_group("dungeon")
+			static_body2.add_to_group("dungeon")
+			line2.add_to_group("dungeon")
+			occluder2.add_to_group("dungeon")
 		if room.room_connection_locations[Hallway.LEFT] == null:
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
@@ -549,6 +624,14 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			line.default_color = Color.GRAY
 			line.points = collision_polygon.polygon
 			add_child(line)
+			var occluder: LightOccluder2D = LightOccluder2D.new()
+			occluder.occluder = OccluderPolygon2D.new()
+			occluder.occluder.closed = false
+			occluder.occluder.polygon = collision_polygon.polygon
+			add_child(occluder)
+			static_body.add_to_group("dungeon")
+			line.add_to_group("dungeon")
+			occluder.add_to_group("dungeon")
 		else:
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
@@ -580,6 +663,22 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			line2.default_color = Color.GRAY
 			line2.points = collision_polygon2.polygon
 			add_child(line2)
+			var occluder: LightOccluder2D = LightOccluder2D.new()
+			occluder.occluder = OccluderPolygon2D.new()
+			occluder.occluder.closed = false
+			occluder.occluder.polygon = collision_polygon.polygon
+			add_child(occluder)
+			var occluder2: LightOccluder2D = LightOccluder2D.new()
+			occluder2.occluder = OccluderPolygon2D.new()
+			occluder2.occluder.closed = false
+			occluder2.occluder.polygon = collision_polygon2.polygon
+			add_child(occluder2)
+			static_body.add_to_group("dungeon")
+			line.add_to_group("dungeon")
+			occluder.add_to_group("dungeon")
+			static_body2.add_to_group("dungeon")
+			line2.add_to_group("dungeon")
+			occluder2.add_to_group("dungeon")
 
 	for hallway: Hallway in hallways:
 		for side: PackedVector2Array in [hallway._get_left_points(), hallway._get_right_points()]:
@@ -596,6 +695,14 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 				line.default_color = Color.GRAY
 				line.points = PackedVector2Array([side[index], side[index + 1]])
 				add_child(line)
+				var occluder: LightOccluder2D = LightOccluder2D.new()
+				occluder.occluder = OccluderPolygon2D.new()
+				occluder.occluder.closed = false
+				occluder.occluder.polygon = collision.polygon
+				add_child(occluder)
+				static_body.add_to_group("dungeon")
+				line.add_to_group("dungeon")
+				occluder.add_to_group("dungeon")
 
 func close_room(room: Room) -> Array:
 	print("room")

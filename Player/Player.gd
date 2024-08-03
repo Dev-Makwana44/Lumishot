@@ -181,7 +181,7 @@ func _unhandled_input(event):
 			
 func take_damage(damage: int) -> void:
 	if not quantum_blinking:
-		self.health -= damage if not shielding else damage * 0.5
+		self.health -= damage if not shielding else int(damage * 0.5)
 		time_since_damage = 0.0
 		hurt.pitch_scale = rng.randfn(1.0, 0.05)
 		hurt.play()
@@ -232,7 +232,7 @@ func use_potion() -> bool:
 		return true
 	return false
 
-func _on_area_2d_area_entered(area):
-	if area.get_parent() is Bullet and area.get_parent().is_in_group("enemy_bullets") and area.name == "Collision Box":
-		area.get_parent().queue_free()
+func _on_area_2d_area_entered(other):
+	if other.get_parent() is Bullet and area.get_parent().is_in_group("enemy_bullets") and other.name == "Collision Box":
+		other.get_parent().queue_free()
 		self.take_damage(5)

@@ -7,7 +7,6 @@ const LOOT_ROOM: int = 3
 const STARTING_ROOM: int = 4
 var SPACE_BETWEEN_ROOMS: int = 250
 
-#var size: Vector2
 var room_type: int
 var room_connection_locations: Array[Hallway]
 var rect: Rect2
@@ -15,8 +14,6 @@ var rect: Rect2
 var enemies: Dictionary = {}
 
 func _init(width: int, height: int, x_pos: int, y_pos: int, level: int):
-	#self.size = Vector2(width, height)
-	#self.position = Vector2(x_pos, y_pos)
 	self.rect = Rect2(x_pos, y_pos, width, height)
 	self.room_type = NORMAL_ROOM
 	self.room_connection_locations = [null, null, null, null]

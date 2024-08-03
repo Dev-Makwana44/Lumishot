@@ -46,7 +46,7 @@ func _ready():
 	current_rotation = turret_face.rotation
 	HEALTH_BAR_SIZE = (health_bar.points[1] - health_bar.points[0]).length()
 
-func _process(delta):
+func _process(_delta):
 	if run:
 		target_location = null
 		for area in search_area.get_overlapping_areas():

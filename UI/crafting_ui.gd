@@ -27,10 +27,10 @@ var discovered_recipes: Dictionary = {}
 func _ready() -> void:
 	hide()
 	recipe_tree.hide_root = true
-	recipe_tree.select_mode = 1
+	recipe_tree.select_mode = Tree.SELECT_ROW
 	recipe_tree.scroll_horizontal_enabled = false
 	inventory_tree.hide_root = true
-	inventory_tree.select_mode = 1
+	inventory_tree.select_mode = Tree.SELECT_ROW
 	build_recipe_dictionary()
 	build_recipe_tree()
 	build_discovered_dictionary()

@@ -21,9 +21,9 @@ var velocity: Vector2
 var distance_from_target: float = 500.0
 var exploded: bool = false
 
-func _init(type: int, angle: float):
+func _init(type: int, starting_angle: float):
 	self.grenade_type = type
-	self.angle = angle
+	self.angle = starting_angle
 
 func _ready():
 	self.sprite = Sprite2D.new()

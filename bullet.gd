@@ -39,7 +39,7 @@ func _ready():
 	self.add_child(self.explosion_radius)
 	self.explosion_radius.name = "Explosion Radius"
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	self.velocity = Vector2(SPEED * cos(self.rotation), SPEED * sin(self.rotation))
 	self.move_and_slide()
 

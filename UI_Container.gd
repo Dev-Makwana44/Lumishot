@@ -36,7 +36,7 @@ func _ready() -> void:
 	hud.set_grenade(null, 1)
 	hud.set_potion(null, 1)
 
-func _process(delta) -> void:
+func _process(_delta) -> void:
 	if Input.is_action_just_pressed("open_inventory"):
 		if (player.room == null or len(player.room.enemies) == 0):
 			if not crafting_ui.visible and not level_completion_screen.visible and not loss_screen.visible:

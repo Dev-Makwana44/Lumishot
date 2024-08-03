@@ -7,10 +7,12 @@
 size = Vector2(14, 24)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fhnk7"]
+radius = 11.365
 
 [node name="Bullet" type="CharacterBody2D"]
 z_index = 7
 z_as_relative = false
+collision_layer = 8
 script = ExtResource("1_yhha3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -27,6 +29,6 @@ rotation = 1.5708
 scale = Vector2(4.38758, 3.53425)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Explosion Radius"]
-position = Vector2(-9.96253e-09, -0.282945)
+visible = false
 scale = Vector2(-1.28167, 1.18417)
 shape = SubResource("CircleShape2D_fhnk7")

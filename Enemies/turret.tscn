@@ -106,6 +106,8 @@ polygon = PackedVector2Array(-11, -16, 11, -16, 11, -15, 15, -15, 15, -11, 16, -
 [node name="Turret" type="CharacterBody2D"]
 z_index = 4
 scale = Vector2(3, 3)
+collision_layer = 2
+collision_mask = 4
 script = ExtResource("1_3qx31")
 
 [node name="Temp" type="Sprite2D" parent="."]
@@ -116,6 +118,8 @@ scale = Vector2(120.906, 59.9844)
 texture = ExtResource("2_wxoii")
 
 [node name="Collision Box" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Collision Box"]
 shape = SubResource("RectangleShape2D_a7blq")
@@ -128,6 +132,8 @@ sprite_frames = SubResource("SpriteFrames_pxcbx")
 animation = &"firing"
 
 [node name="Search Area" type="Area2D" parent="Face"]
+collision_layer = 2
+collision_mask = 4
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Face/Search Area"]
 polygon = PackedVector2Array(0, 0, 358.333, -131.333, 403, -80.6667, 412.333, 0.333333, 403, 69.6667, 360.667, 119.333)

@@ -74,22 +74,7 @@ var room: Room = null
 
 func _ready():
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoBullet.tres") as ItemData, 100)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ExplosiveBullet.tres") as ItemData, 100)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ElectricBullet.tres") as ItemData, 100)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/NeurotoxicBullet.tres") as ItemData, 100)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Grenade.tres") as ItemData, 3)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoGrenade.tres") as ItemData, 3)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/FlareGrenade.tres") as ItemData, 3)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/HealthPotion.tres") as ItemData, 3)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData, 3)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/QuantumBlinkPotion.tres") as ItemData, 3)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ShieldingPotion.tres") as ItemData, 3)
-	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/EnergyBoostPotion.tres") as ItemData, 3)
 	set_inventory(self.inventory)
-	#footstep.stream.loop_mode = AudioStream.
-	#footstep.play()
-	#footstep.playing = true
 
 func _physics_process(delta):
 	if not game_paused:
@@ -173,10 +158,8 @@ func _physics_process(delta):
 func _unhandled_input(event):
 	if event is InputEventKey:
 		if event.pressed and event.keycode == KEY_P:
-			#camera.zoom += Vector2(0.1, 0.1)
 			camera.zoom *= 1.1
 		elif event.pressed and event.keycode == KEY_O:
-			#camera.zoom -= Vector2(0.1, 0.1)
 			camera.zoom *= 0.9
 			
 func take_damage(damage: int) -> void:

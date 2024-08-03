@@ -7,7 +7,8 @@ const ROOM_SIZE_MAX: int = 1500 * 1.5
 const ROOM_SEPARATION_SPEED: int = 300
 const MAIN_ROOM_SIZE_RATIO: float = 1.25
 
-const turret_scene: PackedScene = preload("res://Enemies/turret.tscn")
+const TURRET_SCENE: PackedScene = preload("res://Enemies/turret.tscn")
+const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
 
 #@onready var turret: Turret = %Turret
 @onready var player: Player = %Player
@@ -96,12 +97,13 @@ func _process(delta):
 			
 	for bullet: Bullet in get_tree().get_nodes_in_group("player_bullets"):
 		var bullet_in_room: bool = false
-		for room: Room in rooms:
-			if room.rect.has_point(bullet.position):
-				bullet_in_room = true
-				break
-		if not bullet_in_room:
-			bullet.queue_free()
+		#for room: Room in rooms:
+			#if room.rect.has_point(bullet.position):
+				#bullet_in_room = true
+				#break
+		#if not bullet_in_room:
+			#print(2)
+			#bullet.queue_free()
 	
 	for bullet: Bullet in get_tree().get_nodes_in_group("enemy_bullets"):
 		var bullet_in_room: bool = false
@@ -142,15 +144,16 @@ func _process(delta):
 		if player.ammo[player.selected_ammo_index] > 0 and not player.game_paused:
 			if player.room != null:
 				player.time_since_shooting = 0.0
-				var bullet: Bullet = Bullet.new()
+				var bullet: Bullet = BULLET_SCENE.instantiate()
 				self.add_child(bullet)
-				#await bullet.is_node_ready()
+				await bullet.ready
 				bullet.position = player.position
 				var bullet_path = get_global_mouse_position() - player.position
 				bullet.set_bullet_type(player.selected_ammo_index)
 				bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
-				bullet.z_index = 10
+				bullet.z_index = 9
 				bullet.add_to_group("player_bullets")
+				bullet.set_collision_mask_value(2, true)
 				player.ammo[player.selected_ammo_index] -= 1
 				player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
 				hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
@@ -608,6 +611,7 @@ func create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 	for room: Room in rooms:
 		if room.room_connection_locations[Hallway.UP] == null:
 			var static_body: StaticBody2D = StaticBody2D.new()
+			static_body.set_collision_mask_value(4, true)
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
 			collision_polygon.polygon = PackedVector2Array([room.rect.position, Vector2(room.rect.end.x, room.rect.position.y)])
@@ -959,7 +963,7 @@ func create_astar(rooms: Array) -> CustomAStar:
 func spawn_enemies(spawning_room: Room, level: int) -> void:
 	for i in range(rng.randi_range(2 + level, 7 + level)):
 		if rng.randi_range(0, 1) == 0:
-			var turret: Turret = turret_scene.instantiate()
+			var turret: Turret = TURRET_SCENE.instantiate()
 			self.add_child(turret)
 			var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
 			var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
@@ -970,7 +974,7 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 			turret.room = spawning_room
 			spawning_room.enemies[turret] = true
 		else:
-			var turret: Turret = turret_scene.instantiate()
+			var turret: Turret = TURRET_SCENE.instantiate()
 			self.add_child(turret)
 			var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
 			var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)

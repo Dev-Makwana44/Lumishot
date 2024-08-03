@@ -14,21 +14,19 @@ z_as_relative = false
 script = ExtResource("1_yhha3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-unique_name_in_owner = true
 position = Vector2(0, -2)
 texture = ExtResource("1_vhrsl")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
+[node name="Collision Box" type="CollisionShape2D" parent="."]
 position = Vector2(0, 1.90735e-06)
 rotation = 1.5708
 shape = SubResource("RectangleShape2D_5ldqn")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Explosion Radius" type="Area2D" parent="."]
 rotation = 1.5708
 scale = Vector2(4.38758, 3.53425)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Explosion Radius"]
 position = Vector2(-9.96253e-09, -0.282945)
 scale = Vector2(-1.28167, 1.18417)
 shape = SubResource("CircleShape2D_fhnk7")

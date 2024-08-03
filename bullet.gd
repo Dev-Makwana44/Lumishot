@@ -12,36 +12,39 @@ var bullet_textures: Dictionary = {
 }
 
 var bullet_type: int
-var sprite: Sprite2D
-var collision_box: Area2D
-var explosion_radius: Area2D
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var collision_box: Area2D = $CollisionShape2D
+@onready var explosion_radius: Area2D = $Area2D
 
-func _ready():
-	self.sprite = Sprite2D.new()
-	self.add_child(self.sprite)
-	self.bullet_type = 0
-	self.sprite.texture = self.bullet_textures[self.bullet_type].item_texture
-	self.rotation = 0
-	self.collision_box = Area2D.new()
-	var collision_shape: CollisionShape2D = CollisionShape2D.new()
-	collision_shape.shape = RectangleShape2D.new()
-	collision_shape.shape.size = Vector2(24, 15)
-	self.collision_box.add_child(collision_shape)
-	self.collision_box.area_entered.connect(collision)
-	self.add_child(self.collision_box)
-	self.collision_box.name = "Collision Box"
-	
-	self.explosion_radius = Area2D.new()
-	var explosion_shape: CollisionShape2D = CollisionShape2D.new()
-	explosion_shape.shape = CircleShape2D.new()
-	explosion_shape.shape.radius = 150
-	self.explosion_radius.add_child(explosion_shape)
-	self.add_child(self.explosion_radius)
-	self.explosion_radius.name = "Explosion Radius"
+#func _ready():
+	#self.sprite = Sprite2D.new()
+	#self.add_child(self.sprite)
+	#self.bullet_type = 0
+	#self.sprite.texture = self.bullet_textures[self.bullet_type].item_texture
+	#self.rotation = 0
+	#self.collision_box = Area2D.new()
+	#var collision_shape: CollisionShape2D = CollisionShape2D.new()
+	#collision_shape.shape = RectangleShape2D.new()
+	#collision_shape.shape.size = Vector2(24, 15)
+	#self.collision_box.add_child(collision_shape)
+	#self.collision_box.area_entered.connect(collision)
+	#self.add_child(self.collision_box)
+	#self.collision_box.name = "Collision Box"
+	#
+	#self.explosion_radius = Area2D.new()
+	#var explosion_shape: CollisionShape2D = CollisionShape2D.new()
+	#explosion_shape.shape = CircleShape2D.new()
+	#explosion_shape.shape.radius = 150
+	#self.explosion_radius.add_child(explosion_shape)
+	#self.add_child(self.explosion_radius)
+	#self.explosion_radius.name = "Explosion Radius"
 
 func _physics_process(_delta):
 	self.velocity = Vector2(SPEED * cos(self.rotation), SPEED * sin(self.rotation))
-	self.move_and_slide()
+	#if self.move_and_slide():
+		#self.queue_free()
+	if self.move_and_collide(self.velocity):
+		self.queue_free()
 
 func set_bullet_type(type: int):
 	self.bullet_type = type

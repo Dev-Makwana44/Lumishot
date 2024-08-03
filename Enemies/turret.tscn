@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cuhoxwjnj7otv" path="res://Enemies/Images/Turret Base.png" id="2_jo06s"]
 [ext_resource type="Texture2D" uid="uid://dtm3kc51ikur7" path="res://Resources/Images/Electronics.png" id="2_wxoii"]
 [ext_resource type="Texture2D" uid="uid://cm1fsuu10csid" path="res://Enemies/Images/Turret Face.png" id="3_jj76x"]
-[ext_resource type="Texture2D" uid="uid://bp0ce7tvptbig" path="res://Resources/Lighting/cone light 2.jpg" id="5_8c18m"]
+[ext_resource type="Texture2D" uid="uid://56qaxuk60dx4" path="res://Resources/Lighting/cone.png" id="5_3iynv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a7blq"]
 size = Vector2(32, 32)
@@ -130,25 +130,23 @@ animation = &"firing"
 [node name="Search Area" type="Area2D" parent="Face"]
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Face/Search Area"]
-scale = Vector2(0.75, 0.75)
-polygon = PackedVector2Array(0, 0, 1050, -540, 1050, 540)
+polygon = PackedVector2Array(0, 0, 358.333, -131.333, 403, -80.6667, 412.333, 0.333333, 403, 69.6667, 360.667, 119.333)
 
 [node name="Cone Light2" type="PointLight2D" parent="Face"]
 light_mask = 2
-scale = Vector2(4.38758, 3.53425)
 energy = 0.25
 range_z_max = 9
 shadow_enabled = true
 shadow_filter = 2
-texture = ExtResource("5_8c18m")
-offset = Vector2(157, 2)
+texture = ExtResource("5_3iynv")
+offset = Vector2(209, -4)
+texture_scale = 0.5
 
 [node name="Bullet Spawn Locations" type="Line2D" parent="Face"]
 points = PackedVector2Array(16, -5, 16, 5)
 width = 0.0
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
-visible = false
 shape = SubResource("RectangleShape2D_a7blq")
 
 [node name="Health Bar" type="Line2D" parent="."]

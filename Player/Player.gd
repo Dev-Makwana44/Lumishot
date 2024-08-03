@@ -233,6 +233,6 @@ func use_potion() -> bool:
 	return false
 
 func _on_area_2d_area_entered(other):
-	if other.get_parent() is Bullet and area.get_parent().is_in_group("enemy_bullets") and other.name == "Collision Box":
+	if other.get_parent() is Bullet and other.get_parent().is_in_group("enemy_bullets") and other.name == "Collision Box":
 		other.get_parent().queue_free()
 		self.take_damage(5)

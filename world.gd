@@ -20,7 +20,7 @@ const turret_scene: PackedScene = preload("res://Enemies/turret.tscn")
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var new_walls: Array
 var time_since_entering_room: float = 0.0
-var level: int = 15
+var level: int = 1
 var hallways: Array[Hallway] = []
 var level_cleared: bool = false
 var rooms: Array[Room] = []
@@ -46,15 +46,19 @@ func _ready():
 	
 	loss_screen.hide()
 	level_completion_screen.hide()
-	for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
-		enemy.run = false
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 
 func _process(delta):
 	if level_cleared and level_completion_screen.continue_game:
+		print("new level")
+		level_cleared = false
+		level_completion_screen.continue_game = false
 		level += 1
+		for node in get_tree().get_nodes_in_group("dungeon"):
+			remove_child(node)
 		_ready()
+		level_completion_screen.hide()
 		player.game_paused = false
 	elif player.health <= 0 and loss_screen.restart_game:
 		level = 0
@@ -74,14 +78,6 @@ func _process(delta):
 		player.game_paused = false
 		loss_screen.hide()
 
-	#if current_room == null:
-		#for room: Room in rooms:
-			#if room._point_inside(player.position):
-				#current_room = room
-				#break
-	#else:
-		#if not current_room._point_inside(player.position):
-			#current_room = null
 	time_since_entering_room += delta
 	if player.room == null:
 		for room: Room in rooms:
@@ -127,6 +123,7 @@ func _process(delta):
 				if len(new_walls) > 0:
 					self.remove_child(new_walls[0])
 					self.remove_child(new_walls[1])
+					self.remove_child(new_walls[2])
 					new_walls = []
 				#time_since_entering_room = 0.0
 			enemy.drop_loot()
@@ -137,7 +134,7 @@ func _process(delta):
 					enemies_in_dungeon = true
 					break
 			if not enemies_in_dungeon and player.health > 0:
-				player.game_paused = true
+				#player.game_paused = true
 				level_completion_screen.show()
 				level_cleared = true
 	
@@ -909,7 +906,7 @@ func create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 				line.add_to_group("dungeon")
 				occluder.add_to_group("dungeon")
 
-func close_room(room: Room) -> Array: # OPTIMIZE
+func close_room(room: Room) -> Array:
 	var static_body: StaticBody2D = StaticBody2D.new()
 	var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 	collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
@@ -922,7 +919,12 @@ func close_room(room: Room) -> Array: # OPTIMIZE
 	line.default_color = Color.GRAY
 	line.points = collision_polygon.polygon + PackedVector2Array([collision_polygon.polygon[0]])
 	add_child(line)
-	return [static_body, line]
+	var occluder: LightOccluder2D = LightOccluder2D.new()
+	occluder.occluder = OccluderPolygon2D.new()
+	occluder.occluder.closed = false
+	occluder.occluder.polygon = collision_polygon.polygon
+	add_child(occluder)
+	return [static_body, line, occluder]
 
 func room_comparison(a: Room, b: Room) -> bool: # sorts the rooms in ascending order by area
 	return a.rect.get_area() < b.rect.get_area()
@@ -956,14 +958,11 @@ func create_astar(rooms: Array) -> CustomAStar:
 
 func spawn_enemies(spawning_room: Room, level: int) -> void:
 	for i in range(rng.randi_range(2 + level, 7 + level)):
-	#for i in range(5):
-		var x_pos = rng.randi_range(spawning_room.rect.position.x + 10, spawning_room.rect.end.x - 10)
-		var y_pos = rng.randi_range(spawning_room.rect.position.y + 10, spawning_room.rect.end.y - 10)
-		if not spawning_room.rect.has_point(Vector2(x_pos, y_pos)):
-			print("ERROR")
 		if rng.randi_range(0, 1) == 0:
 			var turret: Turret = turret_scene.instantiate()
 			self.add_child(turret)
+			var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
+			var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
 			turret.position = Vector2(x_pos, y_pos)
 			turret.add_to_group("robots")
 			turret.add_to_group("enemies")
@@ -973,6 +972,8 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 		else:
 			var turret: Turret = turret_scene.instantiate()
 			self.add_child(turret)
+			var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
+			var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
 			turret.position = Vector2(x_pos, y_pos)
 			turret.add_to_group("enemies")
 			turret.add_to_group("robots")

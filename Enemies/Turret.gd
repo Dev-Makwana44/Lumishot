@@ -7,8 +7,10 @@ extends Enemy
 @onready var bullet_spawn_locations: Line2D = $"Face/Bullet Spawn Locations"
 @onready var health_bar: Line2D = $"Health Bar"
 @onready var sentry_turn = $sentry_turn
+@onready var shape: CollisionShape2D = $CollisionShape2D2
 
 const COLLECTABLE_ITEM: PackedScene = preload("res://Collectables/collectable.tscn")
+const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
 
 var loot_items: Array[ItemData] = [
 	load("res://Resources/Items/CraftingItems/Bioluminescent_Bacteria.tres"),
@@ -90,7 +92,7 @@ func _on_face_frame_changed():
 	if turret_face.frame == 7 and not fired_this_animation:
 		fired_this_animation = true
 		for location: Vector2 in bullet_spawn_locations.points:
-			var bullet: Bullet = Bullet.new()
+			var bullet: Bullet = BULLET_SCENE.instantiate()
 			bullet.position = self.position + location.rotated(turret_face.rotation) * self.scale
 			add_sibling(bullet)
 			bullet.rotation = turret_face.rotation
@@ -132,3 +134,7 @@ func drop_loot() -> void:
 		item.position = pos
 		var item_data: ItemData = loot_items.pick_random()
 		item._set_collectable_data(item_data)
+		item.add_to_group("dungeon")
+
+func get_size() -> Vector2:
+	return self.shape.shape.size

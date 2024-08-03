@@ -10,14 +10,10 @@ config_version=5
 
 [application]
 
-config/name="Platformer"
+config/name="Lumishot"
 run/main_scene="res://main menu/main_menu.tscn"
 config/features=PackedStringArray("4.2", "Mobile")
 config/icon="res://icon.svg"
-
-[display]
-
-window/size/mode=2
 
 [editor]
 

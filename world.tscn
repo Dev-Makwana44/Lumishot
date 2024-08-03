@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://UI_Container.gd" id="3_f8rko"]
 [ext_resource type="PackedScene" uid="uid://t7iierwocm7a" path="res://UI/help_menu.tscn" id="5_3jgu8"]
 [ext_resource type="PackedScene" uid="uid://tng4oxoyfv3d" path="res://UI/hud.tscn" id="6_2rqlw"]
-[ext_resource type="PackedScene" uid="uid://bpuxf3x1nl4qm" path="res://UI/crafting_ui.tscn" id="6_8mgjt"]
+[ext_resource type="PackedScene" uid="uid://bpuxf3x1nl4qm" path="res://crafting_ui.tscn" id="6_8mgjt"]
 [ext_resource type="PackedScene" uid="uid://ct7ols0jco0sy" path="res://UI/loss_screen.tscn" id="7_hnyfh"]
 [ext_resource type="AudioStream" uid="uid://cvrrd44cxo6q8" path="res://sfx/gunshot.mp3" id="7_vfxup"]
 [ext_resource type="PackedScene" uid="uid://c4v0ab5iil7a" path="res://UI/level_completion_screen.tscn" id="8_0bkmx"]
@@ -14,6 +14,7 @@
 script = ExtResource("1_1yueh")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false
 color = Color(0, 0, 0, 1)
 
 [node name="Player" parent="." instance=ExtResource("1_07yc4")]
@@ -22,6 +23,7 @@ position = Vector2(172, 184)
 
 [node name="UI_Container" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
+visible = false
 script = ExtResource("3_f8rko")
 
 [node name="Crafting UI" parent="UI_Container" instance=ExtResource("6_8mgjt")]
@@ -42,3 +44,9 @@ unique_name_in_owner = true
 [node name="gunshot" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("7_vfxup")
 max_distance = 1e+10
+
+[node name="Area2D" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+visible = false

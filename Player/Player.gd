@@ -170,13 +170,15 @@ func _physics_process(delta):
 		
 		move_and_slide()		
 
-#func _unhandled_input(event):
-	#if event is InputEventKey:
-		#if event.pressed and event.keycode == KEY_P:
+func _unhandled_input(event):
+	if event is InputEventKey:
+		if event.pressed and event.keycode == KEY_P:
 			#camera.zoom += Vector2(0.1, 0.1)
-		#elif event.pressed and event.keycode == KEY_O:
+			camera.zoom *= 1.1
+		elif event.pressed and event.keycode == KEY_O:
 			#camera.zoom -= Vector2(0.1, 0.1)
-		
+			camera.zoom *= 0.9
+			
 func take_damage(damage: int) -> void:
 	if not quantum_blinking:
 		self.health -= damage if not shielding else damage * 0.5

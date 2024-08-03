@@ -4,10 +4,8 @@ var NUMBER_OF_ROOMS_GENERATED: int = 50
 const PERCENTAGE_OF_MAIN_ROOMS: float = 0.3
 const ROOM_SIZE_MIN: int = 300 * 1.5
 const ROOM_SIZE_MAX: int = 1500 * 1.5
-const NORMAL_ROOM: int = 1
-const BOSS_ROOM: int = 2
-const LOOT_ROOM: int = 3
-const STARTING_ROOM: int = 4
+const ROOM_SEPARATION_SPEED: int = 300
+const MAIN_ROOM_SIZE_RATIO: float = 1.25
 
 const turret_scene: PackedScene = preload("res://Enemies/turret.tscn")
 
@@ -25,7 +23,7 @@ var time_since_entering_room: float = 0.0
 var level: int = 1
 var hallways: Array[Hallway] = []
 var level_cleared: bool = false
-
+var rooms: Array[Room] = []
 
 class CustomAStar:
 	extends AStar2D
@@ -38,16 +36,21 @@ class CustomAStar:
 		return self._compute_cost(from_id, to_id)
 
 func _ready():
+	var starting_time: int = Time.get_ticks_msec()
 	while true:
 		print("generating dungeon")
-		if _generate_dungeon(level):
+		#if generate_dungeon(level):
+		if generate_dungeon2(level):
 			break
+	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
+	
 	loss_screen.hide()
 	level_completion_screen.hide()
 	for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
 		enemy.run = false
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
+
 func _process(delta):
 	if level_cleared and level_completion_screen.continue_game:
 		level += 1
@@ -59,9 +62,9 @@ func _process(delta):
 			enemy.queue_free()
 		#_ready()
 		for room: Room in rooms:
-			if room.room_type == STARTING_ROOM:
+			if room.room_type == Room.STARTING_ROOM:
 				player.position = room._get_center()
-			elif room.room_type == BOSS_ROOM:
+			elif room.room_type == Room.BOSS_ROOM:
 				spawn_enemies(room, level + 5)
 			else:
 				spawn_enemies(room, level)
@@ -82,14 +85,14 @@ func _process(delta):
 	time_since_entering_room += delta
 	if player.room == null:
 		for room: Room in rooms:
-			if room._point_inside(player.position):
+			if room.rect.has_point(player.position):
 				player.room = room
 				time_since_entering_room = 0.0
 				break
 	else:
-		if player.room.room_type != STARTING_ROOM and time_since_entering_room > 0.5 and time_since_entering_room < 1.0 and new_walls != null and len(new_walls) == 0 and len(player.room.enemies) > 0:
+		if player.room.room_type != Room.STARTING_ROOM and time_since_entering_room > 0.5 and time_since_entering_room < 1.0 and new_walls != null and len(new_walls) == 0 and len(player.room.enemies) > 0:
 			new_walls = close_room(player.room)
-		if not player.room._point_inside(player.position):
+		if not player.room.rect.has_point(player.position):
 			player.room = null
 			#if new_walls != null and len(new_walls) > 0 and time_since_entering_room > 0.5:
 				#self.remove_child(new_walls[0])
@@ -98,7 +101,7 @@ func _process(delta):
 	for bullet: Bullet in get_tree().get_nodes_in_group("player_bullets"):
 		var bullet_in_room: bool = false
 		for room: Room in rooms:
-			if room._point_inside(bullet.position):
+			if room.rect.has_point(bullet.position):
 				bullet_in_room = true
 				break
 		if not bullet_in_room:
@@ -107,7 +110,7 @@ func _process(delta):
 	for bullet: Bullet in get_tree().get_nodes_in_group("enemy_bullets"):
 		var bullet_in_room: bool = false
 		for room: Room in rooms:
-			if room._point_inside(bullet.position):
+			if room.rect.has_point(bullet.position):
 				bullet_in_room = true
 				break
 		if not bullet_in_room:
@@ -192,16 +195,15 @@ func _process(delta):
 				enemy.run = false
 		ui_container.hud.health_label.text = str(player.health)
 		
-var rooms: Array[Room] = []
-func _generate_dungeon(level: int) -> bool:
-	rooms = []	
+func generate_dungeon(level: int) -> bool:
+	rooms = []
 	# Create Rooms
 	
 	for i in range(NUMBER_OF_ROOMS_GENERATED + 5 * level):
 		var width : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var height : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
-		var x_pos: int = rng.randi_range(-100, 100)
-		var y_pos: int = rng.randi_range(-100, 100)
+		var x_pos: int = rng.randi_range(-100, 100) * 5
+		var y_pos: int = rng.randi_range(-100, 100) * 5
 		rooms.append(Room.new(width, height, x_pos, y_pos, level))
 	
 	# Separate Rooms
@@ -216,14 +218,14 @@ func _generate_dungeon(level: int) -> bool:
 				#if room_index != other_room_index and (rooms[other_room_index]._get_center() - rooms[room_index]._get_center()).length() < 150:
 				#if room_index != other_room_index and Rect2(rooms[room_index].position, rooms[room_index].size).intersects(Rect2(rooms[other_room_index].position, rooms[other_room_index].size)):
 				if room_index != other_room_index and rooms[room_index]._is_too_close(rooms[other_room_index]):
-					separation_vec = separation_vec - (rooms[other_room_index]._get_center() - rooms[room_index]._get_center())
+					separation_vec = separation_vec - (rooms[other_room_index].rect.get_center() - rooms[room_index].rect.get_center())
 					rooms_moved = true
 			var room_velocity = rooms[room_index].transform.y * -1 * separation_speed + separation_vec
 			rooms[room_index].position += room_velocity * 0.3
 	
 	# Separate main rooms
 	
-	rooms.sort_custom(_room_comparison)
+	rooms.sort_custom(room_comparison)
 	var room_positions: Dictionary = {} # position -> Room
 	var main_rooms: Array[Room] = []
 	var number_of_main_rooms: int = int(len(rooms) * PERCENTAGE_OF_MAIN_ROOMS)
@@ -231,7 +233,9 @@ func _generate_dungeon(level: int) -> bool:
 		main_rooms.append(rooms.pop_back())
 		room_positions[main_rooms[-1]._get_center()] = main_rooms[-1]
 	
-	var mst_path: CustomAStar = _create_mst(room_positions.keys())
+	return true
+	
+	var mst_path: CustomAStar = create_astar(room_positions.keys())
 	
 	#Create Room -> path id dict
 	var room_id_dict: Dictionary = {} # Room -> id
@@ -249,7 +253,7 @@ func _generate_dungeon(level: int) -> bool:
 		if len(mst_path.get_point_connections(p)) == 1:
 			outer_rooms[mst_path.get_point_position(p)] = p
 	var boss_room_position: Vector2 = outer_rooms.keys()[rng.randi_range(0, len(outer_rooms) - 1)]
-	room_positions[boss_room_position].room_type = BOSS_ROOM
+	room_positions[boss_room_position].room_type = Room.BOSS_ROOM
 	
 	#Identify spawn room
 	var room_distances: Dictionary = {}
@@ -260,7 +264,7 @@ func _generate_dungeon(level: int) -> bool:
 		else:
 			room_distances[room_distance] = [room_positions[mst_path.get_point_position(p)]]
 	for room: Room in room_distances[room_distances.keys().max()]:
-		room.room_type = STARTING_ROOM
+		room.room_type = Room.STARTING_ROOM
 	
 	#Create hallways:
 
@@ -318,21 +322,21 @@ func _generate_dungeon(level: int) -> bool:
 					#return false
 	var starting_room_chosen: bool = false
 	for room in main_rooms:
-		if room.room_type == STARTING_ROOM:
+		if room.room_type == Room.STARTING_ROOM:
 			if not starting_room_chosen:
 				player.position = room._get_center()
 				starting_room_chosen = true
 				break
 			else:
-				room.room_type = NORMAL_ROOM
+				room.room_type = Room.NORMAL_ROOM
 	
 	for room in main_rooms:
-		if room.room_type == NORMAL_ROOM:
+		if room.room_type == Room.NORMAL_ROOM:
 			#print("spawning enemies")
 			spawn_enemies(room, level)
 	
 	for room in main_rooms:
-		if room.room_type == BOSS_ROOM:
+		if room.room_type == Room.BOSS_ROOM:
 			spawn_enemies(room, level + 5)
 	
 	#for i in range(5):
@@ -348,43 +352,179 @@ func _generate_dungeon(level: int) -> bool:
 			#collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Rabbit_Foot.tres"))
 		#collectable_instance._set_collectable_data(load("res://Resources/Items/CraftingItems/Iron.tres"))
 	
-	_create_room_nodes([], main_rooms, mst_path)
-	_draw_hallways(hallways)
 	rooms = main_rooms
-	_create_dungeon_borders(main_rooms, hallways)
+	create_room_nodes([], main_rooms)
+	#draw_hallways(hallways)
+	draw_mst(mst_path)
+	#create_dungeon_borders(main_rooms, hallways)
 	return true
 
-func _create_room_nodes(rooms: Array[Room], main_rooms: Array[Room], path: AStar2D) -> void:
+func generate_dungeon2(level: int) -> bool:
+	rooms = []
+	
+	# Create rooms
+	for i in range(NUMBER_OF_ROOMS_GENERATED + 5 * level):
+		var width: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
+		var height: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
+		var new_position: Vector2 = random_point_in_circle(5000 + 50 * level)
+		rooms.append(Room.new(width, height, new_position.x, new_position.y, level))
+	
+	# separate rooms
+	
+	rooms = separate_rooms(rooms, ROOM_SEPARATION_SPEED)
+	
+	# identify main rooms using ratio
+	
+	rooms.sort_custom(room_comparison)
+	var main_rooms: Array[Room] = []
+	var number_of_main_rooms: int = len(rooms) * PERCENTAGE_OF_MAIN_ROOMS
+	for i in range(number_of_main_rooms):
+		main_rooms.append(rooms.pop_back())
+	main_rooms[0].room_type = Room.BOSS_ROOM
+	
+	# Delaunay Triangulation
+	var room_centers: Dictionary = {} # center -> room
+	var delaunay: Delaunay = Delaunay.new()
+	for room: Room in main_rooms:
+		var center = room.rect.get_center()
+		delaunay.add_point(center)
+		room_centers[center] = room
+		
+	var triangles : Array = delaunay.triangulate()
+	var edges: Dictionary = {}
+	for triangle: Delaunay.Triangle in triangles:
+		if not delaunay.is_border_triangle(triangle):
+			for edge: Delaunay.Edge in [triangle.edge_ab, triangle.edge_bc, triangle.edge_ca]:
+				edges[edge] = true
+			
+	for edge: Delaunay.Edge in edges:
+		var node: Line2D = Line2D.new()
+		node.default_color = Color.BLUE
+		node.points = PackedVector2Array([edge.a, edge.b])
+		node.width = 50
+		node.z_index = 10
+		self.add_child(node)
+	
+	# generate minimum spanning tree
+	
+	
+	
+	#var mst_edges: Array[Delaunay.Edge] = generate_mst(room_centers.keys(), edges.keys())
+	#for edge: Delaunay.Edge in mst_edges:
+		#var node: Line2D = Line2D.new()
+		#node.default_color = Color.BLUE
+		#node.points = PackedVector2Array([edge.a, edge.b])
+		#node.width = 50
+		#node.z_index = 10
+		#self.add_child(node)
+	
+	#var ids: Dictionary = {}
+	#for i in range(len(main_rooms)):
+		#ids[i] = main_rooms[i]
+	#var adjacency_matrix: Array[Array] = []
+	#for room: int in ids:
+		#for other: int in ids:
+			#for edge: Delaunay.Edge in edges:
+				#if (edge.a == main_rooms[room].rect.get_center() and edge.b == main_rooms[other].rect.get_center()) or (edge.b == main_rooms[room].rect.get_center() and edge.a == main_rooms[other].rect.get_center()):
+					#adjacency_matrix[room][other] = edge.length()
+					#break
+
+	create_room_nodes([], main_rooms)
+	#draw_mst(create_astar(room_centers.keys()))
+	return true
+
+func generate_mst(vertices: Array, edges: Array) -> Array[Delaunay.Edge]:
+	#var mst_edges: Array[Delaunay.Edge] = [] # set of edges in the mst
+	var mst_edges: Dictionary = {}
+	var mst_vertices: Dictionary = {} # set of vertices that have been added to the mst
+	var available_edges: Dictionary = {} # set of edges that are available to be added to the mst
+	var connections: Dictionary = {} # dictinary where vertex -> array of edges connected to it
+	for vertex: Vector2 in vertices:
+		for edge: Delaunay.Edge in edges:
+			if vertex == edge.a or vertex == edge.b:
+				connections[vertex] = connections.get(vertex, []) + [edge]
+	
+	# choose a random vertex as the starting vertex of the mst
+	var random_vertex: Vector2 = vertices.pick_random()
+	mst_vertices[random_vertex] = true
+	for edge: Delaunay.Edge in connections[random_vertex]:
+		available_edges[edge] = true
+	
+	while len(mst_vertices) < len(vertices):
+		var best_edges = available_edges.keys()
+		best_edges.sort_custom(edges_comparison)
+		for edge: Delaunay.Edge in best_edges:
+			if edge.a not in mst_vertices or edge.b not in mst_vertices:
+				#mst_edges.append(edge)
+				mst_edges[edge] = true
+				available_edges.erase(edge)
+				mst_vertices[edge.a] = true
+				mst_vertices[edge.b] = true
+				for new_edge in connections[edge.a if edge.a not in mst_vertices else edge.b]:
+					available_edges[new_edge] = true
+				break
+	return mst_edges.keys()
+
+func generate_mst2(adjacency_matrix: Array[Array]):
+	pass
+
+func separate_rooms(rooms: Array[Room], separation_speed: int):
+	var not_done: bool = true
+	while not_done:
+		not_done = false
+		for current: int in range(len(rooms)):
+			for other: int in range(len(rooms)):
+				#if current != other and rooms[current].is_too_close(rooms[other]):
+				if current != other and rooms[current].rect.intersects(rooms[other].rect):
+					var direction: Vector2 = (rooms[other].rect.get_center() - rooms[current].rect.get_center()).normalized().round()
+					rooms[current].rect.position -= direction * separation_speed
+					rooms[other].rect.position += direction * separation_speed
+					not_done = true
+	return rooms
+
+func random_point_in_circle(radius: float) -> Vector2:
+	var theta: float = 2 * PI * rng.randf()
+	var rand: float = rng.randf() + rng.randf()
+	var r: float = rand if rand <= 1 else 2 - rand
+	return Vector2(radius * r * cos(theta), radius * r * sin(theta))
+
+func random_point_in_circle2(radius: float) -> Vector2:
+	var a = rng.randf()
+	var b = rng.randf()
+	if b < a:
+		var temp = a
+		a = b
+		b = temp
+	return Vector2((b * radius * cos(2 * PI * a/b)) / radius, (b * radius * sin(2 * PI * a/b)) / radius)
+
+func create_room_nodes(rooms: Array[Room], main_rooms: Array[Room]) -> void:
 	for room in rooms:
 		var room_node = ColorRect.new()
-		room_node.size.x = room.size.x
-		room_node.size.y = room.size.y
-		room_node.position.x = room.position.x
-		room_node.position.y = room.position.y
+		room_node.size = room.rect.size
+		room_node.position = room.rect.position
 		add_child(room_node)
 		room_node.add_to_group("dungeon")
 	
 	for room in main_rooms:
 		var room_node = ColorRect.new()
-		room_node.size.x = room.size.x
-		room_node.size.y = room.size.y
-		room_node.position.x = room.position.x
-		room_node.position.y = room.position.y
-		#room_node.color = Color(0, 255, 0)
-		if room.room_type == BOSS_ROOM:
+		room_node.size = room.rect.size
+		room_node.position = room.rect.position
+		if room.room_type == Room.BOSS_ROOM:
 			room_node.color = Color.RED
-		#elif room.room_type == STARTING_ROOM:
-			#room_node.color = Color.BLUE
-		#elif room.room_type == LOOT_ROOM:
-			#room_node.color = Color.ORANGE
-		#elif room.room_type == NORMAL_ROOM:
+		elif room.room_type == Room.STARTING_ROOM:
+			room_node.color = Color.BLUE
+		elif room.room_type == Room.LOOT_ROOM:
+			room_node.color = Color.ORANGE
+		#elif room.room_type == Room.NORMAL_ROOM:
 			#room_node.color = Color.BLUE_VIOLET
 		else:
 			room_node.color = Color.DIM_GRAY
+		
+		#room_node.color = Color(rng.randf(), rng.randf(), rng.randf())
 		add_child(room_node)
 		room_node.add_to_group("dungeon")
 
-func _draw_mst(path: CustomAStar) -> void:
+func draw_mst(path: CustomAStar) -> void:
 	for p in path.get_point_ids():
 		for c in path.get_point_connections(p):
 			var p_pos: Vector2 = path.get_point_position(p)
@@ -392,19 +532,19 @@ func _draw_mst(path: CustomAStar) -> void:
 			#draw_line(p_pos, c_pos, Color(255, 0, 0), 15, true)
 			var line_node: Line2D = Line2D.new()
 			line_node.points = PackedVector2Array([p_pos, c_pos])
-			line_node.default_color = Color(255, 0, 0)
+			line_node.default_color = Color.RED
 			#line_node.width = rng.randi_range(300, 500)
 			line_node.width = 100
 			line_node.z_index = 1
 			add_child(line_node)
 
-func _draw_hallways(hallways: Array[Hallway]) -> void:
+func draw_hallways(hallways: Array[Hallway]) -> void:
 	for hallway: Hallway in hallways:
 		for line_node: Line2D in hallway.lines:
 			add_child(line_node)
 			line_node.add_to_group("dungeon")
 
-func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
+func create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 	for room: Room in rooms:
 		if room.room_connection_locations[Hallway.UP] == null:
 			var static_body: StaticBody2D = StaticBody2D.new()
@@ -705,7 +845,6 @@ func _create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 				occluder.add_to_group("dungeon")
 
 func close_room(room: Room) -> Array:
-	print("room")
 	var static_body: StaticBody2D = StaticBody2D.new()
 	var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 	collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
@@ -720,10 +859,13 @@ func close_room(room: Room) -> Array:
 	add_child(line)
 	return [static_body, line]
 
-func _room_comparison(a: Room, b: Room) -> bool:
-	return a.size.x * a.size.y < b.size.x * b.size.y
+func room_comparison(a: Room, b: Room) -> bool: # sorts the rooms in ascending order by area
+	return a.rect.get_area() < b.rect.get_area()
 
-func _create_mst(rooms: Array) -> CustomAStar:
+func edges_comparison(a, b) -> bool:
+	return a.length() < b.length()
+
+func create_astar(rooms: Array) -> CustomAStar:
 	# Prim's algorithm
 	var path: CustomAStar = CustomAStar.new()
 	path.add_point(path.get_available_point_id(), rooms.pop_back())

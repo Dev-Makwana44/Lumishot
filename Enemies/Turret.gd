@@ -93,8 +93,9 @@ func _on_face_frame_changed():
 		fired_this_animation = true
 		for location: Vector2 in bullet_spawn_locations.points:
 			var bullet: Bullet = BULLET_SCENE.instantiate()
-			bullet.position = self.position + location.rotated(turret_face.rotation) * self.scale
 			add_sibling(bullet)
+			await bullet.ready
+			bullet.position = self.position + location.rotated(turret_face.rotation) * self.scale
 			bullet.rotation = turret_face.rotation
 			bullet.z_index = 10
 			bullet.add_to_group("enemy_bullets")

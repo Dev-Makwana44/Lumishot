@@ -94,29 +94,6 @@ func _process(delta):
 			#if new_walls != null and len(new_walls) > 0 and time_since_entering_room > 0.5:
 				#self.remove_child(new_walls[0])
 				#self.remove_child(new_walls[1])
-			
-	for bullet: Bullet in get_tree().get_nodes_in_group("player_bullets"):
-		var bullet_in_room: bool = false
-		#for room: Room in rooms:
-			#if room.rect.has_point(bullet.position):
-				#bullet_in_room = true
-				#break
-		#if not bullet_in_room:
-			#print(2)
-			#bullet.queue_free()
-	
-	for bullet: Bullet in get_tree().get_nodes_in_group("enemy_bullets"):
-		var bullet_in_room: bool = false
-		for room: Room in rooms:
-			if room.rect.has_point(bullet.position):
-				bullet_in_room = true
-				break
-		if not bullet_in_room:
-			if bullet.bullet_type == 1:
-				for enemy in bullet.explosion_radius.get_overlapping_areas():
-					if enemy.get_parent() is Enemy:
-						enemy.get_parent().damage(10)
-			bullet.queue_free()
 	
 	for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
 		if enemy.health <= 0:
@@ -146,14 +123,14 @@ func _process(delta):
 				player.time_since_shooting = 0.0
 				var bullet: Bullet = BULLET_SCENE.instantiate()
 				self.add_child(bullet)
-				await bullet.ready
+				await bullet.is_node_ready()
+				bullet.set_collision_mask_value(2, true)
 				bullet.position = player.position
 				var bullet_path = get_global_mouse_position() - player.position
 				bullet.set_bullet_type(player.selected_ammo_index)
 				bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
 				bullet.z_index = 9
 				bullet.add_to_group("player_bullets")
-				bullet.set_collision_mask_value(2, true)
 				player.ammo[player.selected_ammo_index] -= 1
 				player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
 				hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])

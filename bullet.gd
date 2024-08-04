@@ -18,12 +18,21 @@ var bullet_type: int
 
 func _physics_process(delta):
 	self.velocity = Vector2(SPEED * cos(self.rotation), SPEED * sin(self.rotation))
-	#self.move_and_collide(self.velocity * delta)
-	
-	#if self.move_and_slide():
-		#self.queue_free()
-	print(self.move_and_collide(self.velocity * delta))
-	#if self.move_and_collide(self.velocity):
+	if self.move_and_slide():
+		var collider = self.get_last_slide_collision().get_collider()
+		if collider.get_collision_layer_value(1): # collider is a wall
+			self.queue_free()
+		elif collider.get_collision_layer_value(2): # collider is an enemy
+			if self.is_in_group("player_bullets"):
+				self.damage(collider, false)
+				self.queue_free()
+		elif collider.get_collision_layer_value(3): # collider is the player
+			if self.is_in_group("enemy_bullets"):
+				self.damage(collider, true)
+				self.queue_free()
+				#print('bullet hit player')
+		else:
+			print('bullet collided with unknown object')
 		#self.queue_free()
 
 func set_bullet_type(type: int):
@@ -52,6 +61,28 @@ func collision(area: Area2D):
 				parent.damage(20)
 			else:
 				parent.damage(5)
-		print(1)
 		self.queue_free()
 		
+func damage(collider, collider_is_player: bool) -> void:
+	if collider_is_player:
+		collider.damage(5)
+	else:
+		if bullet_type == 0:
+			collider.damage(10)
+		elif bullet_type == 1:
+			for enemy in explosion_radius.get_overlapping_areas():
+				#if enemy.get_parent() is Enemy:
+					enemy.get_parent().damage(10)
+		elif bullet_type == 2:
+			collider.damage(10)
+			collider.slow()
+		elif bullet_type == 3:
+			if collider.is_in_group("robots"):
+				collider.damage(5)
+			else:
+				collider.damage(20)
+		elif bullet_type == 4:
+			if collider.is_in_group("robots"):
+				collider.damage(20)
+			else:
+				collider.damage(5)

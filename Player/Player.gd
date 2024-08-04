@@ -162,7 +162,7 @@ func _unhandled_input(event):
 		elif event.pressed and event.keycode == KEY_O:
 			camera.zoom *= 0.9
 			
-func take_damage(damage: int) -> void:
+func damage(damage: int) -> void:
 	if not quantum_blinking:
 		self.health -= damage if not shielding else int(damage * 0.5)
 		time_since_damage = 0.0
@@ -215,7 +215,7 @@ func use_potion() -> bool:
 		return true
 	return false
 
-func _on_area_2d_area_entered(other):
-	if other.get_parent() is Bullet and other.get_parent().is_in_group("enemy_bullets") and other.name == "Collision Box":
-		other.get_parent().queue_free()
-		self.take_damage(5)
+#func _on_area_2d_area_entered(other):
+	#if other.get_parent() is Bullet and other.get_parent().is_in_group("enemy_bullets") and other.name == "Collision Box":
+		#other.get_parent().queue_free()
+		#self.take_damage(5)

@@ -1,15 +1,44 @@
-[gd_scene load_steps=23 format=3 uid="uid://cfsodffdvsin7"]
+[gd_scene load_steps=28 format=3 uid="uid://cfsodffdvsin7"]
 
 [ext_resource type="Script" path="res://Enemies/Turret.gd" id="1_3qx31"]
 [ext_resource type="Texture2D" uid="uid://cuhoxwjnj7otv" path="res://Enemies/Images/Turret Base.png" id="2_jo06s"]
 [ext_resource type="Texture2D" uid="uid://dtm3kc51ikur7" path="res://Resources/Images/Electronics.png" id="2_wxoii"]
 [ext_resource type="Texture2D" uid="uid://cm1fsuu10csid" path="res://Enemies/Images/Turret Face.png" id="3_jj76x"]
+[ext_resource type="Texture2D" uid="uid://bl00vx3rqal6n" path="res://Enemies/Images/turret_siren_off.png" id="4_5yht6"]
 [ext_resource type="Texture2D" uid="uid://56qaxuk60dx4" path="res://Resources/Lighting/cone.png" id="5_3iynv"]
+[ext_resource type="Texture2D" uid="uid://sd5ifb84acgh" path="res://Enemies/Images/turret_siren_on.png" id="5_n0wrd"]
+[ext_resource type="Texture2D" uid="uid://bg26pv11k0q33" path="res://Resources/Lighting/circle.png" id="6_j4vaa"]
 [ext_resource type="AudioStream" uid="uid://f4dms3c8r32a" path="res://sfx/sentry_turn.mp3" id="6_yn66d"]
-[ext_resource type="AudioStream" uid="uid://crxatqwxd1adj" path="res://sfx/sentry_shoot.mp3" id="7_e1jy6"]
+[ext_resource type="AudioStream" uid="uid://m5plymrlsct7" path="res://sfx/turret_shoot.mp3" id="7_w3jvj"]
+[ext_resource type="AudioStream" uid="uid://wnucdrocwlvb" path="res://sfx/turret_siren.mp3" id="8_fleoc"]
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_3pbm7"]
+polygon = PackedVector2Array(-11, -16, 11, -16, 11, -15, 15, -15, 15, -11, 16, -11, 16, 11, 15, 11, 15, 15, 11, 15, 11, 16, -11, 16, -11, 15, -15, 15, -15, 11, -16, 11, -16, -11, -15, -11, -15, -15, -11, -15)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a7blq"]
 size = Vector2(32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_uk53r"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_5yht6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_n0wrd")
+}],
+"loop": true,
+"name": &"alert",
+"speed": 2.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_5yht6")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nrlff"]
 atlas = ExtResource("3_jj76x")
@@ -116,10 +145,6 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_afkjc"]
 size = Vector2(24, 28)
 
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_3pbm7"]
-closed = false
-polygon = PackedVector2Array(-11, -16, 11, -16, 11, -15, 15, -15, 15, -11, 16, -11, 16, 11, 15, 11, 15, 15, 11, 15, 11, 16, -11, 16, -11, 15, -15, 15, -15, 11, -16, 11, -16, -11, -15, -11, -15, -15, -11, -15)
-
 [node name="Turret" type="CharacterBody2D"]
 z_index = 4
 scale = Vector2(3, 3)
@@ -134,6 +159,12 @@ position = Vector2(863.5, -95.25)
 scale = Vector2(120.906, 59.9844)
 texture = ExtResource("2_wxoii")
 
+[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
+visible = false
+show_behind_parent = true
+light_mask = 2
+occluder = SubResource("OccluderPolygon2D_3pbm7")
+
 [node name="Collision Box" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 4
@@ -144,25 +175,90 @@ shape = SubResource("RectangleShape2D_a7blq")
 [node name="Base" type="Sprite2D" parent="."]
 texture = ExtResource("2_jo06s")
 
+[node name="Siren Container" type="Node2D" parent="."]
+visible = false
+scale = Vector2(0.333, 0.333)
+
+[node name="Siren 1" type="AnimatedSprite2D" parent="Siren Container"]
+position = Vector2(-25, -23)
+scale = Vector2(2.25, 2.25)
+sprite_frames = SubResource("SpriteFrames_uk53r")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Siren 2" type="AnimatedSprite2D" parent="Siren Container"]
+position = Vector2(41, -23)
+scale = Vector2(2.25, 2.25)
+sprite_frames = SubResource("SpriteFrames_uk53r")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Siren 3" type="AnimatedSprite2D" parent="Siren Container"]
+position = Vector2(41, 43)
+scale = Vector2(2.25, 2.25)
+sprite_frames = SubResource("SpriteFrames_uk53r")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Siren 4" type="AnimatedSprite2D" parent="Siren Container"]
+position = Vector2(-25, 43)
+scale = Vector2(2.25, 2.25)
+sprite_frames = SubResource("SpriteFrames_uk53r")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Siren Lights Container" type="Node2D" parent="."]
+visible = false
+scale = Vector2(0.333, 0.333)
+
+[node name="Siren Light 1" type="PointLight2D" parent="Siren Lights Container"]
+position = Vector2(-33.033, -33.033)
+enabled = false
+color = Color(1, 0.117647, 0.152941, 1)
+texture = ExtResource("6_j4vaa")
+texture_scale = 0.5
+
+[node name="Siren Light 2" type="PointLight2D" parent="Siren Lights Container"]
+position = Vector2(33.033, -33.033)
+enabled = false
+color = Color(1, 0.117647, 0.152941, 1)
+texture = ExtResource("6_j4vaa")
+texture_scale = 0.5
+
+[node name="Siren Light 3" type="PointLight2D" parent="Siren Lights Container"]
+position = Vector2(33.033, 33.033)
+enabled = false
+color = Color(1, 0.117647, 0.152941, 1)
+texture = ExtResource("6_j4vaa")
+texture_scale = 0.5
+
+[node name="Siren Light 4" type="PointLight2D" parent="Siren Lights Container"]
+position = Vector2(-33.033, 33.033)
+enabled = false
+color = Color(1, 0.117647, 0.152941, 1)
+texture = ExtResource("6_j4vaa")
+texture_scale = 0.5
+
 [node name="Face" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_pxcbx")
 animation = &"idle"
-frame_progress = 0.96831
+autoplay = "idle"
 
 [node name="Search Area" type="Area2D" parent="Face"]
 collision_layer = 2
 collision_mask = 4
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Face/Search Area"]
-visible = false
 polygon = PackedVector2Array(0, 0, 358.333, -131.333, 403, -80.6667, 412.333, 0.333333, 403, 69.6667, 360.667, 119.333)
 
 [node name="Cone Light2" type="PointLight2D" parent="Face"]
+visible = false
 light_mask = 2
-energy = 0.25
+energy = 0.1
 range_z_max = 9
 shadow_enabled = true
 shadow_filter = 2
+shadow_item_cull_mask = 3
 texture = ExtResource("5_3iynv")
 offset = Vector2(209, -4)
 texture_scale = 0.5
@@ -176,9 +272,10 @@ position = Vector2(16, 0)
 shape = SubResource("RectangleShape2D_afkjc")
 target_position = Vector2(390, 0)
 max_results = 1
-collision_mask = 3
+collision_mask = 6
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+visible = false
 shape = SubResource("RectangleShape2D_a7blq")
 
 [node name="Health Bar" type="Line2D" parent="."]
@@ -191,13 +288,13 @@ stream = ExtResource("6_yn66d")
 max_distance = 1000.0
 
 [node name="sentry_shoot" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("7_e1jy6")
-pitch_scale = 0.5
+stream = ExtResource("7_w3jvj")
 max_distance = 1e+10
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
-visible = false
-occluder = SubResource("OccluderPolygon2D_3pbm7")
+[node name="sentry_siren" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("8_fleoc")
+max_distance = 1e+10
 
 [connection signal="area_entered" from="Collision Box" to="." method="_on_collision_box_area_entered"]
+[connection signal="frame_changed" from="Siren Container/Siren 1" to="." method="_on_siren_1_frame_changed"]
 [connection signal="frame_changed" from="Face" to="." method="_on_face_frame_changed"]

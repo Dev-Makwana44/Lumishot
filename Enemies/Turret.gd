@@ -8,11 +8,24 @@ extends Enemy
 @onready var health_bar: Line2D = $"Health Bar"
 @onready var sentry_turn: AudioStreamPlayer2D = $sentry_turn
 @onready var sentry_shoot: AudioStreamPlayer2D = $sentry_shoot
+@onready var sentry_siren: AudioStreamPlayer2D = $sentry_siren
 @onready var shape: CollisionShape2D = $CollisionShape2D2
 @onready var shape_cast: ShapeCast2D = $Face/ShapeCast2D
+@onready var light: PointLight2D = $"Face/Cone Light2"
+@onready var siren1: AnimatedSprite2D = $"Siren Container/Siren 1"
+@onready var siren_container: Node2D = $"Siren Container"
+@onready var siren_lights_container: Node2D = $"Siren Lights Container"
 
 const COLLECTABLE_ITEM: PackedScene = preload("res://Collectables/collectable.tscn")
 const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
+
+const LIGHT_MODULE: int = 0
+const INFRARED_LIGHT_MODULE: int = 1
+const SIREN_MODULE: int = 2
+
+const LIGHT_MODULE_CHANCE: float = 0.5
+const INFRARED_LIGHT_MODULE_CHANCE: float = 0.25
+const SIREN_MODULE_CHANCE: float = 0.2
 
 var loot_items: Array[ItemData] = [
 	load("res://Resources/Items/CraftingItems/Bioluminescent_Bacteria.tres"),
@@ -37,6 +50,8 @@ var rotation_speed: float = PI * 2/3
 var time_since_last_rotation: float = 0.0
 var current_rotation: float = 0.0
 var fired_this_animation: bool = false
+var alert: bool = false
+var active_modules: Array[bool] = [false, false, false]
 
 var time_since_slowed: float = SLOWNESS_DURATION
 var slowed: bool = false
@@ -45,21 +60,48 @@ var run: bool = false
 var room: Room
 
 func _ready():
-	turret_face.play("idle")
 	turret_face.rotation = 0.0 + [0, PI/2, PI, PI * 3/2].pick_random()
 	current_rotation = turret_face.rotation
 	HEALTH_BAR_SIZE = (health_bar.points[1] - health_bar.points[0]).length()
 	shape_cast.add_exception(self)
+	
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	if rng.randf() < LIGHT_MODULE_CHANCE:
+		active_modules[LIGHT_MODULE] = true
+	if rng.randf() < INFRARED_LIGHT_MODULE_CHANCE:
+		active_modules[INFRARED_LIGHT_MODULE] = true
+	if rng.randf() < SIREN_MODULE_CHANCE:
+		active_modules[SIREN_MODULE] = true
+	
+	if active_modules[LIGHT_MODULE]:
+		light.show()
+	if active_modules[INFRARED_LIGHT_MODULE]:
+		light.color = Color(1, 0, 0)
+	if active_modules[SIREN_MODULE]:
+		siren_container.visible = true
+		siren_lights_container.visible = true
 
 func _process(_delta):
 	if run:
-		target_location = null
+		#target_location = null
+		var player_located: bool = false
 		for area in search_area.get_overlapping_areas():
-			if area.get_parent() is Player and !area.get_parent().invisible and area.get_parent().room != null and area.get_parent().room == self.room:
-				#var query = PhysicsRayQueryParameters2D.create(self.position, area.get_parent().position)
-				#var result = get_world_2d().direct_space_state.intersect_ray(query)
-				#if result and result.collider is Player:
+			if area.get_parent() is Player and (!area.get_parent().invisible or active_modules[INFRARED_LIGHT_MODULE]) and area.get_parent().room != null and area.get_parent().room == self.room:
+				player_located = true
+				if not alert:
+					if active_modules[SIREN_MODULE]:
+						sentry_siren.play()
+						for enemy: Enemy in room.enemies:
+							enemy.alert_enemy()
+						for siren_sprite in siren_container.get_children():
+							siren_sprite.play("alert")
+					alert = true
+				var query = PhysicsRayQueryParameters2D.create(self.position, area.get_parent().position)
+				var result = get_world_2d().direct_space_state.intersect_ray(query)
+				if result and result.collider is Player:
 					target_location = area.get_parent().position
+		if not player_located:
+			target_location = null
 		if target_location == null:
 			turret_face.play("idle")
 		else:
@@ -77,15 +119,18 @@ func _physics_process(delta):
 		
 		var target_rotation: float
 		if target_location != null:
-			target_rotation = atan2(target_location.y - self.position.y, target_location.x - self.position.x)
+			target_rotation = self.position.angle_to_point(target_location)
 		else:
-			time_since_last_rotation += delta
-			if time_since_last_rotation >= TIME_BETWEEN_ROTATIONS:
-				time_since_last_rotation = 0.0
-				current_rotation += PI/2
-				if current_rotation >= 2 * PI:
-					current_rotation -= 2 * PI
-			target_rotation = current_rotation
+			if alert:
+				target_rotation = turret_face.rotation + 0.1
+			else:
+				time_since_last_rotation += delta
+				if time_since_last_rotation >= TIME_BETWEEN_ROTATIONS:
+					time_since_last_rotation = 0.0
+					current_rotation += PI/2
+					if current_rotation >= 2 * PI:
+						current_rotation -= 2 * PI
+				target_rotation = current_rotation
 		var rotation_difference = target_rotation - turret_face.rotation
 		if rotation_difference > PI:
 			rotation_difference -= 2 * PI
@@ -97,7 +142,7 @@ func _physics_process(delta):
 func _on_face_frame_changed():
 	if turret_face.animation == "firing":
 		if turret_face.frame == 7 and not fired_this_animation:
-			if shape_cast.collision_result:
+			if shape_cast.collision_result and !shape_cast.collision_result[0].collider is Player:
 				turret_face.frame = 6
 				return
 				
@@ -132,6 +177,14 @@ func damage(damage: int):
 	node.default_color = Color.RED
 	node.z_index = 2
 	self.add_child(node)
+	if not alert:
+		if active_modules[SIREN_MODULE]:
+			sentry_siren.play()
+			for enemy: Enemy in room.enemies:
+				enemy.alert_enemy()
+			for siren_sprite in siren_container.get_children():
+				siren_sprite.play("alert")
+		alert = true
 
 func slow() -> void:
 	time_since_slowed = 0.0
@@ -159,3 +212,15 @@ func drop_loot() -> void:
 
 func get_size() -> Vector2:
 	return self.shape.shape.size * self.scale
+
+func alert_enemy() -> void:
+	alert = true
+	if active_modules[SIREN_MODULE]:
+		for siren in siren_container.get_children():
+			siren.play("alert")
+	
+
+func _on_siren_1_frame_changed():
+	if siren1.animation == "alert":
+		for light in siren_lights_container.get_children():
+			light.enabled = (siren1.frame == 1)

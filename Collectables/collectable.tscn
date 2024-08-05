@@ -1,39 +1,13 @@
-[gd_scene load_steps=15 format=3 uid="uid://b86iap436pqle"]
+[gd_scene load_steps=7 format=3 uid="uid://b86iap436pqle"]
 
 [ext_resource type="Script" path="res://Collectable.gd" id="1_okohp"]
 [ext_resource type="Texture2D" uid="uid://du857roltjoqt" path="res://Resources/Images/Rabbit Foot.png" id="2_6tk81"]
+[ext_resource type="AudioStream" uid="uid://yqoqq1ee8k8" path="res://sfx/collectable_pickup.wav" id="3_in6at"]
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_l6tc8"]
 polygon = PackedVector2Array(0, -7, -5.5, -4, -7, 0, -5, 5, 0, 7, 5.5, 4.5, 7, 0, 5.5, -4.5)
 
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_q0wwu"]
-polygon = PackedVector2Array(1.5, -2.3, 3.5, -1.3, 3.5, 10.5, 2.5, 10.5, 2.5, 11.5, -2.5, 11.5, -2.5, 10.3, -4.5, 9.3, -4.5, -0.5, -3.5, -0.5, -3.5, -1.3, -1.5, -2.3, -1.5, -3.5, 1.5, -3.5)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_0v8j5"]
-polygon = PackedVector2Array(2.5, 0.5, 1.3, 0.5, 0.299999, 2.5, -0.5, 2.5, -0.5, 3.5, -1.5, 3.5, -1.5, 4.5, -2.5, 4.5, -2.5, 5.5, -3.5, 5.5, -3.5, 6.5, -4.5, 6.5, -4.5, 7.5, -9.5, 7.5, -9.5, 1.5, -8.3, 1.5, -7.3, -0.5, -6.5, -0.5, -6.5, -1.5, -5.5, -1.5, -5.5, -2.5, -4.5, -2.5, -4.5, -3.5, -3.5, -3.5, -3.5, -4.5, -2.5, -4.5, -2.5, -5.5, 2.5, -5.5)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_e3h8b"]
-polygon = PackedVector2Array(-5, -5.5, -5, -7, -4, -7, -4, -8, -3, -8, -3, -9, -2, -9, -2, -10, -1, -10, -1, -11, 0, -11, 0, -12, 3, -12, 3, -11, 4, -11, 4, -8, 3, -8, 3, -7, 2, -7, 2, -6, 1, -6, 1, -5, 0, -5, 0, -4, -1, -4, -1, -3, -2.5, -3, -2.5, -1.5, -4.5, -1.5, -4.5, -3.5, -3, -3.5, -3, -4, -2, -4, -2, -6, -4, -6, -4, -5, -4.5, -5, -4.5, -4, -5, -3.5, -6.5, -3.5, -6.5, -5.5)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_u7say"]
-polygon = PackedVector2Array(5.5, -10.5, 4.3, -10.5, 3.3, -8.5, 2.5, -8.5, 2.5, -7.5, 1.5, -7.5, 1.5, -6.5, 0.5, -6.5, 0.5, -5.5, -0.5, -5.5, -0.5, -4.5, -1.5, -4.5, -1.5, -3.5, -6.5, -3.5, -6.5, -8.5, -5.3, -8.5, -4.3, -10.5, -3.5, -10.5, -3.5, -11.5, -2.5, -11.5, -2.5, -12.5, -1.5, -12.5, -1.5, -13.5, -0.5, -13.5, -0.5, -14.5, 0.5, -14.5, 0.5, -15.5, 5.5, -15.5)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_sm5an"]
-polygon = PackedVector2Array(9.5, -9.5, 10.5, -9.5, 10.5, 9.5, 9.5, 9.5, 9.5, 10.5, -9.5, 10.5, -9.5, -10.5, 9.5, -10.5)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_l5su2"]
-polygon = PackedVector2Array(16, 16, -16, 16, -16, -16, 16, -16)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_rb7rr"]
-polygon = PackedVector2Array(9.5, -12.5, 11.5, -12.5, 11.5, -10.5, 13.5, -10.5, 13.5, -4.5, 12.5, -4.5, 12.5, -3.5, 11.5, -3.5, 11.5, -0.5, 10.5, -0.5, 10.5, 1.5, 9.5, 1.5, 9.5, 2.5, 8.5, 2.5, 8.5, 5.5, 6.5, 5.5, 6.5, 8.5, 5.5, 8.5, 5.5, 11.5, 4.3, 11.5, 3.3, 13.5, -12.5, 13.5, -12.5, 12.3, -14.5, 11.3, -14.5, 4.5, -13.5, 4.5, -13.5, 3.5, -12.5, 3.5, -12.5, 0.5, -11.5, 0.5, -11.5, -1.5, -10.5, -1.5, -10.5, -2.5, -9.5, -2.5, -9.5, -5.5, -8.5, -5.5, -8.5, -7.5, -7.5, -7.5, -7.5, -8.5, -6.5, -8.5, -6.5, -11.5, -5.5, -11.5, -5.5, -12.5, -4.5, -12.5, -4.5, -13.5, 9.5, -13.5)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_yd8vr"]
-polygon = PackedVector2Array(-1.5, -4.5, -0.5, -4.5, -0.5, -3.5, 1.5, -3.5, 1.5, -2.5, 2.5, -2.5, 2.5, -1.5, 3.5, -1.5, 3.5, -0.3, 5.5, 0.700001, 5.5, 1.5, 6.5, 1.5, 6.5, 6.5, 5.5, 6.5, 5.5, 7.5, 0.5, 7.5, 0.5, 6.5, -0.5, 6.5, -0.5, 5.3, -2.5, 4.3, -2.5, 3.5, -3.5, 3.5, -3.5, 2.5, -4.5, 2.5, -4.5, 0.5, -5.5, 0.5, -5.5, -0.5, -8.5, -0.5, -8.5, -4.5, -7.5, -4.5, -7.5, -6.5, -5.5, -6.5, -5.5, -7.5, -1.5, -7.5)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_yskqj"]
-polygon = PackedVector2Array(7.5, -8.3, 9.5, -7.3, 9.5, -0.5, 8.5, -0.5, 8.5, 2.5, 7.3, 2.5, 6.3, 4.5, 5.5, 4.5, 5.5, 5.5, 3.5, 5.5, 3.5, 6.5, 0.5, 6.5, 0.5, 7.5, -5.5, 7.5, -5.5, 6.3, -7.5, 5.3, -7.5, 4.5, -8.5, 4.5, -8.5, -0.5, -7.5, -0.5, -7.5, -1.5, -5.5, -1.5, -5.5, -3.5, -1.5, -3.5, -1.5, -4.5, 0.5, -4.5, 0.5, -7.3, 2.5, -8.3, 2.5, -9.5, 7.5, -9.5)
-
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_6vlr7"]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_s31lq"]
 light_mode = 1
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yss58"]
@@ -56,69 +30,78 @@ visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_q0wwu")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Camouflage Cell" type="LightOccluder2D" parent="."]
 visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_0v8j5")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Combustion Node" type="LightOccluder2D" parent="."]
 visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_e3h8b")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Cryo Cell" type="LightOccluder2D" parent="."]
 visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_u7say")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Electronics" type="LightOccluder2D" parent="."]
 visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_sm5an")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Heavy Plate" type="LightOccluder2D" parent="."]
 visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_l5su2")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Iron" type="LightOccluder2D" parent="."]
 visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_rb7rr")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Mutated Blood" type="LightOccluder2D" parent="."]
 visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_yd8vr")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Rabbit Foot" type="LightOccluder2D" parent="."]
 visible = false
 show_behind_parent = true
 z_index = -4
 z_as_relative = false
-occluder = SubResource("OccluderPolygon2D_yskqj")
+occluder = SubResource("OccluderPolygon2D_l6tc8")
+sdf_collision = false
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 light_mask = 0
 z_index = 9
 z_as_relative = false
-material = SubResource("CanvasItemMaterial_6vlr7")
+material = SubResource("CanvasItemMaterial_s31lq")
 texture = ExtResource("2_6tk81")
 
 [node name="Area2D" type="Area2D" parent="."]
@@ -127,5 +110,8 @@ collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_yss58")
+
+[node name="collectable_pickup" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_in6at")
 
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

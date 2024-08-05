@@ -27,6 +27,8 @@ shape = SubResource("RectangleShape2D_5ldqn")
 [node name="Explosion Radius" type="Area2D" parent="."]
 rotation = 1.5708
 scale = Vector2(4.38758, 3.53425)
+collision_layer = 8
+collision_mask = 6
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Explosion Radius"]
 scale = Vector2(-1.28167, 1.18417)

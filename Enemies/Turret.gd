@@ -53,7 +53,10 @@ func _process(_delta):
 		target_location = null
 		for area in search_area.get_overlapping_areas():
 			if area.get_parent() is Player and !area.get_parent().invisible and area.get_parent().room != null and area.get_parent().room == self.room:
-				target_location = area.get_parent().position
+				#var query = PhysicsRayQueryParameters2D.create(self.position, area.get_parent().position)
+				#var result = get_world_2d().direct_space_state.intersect_ray(query)
+				#if result and result.collider is Player:
+					target_location = area.get_parent().position
 		if target_location == null:
 			turret_face.play("idle")
 		else:
@@ -90,24 +93,39 @@ func _physics_process(delta):
 
 func _on_face_frame_changed():
 	if turret_face.frame == 7 and not fired_this_animation:
+		
+		var space_state = get_world_2d().direct_space_state
+		for location: Vector2 in bullet_spawn_locations.points:
+			#var starting_position = self.position + location.rotated(turret_face.rotation) * self.scale + Vector2(0, Bullet.BULLET_WIDTH * location.sign().y).rotated(turret_face.rotation)
+			#var ending_position = target_location + location.rotated(turret_face.rotation) * self.scale + Vector2(0, Bullet.BULLET_WIDTH * location.sign().y).rotated(turret_face.rotation)
+			var point_shift = location.rotated(turret_face.rotation) * self.scale + Vector2(0, Bullet.BULLET_WIDTH * location.sign().y).rotated(turret_face.rotation)
+			var query = PhysicsRayQueryParameters2D.create(self.position + point_shift, target_location + point_shift)
+			var result = space_state.intersect_ray(query)
+			if result and !result.collider is Player:
+				turret_face.frame = 6
+				return
+			
+		
+		
 		fired_this_animation = true
 		for location: Vector2 in bullet_spawn_locations.points:
 			var bullet: Bullet = BULLET_SCENE.instantiate()
 			add_sibling(bullet)
 			await bullet.is_node_ready()
-			bullet.set_bullet_type(1)
+			bullet.set_bullet_type(0)
+			bullet.set_collision_mask_value(2, true)
 			bullet.set_collision_mask_value(3, true)
 			bullet.position = self.position + location.rotated(turret_face.rotation) * self.scale
 			bullet.rotation = turret_face.rotation
 			bullet.z_index = 9
 			bullet.add_to_group("enemy_bullets")
+			bullet.add_to_group("player_bullets")
+			bullet.add_collision_exception_with(self)
 	elif turret_face.frame == 0:
 		fired_this_animation = false
 
 func damage(damage: int):
 	self.health -= damage
-	#health_bar.add_point(health_bar.points[-1] + Vector2(damage / 100 * HEALTH_BAR_SIZE, 0))
-	#print(health_bar.points[-1])
 	var node: Line2D = Line2D.new()
 	node.points = PackedVector2Array([health_bar.points[1], health_bar.points[0] + Vector2(health / 100.0 * HEALTH_BAR_SIZE, 0)])
 	node.width = 2
@@ -140,4 +158,4 @@ func drop_loot() -> void:
 		item.add_to_group("dungeon")
 
 func get_size() -> Vector2:
-	return self.shape.shape.size
+	return self.shape.shape.size * self.scale

@@ -91,9 +91,6 @@ func _process(delta):
 			new_walls = close_room(player.room)
 		if not player.room.rect.has_point(player.position):
 			player.room = null
-			#if new_walls != null and len(new_walls) > 0 and time_since_entering_room > 0.5:
-				#self.remove_child(new_walls[0])
-				#self.remove_child(new_walls[1])
 	
 	for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
 		if enemy.health <= 0:

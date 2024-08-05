@@ -1,6 +1,7 @@
 class_name Bullet
 extends CharacterBody2D
 
+static var BULLET_WIDTH: int = 14
 const SPEED: int = 1000
 
 var bullet_textures: Dictionary = {
@@ -71,7 +72,7 @@ func damage(collider, collider_is_player: bool) -> void:
 			collider.damage(10)
 		elif bullet_type == 1:
 			for enemy in explosion_radius.get_overlapping_areas():
-				#if enemy.get_parent() is Enemy:
+				if !enemy.get_parent() is Bullet:
 					enemy.get_parent().damage(10)
 		elif bullet_type == 2:
 			collider.damage(10)

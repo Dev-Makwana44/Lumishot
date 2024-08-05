@@ -165,6 +165,7 @@ func _unhandled_input(event):
 func damage(damage: int) -> void:
 	if not quantum_blinking:
 		self.health -= damage if not shielding else int(damage * 0.5)
+		self.health = max(self.health, 0)
 		time_since_damage = 0.0
 		hurt.pitch_scale = rng.randfn(1.0, 0.05)
 		hurt.play()

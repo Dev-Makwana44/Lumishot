@@ -35,15 +35,15 @@ theme_override_font_sizes/font_size = 36
 text = "You lose"
 
 [node name="Label2" type="Label" parent="MarginContainer/HBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 36
 text = "Reload to try again"
 
 [node name="Button" type="Button" parent="MarginContainer/HBoxContainer"]
-visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
-text = "Try Again"
+text = "Restart"
 
 [connection signal="button_down" from="MarginContainer/HBoxContainer/Button" to="." method="_on_button_button_down"]

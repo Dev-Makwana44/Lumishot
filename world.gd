@@ -52,7 +52,6 @@ func _ready():
 
 func _process(delta):
 	if level_cleared and level_completion_screen.continue_game:
-		print("new level")
 		level_cleared = false
 		level_completion_screen.continue_game = false
 		level += 1
@@ -62,22 +61,19 @@ func _process(delta):
 		level_completion_screen.hide()
 		player.game_paused = false
 	elif player.health <= 0 and loss_screen.restart_game:
-		level = 0
+		player.health = player.MAX_HEALTH
+		loss_screen.restart_game = false
+		level = 1
 		for enemy in get_tree().get_nodes_in_group("enemies"):
 			enemy.queue_free()
-		#_ready()
-		for room: Room in rooms:
-			if room.room_type == Room.STARTING_ROOM:
-				player.position = room._get_center()
-			elif room.room_type == Room.BOSS_ROOM:
-				spawn_enemies(room, level + 5)
-			else:
-				spawn_enemies(room, level)
+		for node in get_tree().get_nodes_in_group("dungeon"):
+			remove_child(node)
 		player.inventory = InventoryComponent.new()
 		player.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
 		player.set_inventory(player.inventory)
-		player.game_paused = false
 		loss_screen.hide()
+		_ready()
+		player.game_paused = false
 
 	time_since_entering_room += delta
 	if player.room == null:

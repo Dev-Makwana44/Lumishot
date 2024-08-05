@@ -138,6 +138,7 @@ func _on_inventory_tree_item_selected() -> void:
 						if discovered_recipes[crafting_item.item_name]:
 							title_label.text = crafting_item.item_name
 							item_texture.texture = crafting_item.item_texture
+				place.play()
 			break
 	inventory_tree.deselect_all()
 

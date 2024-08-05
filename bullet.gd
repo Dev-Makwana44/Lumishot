@@ -14,7 +14,6 @@ var bullet_textures: Dictionary = {
 
 var bullet_type: int
 @onready var sprite: Sprite2D = $Sprite2D
-#@onready var collision_box: Area2D = $"Collision Box"
 @onready var explosion_radius: Area2D = $"Explosion Radius"
 
 func _physics_process(delta):
@@ -31,39 +30,13 @@ func _physics_process(delta):
 			if self.is_in_group("enemy_bullets"):
 				self.damage(collider, true)
 				self.queue_free()
-				#print('bullet hit player')
 		else:
 			print('bullet collided with unknown object')
-		#self.queue_free()
 
 func set_bullet_type(type: int):
 	self.bullet_type = type
 	self.sprite.texture = self.bullet_textures[self.bullet_type].item_texture
 
-func collision(area: Area2D):
-	var parent = area.get_parent()
-	if parent is Enemy and self.is_in_group("player_bullets"):
-		if bullet_type == 0:
-			parent.damage(10)
-		elif bullet_type == 1:
-			for enemy in explosion_radius.get_overlapping_areas():
-				if enemy.get_parent() is Enemy:
-					enemy.get_parent().damage(10)
-		elif bullet_type == 2:
-			parent.damage(10)
-			parent.slow()
-		elif bullet_type == 3:
-			if parent.is_in_group("robots"):
-				parent.damage(5)
-			else:
-				parent.damage(20)
-		elif bullet_type == 4:
-			if parent.is_in_group("robots"):
-				parent.damage(20)
-			else:
-				parent.damage(5)
-		self.queue_free()
-		
 func damage(collider, collider_is_player: bool) -> void:
 	if collider_is_player:
 		collider.damage(5)

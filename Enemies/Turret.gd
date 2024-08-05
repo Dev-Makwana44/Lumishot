@@ -6,8 +6,10 @@ extends Enemy
 @onready var collision_box: Area2D = $"Collision Box"
 @onready var bullet_spawn_locations: Line2D = $"Face/Bullet Spawn Locations"
 @onready var health_bar: Line2D = $"Health Bar"
-@onready var sentry_turn = $sentry_turn
+@onready var sentry_turn: AudioStreamPlayer2D = $sentry_turn
+@onready var sentry_shoot: AudioStreamPlayer2D = $sentry_shoot
 @onready var shape: CollisionShape2D = $CollisionShape2D2
+@onready var shape_cast: ShapeCast2D = $Face/ShapeCast2D
 
 const COLLECTABLE_ITEM: PackedScene = preload("res://Collectables/collectable.tscn")
 const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
@@ -47,6 +49,7 @@ func _ready():
 	turret_face.rotation = 0.0 + [0, PI/2, PI, PI * 3/2].pick_random()
 	current_rotation = turret_face.rotation
 	HEALTH_BAR_SIZE = (health_bar.points[1] - health_bar.points[0]).length()
+	shape_cast.add_exception(self)
 
 func _process(_delta):
 	if run:
@@ -89,40 +92,37 @@ func _physics_process(delta):
 		elif rotation_difference < -PI:
 			rotation_difference += 2 * PI
 		turret_face.rotation += min(rotation_speed * delta, abs(rotation_difference)) * sign(rotation_difference)
-		sentry_turn.play()
+		#sentry_turn.play()
 
 func _on_face_frame_changed():
-	if turret_face.frame == 7 and not fired_this_animation:
-		
-		var space_state = get_world_2d().direct_space_state
-		for location: Vector2 in bullet_spawn_locations.points:
-			#var starting_position = self.position + location.rotated(turret_face.rotation) * self.scale + Vector2(0, Bullet.BULLET_WIDTH * location.sign().y).rotated(turret_face.rotation)
-			#var ending_position = target_location + location.rotated(turret_face.rotation) * self.scale + Vector2(0, Bullet.BULLET_WIDTH * location.sign().y).rotated(turret_face.rotation)
-			var point_shift = location.rotated(turret_face.rotation) * self.scale + Vector2(0, Bullet.BULLET_WIDTH * location.sign().y).rotated(turret_face.rotation)
-			var query = PhysicsRayQueryParameters2D.create(self.position + point_shift, target_location + point_shift)
-			var result = space_state.intersect_ray(query)
-			if result and !result.collider is Player:
+	if turret_face.animation == "firing":
+		if turret_face.frame == 7 and not fired_this_animation:
+			if shape_cast.collision_result:
 				turret_face.frame = 6
 				return
+				
+			fired_this_animation = true
+			for location: Vector2 in bullet_spawn_locations.points:
+				var bullet: Bullet = BULLET_SCENE.instantiate()
+				add_sibling(bullet)
+				await bullet.is_node_ready()
+				bullet.set_bullet_type(0)
+				bullet.set_collision_mask_value(2, true)
+				bullet.set_collision_mask_value(3, true)
+				bullet.position = self.position + location.rotated(turret_face.rotation) * self.scale
+				bullet.rotation = turret_face.rotation
+				bullet.z_index = 9
+				bullet.add_to_group("enemy_bullets")
+				bullet.add_to_group("player_bullets")
+				bullet.add_collision_exception_with(self)
+			sentry_shoot.play()
 			
-		
-		
-		fired_this_animation = true
-		for location: Vector2 in bullet_spawn_locations.points:
-			var bullet: Bullet = BULLET_SCENE.instantiate()
-			add_sibling(bullet)
-			await bullet.is_node_ready()
-			bullet.set_bullet_type(0)
-			bullet.set_collision_mask_value(2, true)
-			bullet.set_collision_mask_value(3, true)
-			bullet.position = self.position + location.rotated(turret_face.rotation) * self.scale
-			bullet.rotation = turret_face.rotation
-			bullet.z_index = 9
-			bullet.add_to_group("enemy_bullets")
-			bullet.add_to_group("player_bullets")
-			bullet.add_collision_exception_with(self)
-	elif turret_face.frame == 0:
-		fired_this_animation = false
+		elif turret_face.frame == 0:
+			fired_this_animation = false
+	else:
+		if turret_face.frame == 0:
+			#sentry_turn.play()
+			pass
 
 func damage(damage: int):
 	self.health -= damage

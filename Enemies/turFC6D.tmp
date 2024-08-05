@@ -110,7 +110,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle",
-"speed": 5.0
+"speed": 20.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_afkjc"]
@@ -147,7 +147,6 @@ texture = ExtResource("2_jo06s")
 [node name="Face" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_pxcbx")
 animation = &"idle"
-frame_progress = 0.96831
 
 [node name="Search Area" type="Area2D" parent="Face"]
 collision_layer = 2

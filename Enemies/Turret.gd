@@ -219,7 +219,6 @@ func alert_enemy() -> void:
 		for siren in siren_container.get_children():
 			siren.play("alert")
 	
-
 func _on_siren_1_frame_changed():
 	if siren1.animation == "alert":
 		for light in siren_lights_container.get_children():

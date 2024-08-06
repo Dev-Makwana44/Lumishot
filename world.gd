@@ -10,7 +10,6 @@ const MAIN_ROOM_SIZE_RATIO: float = 1.25
 const TURRET_SCENE: PackedScene = preload("res://Enemies/turret.tscn")
 const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
 
-#@onready var turret: Turret = %Turret
 @onready var player: Player = %Player
 @onready var hud: HUD = %HUD
 @onready var ui_container: UI_CONTAINER = %UI_Container
@@ -26,8 +25,7 @@ var hallways: Array[Hallway] = []
 var level_cleared: bool = false
 var rooms: Array[Room] = []
 
-class CustomAStar:
-	extends AStar2D
+class CustomAStar extends AStar2D:
 	
 	func _compute_cost(from_id, to_id):
 		var diff: Vector2 = (self.get_point_position(from_id) - self.get_point_position(to_id)).abs()
@@ -954,3 +952,18 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 			turret.run = true
 			turret.room = spawning_room
 			spawning_room.enemies[turret] = true
+	
+	# use separation steering algorithm to prevent overlaps without having to regenerate enemies
+	var not_done: bool = true
+	var enemies = spawning_room.enemies.keys()
+	while not_done:
+		not_done = false
+		for current: int in range(len(enemies)):
+			var current_rect = Rect2(enemies[current].position - (enemies[current].get_size() / 2), enemies[current].get_size())
+			for other: int in range(len(enemies)):
+				var other_rect = Rect2(enemies[other].position - (enemies[other].get_size() / 2), enemies[other].get_size())
+				if current != other and current_rect.intersects(other_rect):
+					var direction: Vector2 = (enemies[other].position - enemies[current].position).normalized().round()
+					enemies[current].position -= direction * 50
+					enemies[other].position += direction * 50
+					not_done = true

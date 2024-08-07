@@ -15,118 +15,6 @@ func _init(room_a: Room, room_b: Room) -> void: # from a to b
 	self.b = room_b
 	self.lines = []
 
-#func _create_path(width: int, starting_direction: int) -> bool:
-	#self.line_width = width
-	#if a.room_connection_locations[starting_direction]:
-		#return false
-	#else:
-		#a.room_connection_locations[starting_direction] = self
-	#if starting_direction % 2 == 0: # starts horizontal
-		#if starting_direction == LEFT and b.room_connection_locations[RIGHT]:
-			#return false
-		#elif starting_direction == RIGHT and b.room_connection_locations[LEFT]:
-			#return false
-		#var overlap: float = self._overlap(a.rect.position.y, a.rect.end.y, b.rect.position.y, b.rect.end.y)
-		#if overlap >= width:
-			#b.room_connection_locations[RIGHT if starting_direction == LEFT else LEFT] = self
-			#var line_node: Line2D = Line2D.new()
-			#line_node.default_color = Color.DIM_GRAY
-			#line_node.width = width
-			#line_node.z_index = 2
-			#if b.rect.get_center().y < a.rect.get_center().y:
-				#if starting_direction == LEFT:
-					#line_node.points = PackedVector2Array([Vector2(a.rect.position.x, b.rect.end.y - overlap / 2), Vector2(b.rect.end.x, b.rect.end.y - overlap / 2)])
-				#else:
-					#line_node.points = PackedVector2Array([Vector2(a.rect.end.x, b.rect.end.y - overlap / 2), Vector2(b.rect.position.x, b.rect.end.y - overlap / 2)])
-			#else:
-				#if starting_direction == LEFT:
-					#line_node.points = PackedVector2Array([Vector2(a.rect.position.x, a.rect.end.y - overlap / 2), Vector2(b.rect.end.x, a.rect.end.y - overlap / 2)])
-				#else:
-					#line_node.points = PackedVector2Array([Vector2(a.rect.end.x, a.rect.end.y - overlap / 2), Vector2(b.rect.position.x, a.rect.end.y - overlap / 2)])
-			#lines.append(line_node)
-		#else: # has to turn
-			##if a.rect.position.y > b.rect.position.y and b.room_connection_locations[DOWN]:
-				##return false
-			##elif a.rect.position.y < b.rect.position.y and b.room_connection_locations[UP]:
-				##return false
-			#if a.rect.position.y > b.rect.position.y:
-				#if b.room_connection_locations[DOWN]:
-					#return false
-				#else:
-					#b.room_connection_locations[DOWN] = self
-			#else:
-				#if b.room_connection_locations[UP]:
-					#return false
-				#else:
-					#b.room_connection_locations[UP] = self
-			#var line_node: Line2D = Line2D.new()
-			#line_node.default_color = Color.DIM_GRAY
-			#line_node.width = width
-			#line_node.z_index = 2
-			#var second_line_node: Line2D = Line2D.new()
-			#second_line_node.default_color = Color.DIM_GRAY
-			#second_line_node.width = width
-			#second_line_node.z_index = 2
-			#if starting_direction == LEFT:
-				#line_node.points = PackedVector2Array([Vector2(a.rect.position.x, a.rect.position.y + a.rect.size.y / 2), Vector2(b.rect.get_center().x - width / 2, a.rect.position.y + a.rect.size.y / 2)])
-				#second_line_node.points = PackedVector2Array([line_node.points[1] + Vector2(width / 2, width / 2), Vector2(b.rect.get_center().x, b.rect.position.y if b.rect.get_center().y > a.rect.get_center().y else b.rect.end.y)])
-			#else:
-				#line_node.points = PackedVector2Array([Vector2(a.rect.end.x, a.rect.position.y + a.rect.size.y / 2), Vector2(b.rect.get_center().x + width / 2, a.rect.position.y + a.rect.size.y / 2)])
-				#second_line_node.points = PackedVector2Array([line_node.points[1] - Vector2(width / 2, width / 2), Vector2(b.rect.get_center().x, b.rect.position.y if b.rect.get_center().y > a.rect.get_center().y else b.rect.end.y)])
-			#lines.append(line_node)
-			#lines.append(second_line_node)
-	#else:
-		#if starting_direction == DOWN and b.room_connection_locations[UP]:
-			#return false
-		#elif starting_direction == UP and b.room_connection_locations[DOWN]:
-			#return false
-		#var overlap: int = self._overlap(a.rect.position.x, a.rect.end.x, b.rect.position.x, b.rect.end.x)
-		#if overlap >= width:
-			#b.room_connection_locations[UP if starting_direction == DOWN else DOWN] = self
-			#var line_node: Line2D = Line2D.new()
-			#line_node.default_color = Color.DIM_GRAY
-			#line_node.width = width
-			#line_node.z_index = 2
-			#if b.rect.get_center().x < a.rect.get_center().x:
-				#if starting_direction == DOWN:
-					#line_node.points = PackedVector2Array([Vector2(b.rect.end.x - overlap / 2, a.rect.end.y), Vector2(b.rect.end.x - overlap / 2, b.rect.position.y)])
-				#else:
-					#line_node.points = PackedVector2Array([Vector2(b.rect.end.x - overlap / 2, a.rect.position.y), Vector2(b.rect.end.x - overlap / 2, b.rect.end.y)])
-			#else:
-				#if starting_direction == DOWN:
-					#line_node.points = PackedVector2Array([Vector2(a.rect.end.x - overlap / 2, a.rect.end.y), Vector2(a.rect.end.x - overlap / 2, b.rect.position.y)])
-				#else:
-					#line_node.points = PackedVector2Array([Vector2(a.rect.end.x - overlap / 2, a.rect.position.y), Vector2(a.rect.end.x - overlap / 2, b.rect.end.y)])
-			#lines.append(line_node)
-		#else:
-			#if a.rect.position.x > b.rect.position.x:
-				#if b.room_connection_locations[RIGHT]:
-					#return false
-				#else:
-					#b.room_connection_locations[RIGHT] = self
-			#else:
-				#if b.room_connection_locations[LEFT]:
-					#return false
-				#else:
-					#b.room_connection_locations[LEFT] = self
-			#var line_node: Line2D = Line2D.new()
-			#line_node.default_color = Color.DIM_GRAY
-			#line_node.width = width
-			#line_node.z_index = 2
-			#var second_line_node: Line2D = Line2D.new()
-			#second_line_node.default_color = Color.DIM_GRAY
-			#second_line_node.width = width
-			#second_line_node.z_index = 3
-			#if starting_direction == DOWN:
-				#line_node.points = PackedVector2Array([Vector2(a.rect.position.x + a.rect.size.x / 2, a.rect.end.y), Vector2(a.rect.position.x + a.rect.size.x / 2, b.rect.position.y + b.rect.size.y / 2 + width / 2)])
-				#second_line_node.points = PackedVector2Array([line_node.points[1] - Vector2(width / 2 * (-1 if b.rect.position.x < a.rect.position.x else 1), width / 2), Vector2(b.rect.position.x if b.rect.position.x > a.rect.position.x else b.rect.end.x, b.rect.position.y + b.rect.size.y / 2)])
-			#else:
-				#line_node.points = PackedVector2Array([Vector2(a.rect.position.x + a.rect.size.x / 2, a.rect.position.y), Vector2(a.rect.position.x + a.rect.size.x / 2, b.rect.position.y + b.rect.size.y / 2 - width / 2)])
-				#second_line_node.points = PackedVector2Array([line_node.points[1] + Vector2(width / 2 * (-1 if b.rect.position.x > a.rect.position.x else 1), width / 2), Vector2(b.rect.position.x if b.rect.position.x > a.rect.position.x else b.rect.end.x, b.rect.position.y + b.rect.size.y / 2)])
-			#lines.append(line_node)
-			#lines.append(second_line_node)
-	#return true
-
 func _create_path(width: int, starting_direction: int) -> bool:
 	self.line_width = width
 	if a.room_connection_locations[starting_direction]:
@@ -157,10 +45,6 @@ func _create_path(width: int, starting_direction: int) -> bool:
 					line_node.points = PackedVector2Array([Vector2(a.rect.position.x + a.rect.size.x, a.rect.position.y + a.rect.size.y - overlap / 2), Vector2(b.rect.position.x, a.rect.position.y + a.rect.size.y - overlap / 2)])
 			lines.append(line_node)
 		else: # has to turn
-			#if a.rect.position.y > b.rect.position.y and b.room_connection_locations[DOWN]:
-				#return false
-			#elif a.rect.position.y < b.rect.position.y and b.room_connection_locations[UP]:
-				#return false
 			if a.rect.position.y > b.rect.position.y:
 				if b.room_connection_locations[DOWN]:
 					return false

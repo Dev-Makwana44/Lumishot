@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://c08825m6w6y8n"]
+
+[ext_resource type="Script" path="res://world/room.gd" id="1_v687y"]
+
+[node name="Room" type="Node2D"]
+script = ExtResource("1_v687y")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Door Container" type="Node2D" parent="."]

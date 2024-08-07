@@ -35,7 +35,7 @@ func _ready() -> void:
 	build_recipe_tree()
 	build_discovered_dictionary()
 	
-	open.play()
+	#open.play()
 	
 	for slot: InventorySlot in crafting_slots:
 		slot.set_item_data(null, 1)

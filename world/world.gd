@@ -1,7 +1,9 @@
 extends Node2D
 
 var NUMBER_OF_ROOMS_GENERATED: int = 50
+#var NUMBER_OF_ROOMS_GENERATED: int = 15
 const PERCENTAGE_OF_MAIN_ROOMS: float = 0.3
+#const PERCENTAGE_OF_MAIN_ROOMS: float = 1
 const ROOM_SIZE_MIN: int = 300 * 1.5
 const ROOM_SIZE_MAX: int = 1500 * 1.5
 const ROOM_SEPARATION_SPEED: int = 300
@@ -166,13 +168,12 @@ func _process(delta):
 func generate_dungeon(level: int) -> bool:
 	rooms = []
 	# Create Rooms
-	
 	for i in range(NUMBER_OF_ROOMS_GENERATED + 5 * level):
 		var width : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var height : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var x_pos: int = rng.randi_range(-100, 100) * 5
 		var y_pos: int = rng.randi_range(-100, 100) * 5
-		rooms.append(Room.new(width, height, x_pos, y_pos, level))
+		rooms.append(Room.new_room(width, height, x_pos, y_pos, level))
 	
 	# Separate Rooms
 	
@@ -313,58 +314,23 @@ func generate_dungeon2(level: int) -> bool:
 		var width: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var height: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var new_position: Vector2i = random_point_in_circle(5000 + 50 * level)
-		rooms.append(Room.new(width, height, new_position.x, new_position.y, level))
+		#rooms.append(Room.new(width, height, new_position.x, new_position.y, level))
+		rooms.append(Room.new_room(width, height, new_position.x, new_position.y, level))
+	#rooms = [Room.new_room(1000, 1000, 0, 0, 1), Room.new_room(1000, 1000, 200, 0, 1), Room.new_room(1000, 1000, 200, 200, 1), Room.new_room(1000, 1000, 0, 200, 1)]
 	
 	# separate rooms
-	
 	rooms = separate_rooms(rooms, ROOM_SEPARATION_SPEED)
 	
 	# identify main rooms using ratio
 	
-	rooms.sort_custom(room_comparison)
+	rooms.sort_custom(room_comparison) # sorts them in ascending order
 	var main_rooms: Array[Room] = []
 	var number_of_main_rooms: int = len(rooms) * PERCENTAGE_OF_MAIN_ROOMS
 	var room_positions: Dictionary = {} # position -> Room
 	for i in range(number_of_main_rooms):
 		main_rooms.append(rooms.pop_back())
 		room_positions[main_rooms[-1].rect.get_center()] = main_rooms[-1]
-	
-	# Delaunay Triangulation
-	#var room_centers: Dictionary = {} # center -> room
-	#var delaunay: Delaunay = Delaunay.new()
-	#for room: Room in main_rooms:
-		#var center = room.rect.get_center()
-		#delaunay.add_point(center)
-		#room_centers[center] = room
-
-	#var triangles : Array = delaunay.triangulate()
-	#var edges: Dictionary = {}
-	#for triangle: Delaunay.Triangle in triangles:
-		#if not delaunay.is_border_triangle(triangle):
-			#for edge: Delaunay.Edge in [triangle.edge_ab, triangle.edge_bc, triangle.edge_ca]:
-				#edges[edge] = true
-	
-	# generate minimum spanning tree
-	
-	#var mst_edges: Array[Delaunay.Edge] = generate_mst(room_centers.keys(), edges.keys())
-	#for edge: Delaunay.Edge in mst_edges:
-		#var node: Line2D = Line2D.new()
-		#node.default_color = Color.BLUE
-		#node.points = PackedVector2Array([edge.a, edge.b])
-		#node.width = 50
-		#node.z_index = 10
-		#self.add_child(node)
-	
-	#var ids: Dictionary = {}
-	#for i in range(len(main_rooms)):
-		#ids[i] = main_rooms[i]
-	#var adjacency_matrix: Array[Array] = []
-	#for room: int in ids:
-		#for other: int in ids:
-			#for edge: Delaunay.Edge in edges:
-				#if (edge.a == main_rooms[room].rect.get_center() and edge.b == main_rooms[other].rect.get_center()) or (edge.b == main_rooms[room].rect.get_center() and edge.a == main_rooms[other].rect.get_center()):
-					#adjacency_matrix[room][other] = edge.length()
-					#break
+		add_child(main_rooms[-1])
 
 	var mst_path: CustomAStar = create_astar(room_positions.keys())
 	
@@ -443,7 +409,21 @@ func generate_dungeon2(level: int) -> bool:
 			if room_connections[direction]:
 				hallways.append(Hallway.new(room, room_connections[direction][0]))
 				if not hallways[-1]._create_path(rng.randi_range(300, 500), direction):
+					#print("Hallways intersected")
 					return false
+	
+	for room in main_rooms:
+		if !room is Room:
+			print("ERROR: ROOM ISN'T THE CORRECT TYPE")
+		var room_polygon = PackedVector2Array([room.rect.position, Vector2(room.rect.end.x, room.rect.position.y), room.rect.end, Vector2(room.rect.position.x, room.rect.end.y)])
+		for hallway: Hallway in hallways:
+			var hallway_polygon: PackedVector2Array = hallway._get_left_points()
+			var right_points: PackedVector2Array = hallway._get_right_points()
+			right_points.reverse()
+			hallway_polygon.append_array(right_points)
+			if Geometry2D.intersect_polygons(hallway_polygon, room_polygon):
+				return false
+	
 	var starting_room_chosen: bool = false
 	for room in main_rooms:
 		if room.room_type == Room.STARTING_ROOM:
@@ -453,7 +433,7 @@ func generate_dungeon2(level: int) -> bool:
 				break
 			else:
 				room.room_type = Room.NORMAL_ROOM
-	
+		
 	for room in main_rooms:
 		if room.room_type == Room.NORMAL_ROOM:
 			spawn_enemies(room, level)
@@ -461,10 +441,11 @@ func generate_dungeon2(level: int) -> bool:
 			spawn_enemies(room, level + 5)
 	
 	rooms = main_rooms
-	create_room_nodes([], main_rooms)
+	for room in rooms:
+		room.setup_room()
+	#create_room_nodes([], main_rooms)
 	draw_hallways(hallways)
-	#draw_mst(mst_path)
-	create_dungeon_borders(main_rooms, hallways)
+	#create_dungeon_borders(main_rooms, hallways)
 	return true
 
 func generate_mst(vertices: Array, edges: Array) -> Array[Delaunay.Edge]:
@@ -505,7 +486,6 @@ func separate_rooms(rooms: Array[Room], separation_speed: int):
 		not_done = false
 		for current: int in range(len(rooms)):
 			for other: int in range(len(rooms)):
-				#if current != other and rooms[current].is_too_close(rooms[other]):
 				if current != other and rooms[current].rect.intersects(rooms[other].rect):
 					var direction: Vector2 = (rooms[other].rect.get_center() - rooms[current].rect.get_center()).normalized().round()
 					rooms[current].rect.position -= direction * separation_speed
@@ -550,7 +530,7 @@ func create_room_nodes(rooms: Array[Room], main_rooms: Array[Room]) -> void:
 			#room_node.color = Color.BLUE_VIOLET
 		else:
 			room_node.color = Color.DIM_GRAY
-		
+		room_node.color = Color.ORANGE
 		#room_node.color = Color(rng.randf(), rng.randf(), rng.randf())
 		add_child(room_node)
 		room_node.add_to_group("dungeon")
@@ -953,7 +933,7 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 			turret.room = spawning_room
 			spawning_room.enemies[turret] = true
 	
-	# use separation steering algorithm to prevent overlaps without having to regenerate enemies
+	# use separation steering algorithm to prevent overlaps without having to 
 	var not_done: bool = true
 	var enemies = spawning_room.enemies.keys()
 	while not_done:

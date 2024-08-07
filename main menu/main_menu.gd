@@ -3,7 +3,7 @@ extends Control
 
 @onready var start_button = $"MarginContainer/HBoxContainer/VBoxContainer/Start Button"
 @onready var quit_button = $"MarginContainer/HBoxContainer/VBoxContainer/Quit Button"
-@onready var start_level = preload("res://world.tscn") as PackedScene
+@onready var start_level = preload("res://world/world.tscn") as PackedScene
 @onready var open = $open
 @onready var close = $close
 

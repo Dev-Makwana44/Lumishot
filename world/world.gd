@@ -90,147 +90,6 @@ func _process(delta):
 			hud.set_grenade(hud.grenade_slot.item_data, player.grenades[player.selected_grenade_index])
 			if player.grenades[player.selected_grenade_index] == 0:
 				ui_container.select_grenade()
-		
-func generate_dungeon(level: int) -> bool:
-	rooms = []
-	# Create Rooms
-	for i in range(NUMBER_OF_ROOMS_GENERATED + 5 * level):
-		var width : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
-		var height : int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
-		var x_pos: int = rng.randi_range(-100, 100) * 5
-		var y_pos: int = rng.randi_range(-100, 100) * 5
-		rooms.append(Room.new_room(width, height, x_pos, y_pos, level))
-	
-	# Separate Rooms
-	
-	var separation_speed: int = 100
-	var rooms_moved: bool = true
-	while rooms_moved:
-		rooms_moved = false
-		for room_index in range(len(rooms)):
-			var separation_vec: Vector2
-			for other_room_index in range(len(rooms)):
-				#if room_index != other_room_index and (rooms[other_room_index]._get_center() - rooms[room_index]._get_center()).length() < 150:
-				#if room_index != other_room_index and Rect2(rooms[room_index].position, rooms[room_index].size).intersects(Rect2(rooms[other_room_index].position, rooms[other_room_index].size)):
-				if room_index != other_room_index and rooms[room_index]._is_too_close(rooms[other_room_index]):
-					separation_vec = separation_vec - (rooms[other_room_index].rect.get_center() - rooms[room_index].rect.get_center())
-					rooms_moved = true
-			var room_velocity = rooms[room_index].transform.y * -1 * separation_speed + separation_vec
-			rooms[room_index].position += room_velocity * 0.3
-	
-	# Separate main rooms
-	
-	rooms.sort_custom(room_comparison)
-	var room_positions: Dictionary = {} # position -> Room
-	var main_rooms: Array[Room] = []
-	var number_of_main_rooms: int = int(len(rooms) * PERCENTAGE_OF_MAIN_ROOMS)
-	for i in range(number_of_main_rooms):
-		main_rooms.append(rooms.pop_back())
-		room_positions[main_rooms[-1]._get_center()] = main_rooms[-1]
-	
-	var mst_path: CustomAStar = create_astar(room_positions.keys())
-	
-	#Create Room -> path id dict
-	var room_id_dict: Dictionary = {} # Room -> id
-	for p in mst_path.get_point_ids():
-		room_id_dict[room_positions[mst_path.get_point_position(p)]] = p
-	
-	#Confirm that no room has more than four connections
-	for p: int in mst_path.get_point_ids():
-		if len(mst_path.get_point_connections(p)) > 4:
-			return false
-	
-	#Identify boss room
-	var outer_rooms: Dictionary = {} # position -> id
-	for p in mst_path.get_point_ids():
-		if len(mst_path.get_point_connections(p)) == 1:
-			outer_rooms[mst_path.get_point_position(p)] = p
-	var boss_room_position: Vector2 = outer_rooms.keys()[rng.randi_range(0, len(outer_rooms) - 1)]
-	room_positions[boss_room_position].room_type = Room.BOSS_ROOM
-	
-	#Identify spawn room
-	var room_distances: Dictionary = {}
-	for p: int in mst_path.get_point_ids():
-		var room_distance: int = len(mst_path.get_point_path(p, outer_rooms[boss_room_position]))
-		if room_distance in room_distances:
-			room_distances[room_distance].append(room_positions[mst_path.get_point_position(p)])
-		else:
-			room_distances[room_distance] = [room_positions[mst_path.get_point_position(p)]]
-	for room: Room in room_distances[room_distances.keys().max()]:
-		room.room_type = Room.STARTING_ROOM
-	
-	#Create hallways:
-
-	hallways = []
-	var hallway_connections: Dictionary = {}
-	for room: Room in main_rooms:
-		var room_connections: Array = [[], [], [], []]
-		for connecting_room_id in mst_path.get_point_connections(room_id_dict[room]):
-			var connected_room: Room = room_positions[mst_path.get_point_position(connecting_room_id)]
-			if [connected_room, room] not in hallway_connections:
-				var angle = room._get_center().angle_to_point(connected_room._get_center())
-				if angle < 0:
-					angle += 2 * PI
-				var direction: int = snapped((2 * PI - angle) / (PI / 2), 1) % 4
-				#room_connections[snapped(angle / (PI / 2), 1) % 4].append(connected_room)
-				if len(room_connections[direction]) == 1:
-					if direction % 2 == 0: # originally horizontal
-						if connected_room._get_center().y < room._get_center().y:
-							if len(room_connections[1]) == 1:
-								return false
-							else:
-								room_connections[1].append(connected_room)
-						else:
-							if len(room_connections[3]) == 1:
-								return false
-							else:
-								room_connections[3].append(connected_room)
-					else:
-						if connected_room._get_center().x > room._get_center().x:
-							if len(room_connections[0]) == 1:
-								return false
-							else:
-								room_connections[0].append(connected_room)
-						else:
-							if len(room_connections[2]) == 1:
-								return false
-							else:
-								room_connections[2].append(connected_room)
-				else:
-					room_connections[direction].append(connected_room)
-				hallway_connections[[room, connected_room]] = true
-		for direction: int in range(len(room_connections)):
-			if len(room_connections[direction]) > 1:
-				return false
-			if room_connections[direction]:
-				hallways.append(Hallway.new(room, room_connections[direction][0]))
-				if not hallways[-1]._create_path(rng.randi_range(300, 500), direction):
-					return false
-	var starting_room_chosen: bool = false
-	for room in main_rooms:
-		if room.room_type == Room.STARTING_ROOM:
-			if not starting_room_chosen:
-				player.position = room._get_center()
-				starting_room_chosen = true
-				break
-			else:
-				room.room_type = Room.NORMAL_ROOM
-	
-	for room in main_rooms:
-		if room.room_type == Room.NORMAL_ROOM:
-			#print("spawning enemies")
-			spawn_enemies(room, level)
-	
-	for room in main_rooms:
-		if room.room_type == Room.BOSS_ROOM:
-			spawn_enemies(room, level + 5)
-	
-	rooms = main_rooms
-	create_room_nodes([], main_rooms)
-	#draw_hallways(hallways)
-	draw_mst(mst_path)
-	#create_dungeon_borders(main_rooms, hallways)
-	return true
 
 func generate_dungeon2(level: int) -> bool:
 	rooms = []
@@ -248,10 +107,10 @@ func generate_dungeon2(level: int) -> bool:
 	# identify main rooms using ratio
 	
 	rooms.sort_custom(room_comparison) # sorts them in ascending order
+	
 	var main_rooms: Array[Room] = []
-	var number_of_main_rooms: int = len(rooms) * PERCENTAGE_OF_MAIN_ROOMS
 	var room_positions: Dictionary = {} # position -> Room
-	for i in range(number_of_main_rooms):
+	for i in range(len(rooms) * PERCENTAGE_OF_MAIN_ROOMS):
 		main_rooms.append(rooms.pop_back())
 		room_positions[main_rooms[-1].rect.get_center()] = main_rooms[-1]
 		add_child(main_rooms[-1])
@@ -260,20 +119,25 @@ func generate_dungeon2(level: int) -> bool:
 	
 	#Create Room -> path id dict
 	var room_id_dict: Dictionary = {} # Room -> id
-	for p in mst_path.get_point_ids():
-		room_id_dict[room_positions[mst_path.get_point_position(p)]] = p
+	var outer_rooms: Dictionary = {} # position -> id
 	
-	#Confirm that no room has more than four connections
 	for p: int in mst_path.get_point_ids():
+	
+		#Confirm that no room has more than four connections
 		if len(mst_path.get_point_connections(p)) > 4:
 			return false
-	
-	#Identify boss room
-	var outer_rooms: Dictionary = {} # position -> id
-	for p in mst_path.get_point_ids():
+			
+		# set room id dict value
+		room_id_dict[room_positions[mst_path.get_point_position(p)]] = p
+		
+		#Identify boss room
+
 		if len(mst_path.get_point_connections(p)) == 1:
 			outer_rooms[mst_path.get_point_position(p)] = p
-	var boss_room_position: Vector2 = outer_rooms.keys()[rng.randi_range(0, len(outer_rooms) - 1)]
+
+	var outer_room_positions = outer_rooms.keys()
+	outer_room_positions.sort_custom(func (a: Vector2, b: Vector2) : a.length() > b.length())
+	var boss_room_position: Vector2 = outer_room_positions[0]
 	room_positions[boss_room_position].room_type = Room.BOSS_ROOM
 	
 	#Identify spawn room
@@ -284,8 +148,14 @@ func generate_dungeon2(level: int) -> bool:
 			room_distances[room_distance].append(room_positions[mst_path.get_point_position(p)])
 		else:
 			room_distances[room_distance] = [room_positions[mst_path.get_point_position(p)]]
+	var starting_room_chosen: bool = false
 	for room: Room in room_distances[room_distances.keys().max()]:
-		room.room_type = Room.STARTING_ROOM
+		if not starting_room_chosen:
+			room.room_type = Room.STARTING_ROOM
+			player.position = room.rect.get_center()
+			starting_room_chosen = true
+		else:
+			room.room_type = Room.NORMAL_ROOM
 	
 	#Create hallways:
 
@@ -300,7 +170,6 @@ func generate_dungeon2(level: int) -> bool:
 				if angle < 0:
 					angle += 2 * PI
 				var direction: int = snapped((2 * PI - angle) / (PI / 2), 1) % 4
-				#room_connections[snapped(angle / (PI / 2), 1) % 4].append(connected_room)
 				if len(room_connections[direction]) == 1:
 					if direction % 2 == 0: # originally horizontal
 						if connected_room.rect.get_center().y < room.rect.get_center().y:
@@ -337,8 +206,7 @@ func generate_dungeon2(level: int) -> bool:
 					return false
 	
 	for room in main_rooms:
-		if !room is Room:
-			print("ERROR: ROOM ISN'T THE CORRECT TYPE")
+		# check for hallway-room collisions
 		var room_polygon = PackedVector2Array([room.rect.position, Vector2(room.rect.end.x, room.rect.position.y), room.rect.end, Vector2(room.rect.position.x, room.rect.end.y)])
 		for hallway: Hallway in hallways:
 			var hallway_polygon: PackedVector2Array = hallway._get_left_points()
@@ -347,27 +215,17 @@ func generate_dungeon2(level: int) -> bool:
 			hallway_polygon.append_array(right_points)
 			if Geometry2D.intersect_polygons(hallway_polygon, room_polygon):
 				return false
-	
-	var starting_room_chosen: bool = false
-	for room in main_rooms:
-		if room.room_type == Room.STARTING_ROOM:
-			if not starting_room_chosen:
-				player.position = room.rect.get_center()
-				starting_room_chosen = true
-				break
-			else:
-				room.room_type = Room.NORMAL_ROOM
 		
-	for room in main_rooms:
+		# spawn enemies
 		if room.room_type == Room.NORMAL_ROOM:
 			spawn_enemies(room, level)
 		elif room.room_type == Room.BOSS_ROOM:
 			spawn_enemies(room, level + 5)
 	
-	rooms = main_rooms
-	for room in rooms:
+		# setup rooms
 		room.setup_room()
-	#create_room_nodes([], main_rooms)
+	
+	rooms = main_rooms
 	draw_hallways(hallways)
 	create_dungeon_borders([], hallways)
 	return true
@@ -422,33 +280,6 @@ func random_point_in_circle(radius: float) -> Vector2i:
 	var rand: float = rng.randf() + rng.randf()
 	var r: float = rand if rand <= 1 else 2 - rand
 	return Vector2i(radius * r * cos(theta), radius * r * sin(theta))
-
-func create_room_nodes(rooms: Array[Room], main_rooms: Array[Room]) -> void:
-	for room in rooms:
-		var room_node = ColorRect.new()
-		room_node.size = room.rect.size
-		room_node.position = room.rect.position
-		add_child(room_node)
-		room_node.add_to_group("dungeon")
-	
-	for room in main_rooms:
-		var room_node = ColorRect.new()
-		room_node.size = room.rect.size
-		room_node.position = room.rect.position
-		if room.room_type == Room.BOSS_ROOM:
-			room_node.color = Color.RED
-		elif room.room_type == Room.STARTING_ROOM:
-			room_node.color = Color.BLUE
-		elif room.room_type == Room.LOOT_ROOM:
-			room_node.color = Color.ORANGE
-		#elif room.room_type == Room.NORMAL_ROOM:
-			#room_node.color = Color.BLUE_VIOLET
-		else:
-			room_node.color = Color.DIM_GRAY
-		room_node.color = Color.ORANGE
-		#room_node.color = Color(rng.randf(), rng.randf(), rng.randf())
-		add_child(room_node)
-		room_node.add_to_group("dungeon")
 
 func draw_mst(path: CustomAStar) -> void:
 	for p in path.get_point_ids():

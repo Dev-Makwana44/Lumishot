@@ -24,6 +24,8 @@ var inventory: InventoryComponent = null
 var recipe_dictionary: Dictionary = {}
 var discovered_recipes: Dictionary = {}
 
+var crafting_recipe_selected: bool = false
+
 func _ready() -> void:
 	hide()
 	recipe_tree.hide_root = true
@@ -108,6 +110,7 @@ func _on_recipe_tree_item_selected() -> void:
 			if recipe.recipe_final_item.item_name == cell_recipe_name and inventory.inventory_has_items(recipe.recipe_materials):
 				build_recipe_material_window(recipe)
 				populate_inventory()
+				self.crafting_recipe_selected = true
 				break
 	recipe_tree.deselect_all()
 
@@ -158,6 +161,7 @@ func crafting_slot_click(index: int) -> void:
 	if crafting_slots[index].item_data != null:
 		inventory.add_item(crafting_slots[index].item_data)
 		populate_inventory()
+		self.crafting_recipe_selected = false
 		
 	place.play()
 		
@@ -178,8 +182,9 @@ func _on_craft_button_button_down():
 			slot.set_item_data(null, 1)
 			
 		craft.play()
-			
-		item_texture.texture = question_mark
+		
+		if not self.crafting_recipe_selected:
+			item_texture.texture = question_mark
 		if discovered_recipes[craftable_item.item_name] == false:
 			discovered_recipes[craftable_item.item_name] = true
 			
@@ -191,6 +196,21 @@ func _on_craft_button_button_down():
 					break
 				if tree_item.get_text(0) == craftable_item.item_name:
 					tree_item.set_icon(1, check_mark)
+					break
+				tree_item = tree_item.get_next_in_tree()
+		else:
+			var tree_item: TreeItem = recipe_tree.get_root()
+			while true:
+				if tree_item == null:
+					break
+				if tree_item.get_text(0) == craftable_item.item_name:
+					for recipe: ItemRecipe in recipe_array:
+						if recipe.recipe_final_item.item_name == craftable_item.item_name and inventory.inventory_has_items(recipe.recipe_materials):
+							build_recipe_material_window(recipe)
+							populate_inventory()
+							break
+						else:
+							item_texture.texture = null
 					break
 				tree_item = tree_item.get_next_in_tree()
 				

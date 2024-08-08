@@ -1,0 +1,50 @@
+[gd_scene load_steps=10 format=3 uid="uid://ccyqf1eriwngl"]
+
+[ext_resource type="Script" path="res://world/world.gd" id="1_vfsft"]
+[ext_resource type="PackedScene" uid="uid://cakxa05kasxk6" path="res://Player/Player.tscn" id="2_l4l4n"]
+[ext_resource type="Script" path="res://UI_Container.gd" id="3_gf81x"]
+[ext_resource type="PackedScene" uid="uid://bpuxf3x1nl4qm" path="res://crafting_ui.tscn" id="4_ef05g"]
+[ext_resource type="PackedScene" uid="uid://t7iierwocm7a" path="res://UI/help_menu.tscn" id="5_m61gr"]
+[ext_resource type="PackedScene" uid="uid://tng4oxoyfv3d" path="res://UI/hud.tscn" id="6_yopqo"]
+[ext_resource type="PackedScene" uid="uid://ct7ols0jco0sy" path="res://UI/loss_screen.tscn" id="7_kqvhr"]
+[ext_resource type="PackedScene" uid="uid://c4v0ab5iil7a" path="res://UI/level_completion_screen.tscn" id="8_bfgva"]
+[ext_resource type="AudioStream" uid="uid://cvrrd44cxo6q8" path="res://sfx/gunshot.mp3" id="9_ifwjy"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_vfsft")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false
+color = Color(0, 0, 0, 1)
+
+[node name="Player" parent="." instance=ExtResource("2_l4l4n")]
+unique_name_in_owner = true
+position = Vector2(172, 184)
+
+[node name="UI_Container" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_gf81x")
+
+[node name="Crafting UI" parent="UI_Container" instance=ExtResource("4_ef05g")]
+unique_name_in_owner = true
+metadata/_edit_use_anchors_ = true
+
+[node name="Help Menu" parent="UI_Container" instance=ExtResource("5_m61gr")]
+unique_name_in_owner = true
+metadata/_edit_use_anchors_ = true
+
+[node name="HUD" parent="UI_Container" instance=ExtResource("6_yopqo")]
+unique_name_in_owner = true
+metadata/_edit_use_anchors_ = true
+
+[node name="Loss Screen" parent="UI_Container" instance=ExtResource("7_kqvhr")]
+unique_name_in_owner = true
+metadata/_edit_use_anchors_ = true
+
+[node name="Level Completion Screen" parent="UI_Container" instance=ExtResource("8_bfgva")]
+unique_name_in_owner = true
+metadata/_edit_use_anchors_ = true
+
+[node name="gunshot" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("9_ifwjy")
+max_distance = 1e+10

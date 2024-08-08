@@ -1,6 +1,8 @@
 class_name Turret
 extends Enemy
 
+signal enemy_defeated
+
 @onready var turret_face: AnimatedSprite2D = $Face
 @onready var search_area: Area2D = $"Face/Search Area"
 @onready var collision_box: Area2D = $"Collision Box"
@@ -80,6 +82,8 @@ func _ready():
 	if active_modules[SIREN_MODULE]:
 		siren_container.visible = true
 		siren_lights_container.visible = true
+	
+	enemy_defeated.connect(room.enemy_defeated)
 
 func _process(_delta):
 	if run:
@@ -171,6 +175,9 @@ func _on_face_frame_changed():
 
 func damage(damage: int):
 	self.health -= damage
+	if self.health <= 0:
+		enemy_defeated.emit()
+	
 	var node: Line2D = Line2D.new()
 	node.points = PackedVector2Array([health_bar.points[1], health_bar.points[0] + Vector2(health / 100.0 * HEALTH_BAR_SIZE, 0)])
 	node.width = 2

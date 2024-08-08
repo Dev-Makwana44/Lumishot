@@ -93,7 +93,6 @@ func _physics_process(delta):
 			gun.position = Vector2(-10, 0)
 			gun.rotation_degrees += 135
 		
-		
 		var v: Vector2 = Vector2(int(Input.is_action_pressed("move_left")) * -1 + int(Input.is_action_pressed("move_right")), -1 * int(Input.is_action_pressed("move_up")) + int(Input.is_action_pressed("move_down")))
 		v = v.normalized() # makes it so that strafing is not faster
 		

@@ -13,6 +13,7 @@ radius = 11.365
 z_index = 7
 z_as_relative = false
 collision_layer = 8
+collision_mask = 33
 script = ExtResource("1_yhha3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

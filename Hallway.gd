@@ -20,7 +20,7 @@ func _create_path(width: int, starting_direction: int) -> bool:
 	if a.room_connection_locations[starting_direction]:
 		return false
 	else:
-		a.room_connection_locations[starting_direction] = self
+		a.room_connection_locations[starting_direction].append(self)
 	if starting_direction % 2 == 0: # starts horizontal
 		if starting_direction == LEFT and b.room_connection_locations[RIGHT]:
 			return false
@@ -28,7 +28,7 @@ func _create_path(width: int, starting_direction: int) -> bool:
 			return false
 		var overlap: float = self._overlap(a.rect.position.y, a.rect.position.y + a.rect.size.y, b.rect.position.y, b.rect.position.y + b.rect.size.y)
 		if overlap >= width:
-			b.room_connection_locations[RIGHT if starting_direction == LEFT else LEFT] = self
+			b.room_connection_locations[RIGHT if starting_direction == LEFT else LEFT].append(self)
 			var line_node: Line2D = Line2D.new()
 			line_node.default_color = Color.DIM_GRAY
 			line_node.width = width
@@ -49,12 +49,12 @@ func _create_path(width: int, starting_direction: int) -> bool:
 				if b.room_connection_locations[DOWN]:
 					return false
 				else:
-					b.room_connection_locations[DOWN] = self
+					b.room_connection_locations[DOWN].append(self)
 			else:
 				if b.room_connection_locations[UP]:
 					return false
 				else:
-					b.room_connection_locations[UP] = self
+					b.room_connection_locations[UP].append(self)
 			var line_node: Line2D = Line2D.new()
 			line_node.default_color = Color.DIM_GRAY
 			line_node.width = width
@@ -78,7 +78,7 @@ func _create_path(width: int, starting_direction: int) -> bool:
 			return false
 		var overlap: int = self._overlap(a.rect.position.x, a.rect.position.x + a.rect.size.x, b.rect.position.x, b.rect.position.x + b.rect.size.x)
 		if overlap >= width:
-			b.room_connection_locations[UP if starting_direction == DOWN else DOWN] = self
+			b.room_connection_locations[UP if starting_direction == DOWN else DOWN].append(self)
 			var line_node: Line2D = Line2D.new()
 			line_node.default_color = Color.DIM_GRAY
 			line_node.width = width
@@ -103,12 +103,12 @@ func _create_path(width: int, starting_direction: int) -> bool:
 				if b.room_connection_locations[RIGHT]:
 					return false
 				else:
-					b.room_connection_locations[RIGHT] = self
+					b.room_connection_locations[RIGHT].append(self)
 			else:
 				if b.room_connection_locations[LEFT]:
 					return false
 				else:
-					b.room_connection_locations[LEFT] = self
+					b.room_connection_locations[LEFT].append(self)
 			var line_node: Line2D = Line2D.new()
 			line_node.default_color = Color.DIM_GRAY
 			line_node.width = width

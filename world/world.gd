@@ -21,7 +21,6 @@ const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var new_walls: Array
-var time_since_entering_room: float = 0.0
 var level: int = 1
 var hallways: Array[Hallway] = []
 var level_cleared: bool = false
@@ -47,16 +46,16 @@ func _ready():
 	
 	loss_screen.hide()
 	level_completion_screen.hide()
-	
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 
 func _process(delta):
 	if level_cleared and level_completion_screen.continue_game:
 		level_cleared = false
 		level_completion_screen.continue_game = false
 		level += 1
-		for node in get_tree().get_nodes_in_group("dungeon"):
-			remove_child(node)
+		for room: Room in rooms:
+			self.remove_child(room)
+		for node in self.get_tree().get_nodes_in_group("dungeon"):
+			self.remove_child(node)
 		_ready()
 		level_completion_screen.hide()
 		player.game_paused = false
@@ -75,29 +74,10 @@ func _process(delta):
 		_ready()
 		player.game_paused = false
 
-	time_since_entering_room += delta
-	if player.room == null:
-		for room: Room in rooms:
-			if room.rect.has_point(player.position):
-				player.room = room
-				time_since_entering_room = 0.0
-				break
-	else:
-		if player.room.room_type != Room.STARTING_ROOM and time_since_entering_room > 0.5 and time_since_entering_room < 1.0 and new_walls != null and len(new_walls) == 0 and len(player.room.enemies) > 0:
-			new_walls = close_room(player.room)
-		if not player.room.rect.has_point(player.position):
-			player.room = null
 	
 	for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
 		if enemy.health <= 0:
 			enemy.room.enemies.erase(enemy)
-			if len(enemy.room.enemies) == 0:
-				if len(new_walls) > 0:
-					self.remove_child(new_walls[0])
-					self.remove_child(new_walls[1])
-					self.remove_child(new_walls[2])
-					new_walls = []
-				#time_since_entering_room = 0.0
 			enemy.drop_loot()
 			enemy.queue_free()
 			var enemies_in_dungeon: bool = false
@@ -112,25 +92,24 @@ func _process(delta):
 	
 	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
 		if player.ammo[player.selected_ammo_index] > 0 and not player.game_paused:
-			if player.room != null:
-				player.time_since_shooting = 0.0
-				var bullet: Bullet = BULLET_SCENE.instantiate()
-				self.add_child(bullet)
-				await bullet.is_node_ready()
-				bullet.set_collision_mask_value(2, true)
-				bullet.position = player.position
-				var bullet_path = get_global_mouse_position() - player.position
-				bullet.set_bullet_type(player.selected_ammo_index)
-				bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
-				bullet.z_index = 9
-				bullet.add_to_group("player_bullets")
-				player.ammo[player.selected_ammo_index] -= 1
-				player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
-				hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
-				if player.ammo[player.selected_ammo_index] == 0:
-					ui_container.select_ammo_up()
-				gunshot.pitch_scale = rng.randfn(1.0, 0.01)
-				gunshot.play()
+			player.time_since_shooting = 0.0
+			var bullet: Bullet = BULLET_SCENE.instantiate()
+			self.add_child(bullet)
+			await bullet.is_node_ready()
+			bullet.set_collision_mask_value(2, true)
+			bullet.position = player.position
+			var bullet_path = get_global_mouse_position() - player.position
+			bullet.set_bullet_type(player.selected_ammo_index)
+			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
+			bullet.z_index = 9
+			bullet.add_to_group("player_bullets")
+			player.ammo[player.selected_ammo_index] -= 1
+			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
+			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
+			if player.ammo[player.selected_ammo_index] == 0:
+				ui_container.select_ammo_up()
+			gunshot.pitch_scale = rng.randfn(1.0, 0.01)
+			gunshot.play()
 
 	if Input.is_action_just_pressed("use_potion"):
 		if player.potions[player.selected_potion_index] > 0 and not player.game_paused:
@@ -314,9 +293,7 @@ func generate_dungeon2(level: int) -> bool:
 		var width: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var height: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var new_position: Vector2i = random_point_in_circle(5000 + 50 * level)
-		#rooms.append(Room.new(width, height, new_position.x, new_position.y, level))
 		rooms.append(Room.new_room(width, height, new_position.x, new_position.y, level))
-	#rooms = [Room.new_room(1000, 1000, 0, 0, 1), Room.new_room(1000, 1000, 200, 0, 1), Room.new_room(1000, 1000, 200, 200, 1), Room.new_room(1000, 1000, 0, 200, 1)]
 	
 	# separate rooms
 	rooms = separate_rooms(rooms, ROOM_SEPARATION_SPEED)
@@ -445,7 +422,7 @@ func generate_dungeon2(level: int) -> bool:
 		room.setup_room()
 	#create_room_nodes([], main_rooms)
 	draw_hallways(hallways)
-	#create_dungeon_borders(main_rooms, hallways)
+	create_dungeon_borders([], hallways)
 	return true
 
 func generate_mst(vertices: Array, edges: Array) -> Array[Delaunay.Edge]:
@@ -583,19 +560,19 @@ func create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-			if room == room.room_connection_locations[Hallway.UP].a:
-				collision_polygon.polygon = PackedVector2Array([room.rect.position, room.room_connection_locations[Hallway.UP]._get_left_points()[0]])
+			if room == room.room_connection_locations[Hallway.UP][0].a:
+				collision_polygon.polygon = PackedVector2Array([room.rect.position, room.room_connection_locations[Hallway.UP][0]._get_left_points()[0]])
 			else:
-				collision_polygon.polygon = PackedVector2Array([room.rect.position, room.room_connection_locations[Hallway.UP]._get_right_points()[-1]])
+				collision_polygon.polygon = PackedVector2Array([room.rect.position, room.room_connection_locations[Hallway.UP][0]._get_right_points()[-1]])
 			static_body.add_child(collision_polygon)
 			add_child(static_body)
 			var static_body2: StaticBody2D = StaticBody2D.new()
 			var collision_polygon2: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon2.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-			if room == room.room_connection_locations[Hallway.UP].a:
-				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.UP]._get_right_points()[0], Vector2(room.rect.end.x, room.rect.position.y)])
+			if room == room.room_connection_locations[Hallway.UP][0].a:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.UP][0]._get_right_points()[0], Vector2(room.rect.end.x, room.rect.position.y)])
 			else:
-				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.UP]._get_left_points()[-1], Vector2(room.rect.end.x, room.rect.position.y)])
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.UP][0]._get_left_points()[-1], Vector2(room.rect.end.x, room.rect.position.y)])
 			static_body2.add_child(collision_polygon2)
 			add_child(static_body2)
 			var line: Line2D = Line2D.new()
@@ -652,19 +629,19 @@ func create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-			if room == room.room_connection_locations[Hallway.RIGHT].a:
-				collision_polygon.polygon = PackedVector2Array([Vector2(room.rect.end.x, room.rect.position.y), room.room_connection_locations[Hallway.RIGHT]._get_left_points()[0]])
+			if room == room.room_connection_locations[Hallway.RIGHT][0].a:
+				collision_polygon.polygon = PackedVector2Array([Vector2(room.rect.end.x, room.rect.position.y), room.room_connection_locations[Hallway.RIGHT][0]._get_left_points()[0]])
 			else:
-				collision_polygon.polygon = PackedVector2Array([Vector2(room.rect.end.x, room.rect.position.y), room.room_connection_locations[Hallway.RIGHT]._get_right_points()[-1]])
+				collision_polygon.polygon = PackedVector2Array([Vector2(room.rect.end.x, room.rect.position.y), room.room_connection_locations[Hallway.RIGHT][0]._get_right_points()[-1]])
 			static_body.add_child(collision_polygon)
 			add_child(static_body)
 			var static_body2: StaticBody2D = StaticBody2D.new()
 			var collision_polygon2: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon2.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-			if room == room.room_connection_locations[Hallway.RIGHT].a:
-				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.RIGHT]._get_right_points()[0], room.rect.end])
+			if room == room.room_connection_locations[Hallway.RIGHT][0].a:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.RIGHT][0]._get_right_points()[0], room.rect.end])
 			else:
-				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.RIGHT]._get_left_points()[-1], room.rect.end])
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.RIGHT][0]._get_left_points()[-1], room.rect.end])
 			static_body2.add_child(collision_polygon2)
 			add_child(static_body2)
 			var line: Line2D = Line2D.new()
@@ -721,19 +698,19 @@ func create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-			if room == room.room_connection_locations[Hallway.DOWN].a:
-				collision_polygon.polygon = PackedVector2Array([room.rect.end, room.room_connection_locations[Hallway.DOWN]._get_left_points()[0]])
+			if room == room.room_connection_locations[Hallway.DOWN][0].a:
+				collision_polygon.polygon = PackedVector2Array([room.rect.end, room.room_connection_locations[Hallway.DOWN][0]._get_left_points()[0]])
 			else:
-				collision_polygon.polygon = PackedVector2Array([room.rect.end, room.room_connection_locations[Hallway.DOWN]._get_right_points()[-1]])
+				collision_polygon.polygon = PackedVector2Array([room.rect.end, room.room_connection_locations[Hallway.DOWN][0]._get_right_points()[-1]])
 			static_body.add_child(collision_polygon)
 			add_child(static_body)
 			var static_body2: StaticBody2D = StaticBody2D.new()
 			var collision_polygon2: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon2.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-			if room == room.room_connection_locations[Hallway.DOWN].a:
-				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.DOWN]._get_right_points()[0], Vector2(room.rect.position.x, room.rect.end.y)])
+			if room == room.room_connection_locations[Hallway.DOWN][0].a:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.DOWN][0]._get_right_points()[0], Vector2(room.rect.position.x, room.rect.end.y)])
 			else:
-				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.DOWN]._get_left_points()[-1], Vector2(room.rect.position.x, room.rect.end.y)])
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.DOWN][0]._get_left_points()[-1], Vector2(room.rect.position.x, room.rect.end.y)])
 			static_body2.add_child(collision_polygon2)
 			add_child(static_body2)
 			var line: Line2D = Line2D.new()
@@ -790,19 +767,19 @@ func create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 			var static_body: StaticBody2D = StaticBody2D.new()
 			var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-			if room == room.room_connection_locations[Hallway.LEFT].a:
-				collision_polygon.polygon = PackedVector2Array([Vector2(room.rect.position.x, room.rect.end.y), room.room_connection_locations[Hallway.LEFT]._get_left_points()[0]])
+			if room == room.room_connection_locations[Hallway.LEFT][0].a:
+				collision_polygon.polygon = PackedVector2Array([Vector2(room.rect.position.x, room.rect.end.y), room.room_connection_locations[Hallway.LEFT][0]._get_left_points()[0]])
 			else:
-				collision_polygon.polygon = PackedVector2Array([Vector2(room.rect.position.x, room.rect.end.y), room.room_connection_locations[Hallway.LEFT]._get_right_points()[-1]])
+				collision_polygon.polygon = PackedVector2Array([Vector2(room.rect.position.x, room.rect.end.y), room.room_connection_locations[Hallway.LEFT][0]._get_right_points()[-1]])
 			static_body.add_child(collision_polygon)
 			add_child(static_body)
 			var static_body2: StaticBody2D = StaticBody2D.new()
 			var collision_polygon2: CollisionPolygon2D = CollisionPolygon2D.new()
 			collision_polygon2.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-			if room == room.room_connection_locations[Hallway.LEFT].a:
-				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.LEFT]._get_right_points()[0], room.rect.position])
+			if room == room.room_connection_locations[Hallway.LEFT][0].a:
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.LEFT][0]._get_right_points()[0], room.rect.position])
 			else:
-				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.LEFT]._get_left_points()[-1], room.rect.position])
+				collision_polygon2.polygon = PackedVector2Array([room.room_connection_locations[Hallway.LEFT][0]._get_left_points()[-1], room.rect.position])
 			static_body2.add_child(collision_polygon2)
 			add_child(static_body2)
 			var line: Line2D = Line2D.new()
@@ -912,6 +889,7 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 	for i in range(rng.randi_range(2 + level, 7 + level)):
 		if rng.randi_range(0, 1) == 0:
 			var turret: Turret = TURRET_SCENE.instantiate()
+			turret.room = spawning_room
 			self.add_child(turret)
 			var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
 			var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
@@ -919,10 +897,10 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 			turret.add_to_group("robots")
 			turret.add_to_group("enemies")
 			turret.run = true
-			turret.room = spawning_room
 			spawning_room.enemies[turret] = true
 		else:
 			var turret: Turret = TURRET_SCENE.instantiate()
+			turret.room = spawning_room
 			self.add_child(turret)
 			var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
 			var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
@@ -930,7 +908,6 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 			turret.add_to_group("enemies")
 			turret.add_to_group("robots")
 			turret.run = true
-			turret.room = spawning_room
 			spawning_room.enemies[turret] = true
 	
 	# use separation steering algorithm to prevent overlaps without having to 

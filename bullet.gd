@@ -30,6 +30,8 @@ func _physics_process(delta):
 			if self.is_in_group("enemy_bullets"):
 				self.damage(collider, true)
 				self.queue_free()
+		elif collider.get_collision_layer_value(6): # collider is the room door
+			self.queue_free()
 		else:
 			print('bullet collided with unknown object')
 

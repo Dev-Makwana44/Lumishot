@@ -11,3 +11,4 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Door Container" type="Node2D" parent="."]
+visible = false

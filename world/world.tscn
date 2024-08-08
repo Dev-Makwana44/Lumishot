@@ -53,6 +53,6 @@ metadata/_edit_use_anchors_ = true
 stream = ExtResource("9_ifwjy")
 max_distance = 1e+10
 
-[connection signal="player_recieved_damage" from="Player" to="." method="_on_player_player_recieved_damage"]
+[connection signal="player_health_changed" from="Player" to="." method="_on_player_player_health_changed"]
 [connection signal="restart_game" from="UI_Container/Loss Screen" to="." method="_on_loss_screen_restart_game"]
 [connection signal="level_complete" from="UI_Container/Level Completion Screen" to="." method="_on_level_completion_screen_level_complete"]

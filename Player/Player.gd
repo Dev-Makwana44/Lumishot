@@ -1,7 +1,7 @@
 class_name Player
 extends CharacterBody2D
 
-signal player_recieved_damage
+signal player_health_changed
 
 const bullet_indices: Dictionary = {
 	'Bullet' : 0,
@@ -170,7 +170,7 @@ func damage(damage: int) -> void:
 		time_since_damage = 0.0
 		hurt.pitch_scale = rng.randfn(1.0, 0.05)
 		hurt.play()
-		self.player_recieved_damage.emit()
+		self.player_health_changed.emit()
 		if not self.damage_flash:
 			self.modulate.g /= 2
 			self.modulate.b /= 2
@@ -192,6 +192,7 @@ func set_inventory(inv: InventoryComponent) -> void:
 func use_potion() -> bool:
 	if selected_potion_index == 0 and self.health < MAX_HEALTH:
 		self.health = min(self.health + 25, MAX_HEALTH)
+		self.player_health_changed.emit()
 		return true
 	elif selected_potion_index == 1 and not speed_boost:
 		speed_boost = true

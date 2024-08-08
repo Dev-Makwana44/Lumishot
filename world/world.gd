@@ -861,14 +861,6 @@ func _on_level_completion_screen_level_complete():
 	_ready()
 	player.game_paused = false
 
-func _on_player_player_recieved_damage():
-	if player.health <= 0:
-		loss_screen.show()
-		player.game_paused = true
-		for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
-			enemy.run = false
-	ui_container.hud.health_label.text = str(player.health)
-
 func _on_loss_screen_restart_game():
 	player.health = player.MAX_HEALTH
 	level = 1
@@ -887,3 +879,11 @@ func _on_loss_screen_restart_game():
 	player.set_inventory(player.inventory)
 	_ready()
 	player.game_paused = false
+
+func _on_player_player_health_changed():
+	ui_container.hud.health_label.text = str(player.health)
+	if player.health <= 0:
+		loss_screen.show()
+		player.game_paused = true
+		for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
+			enemy.run = false

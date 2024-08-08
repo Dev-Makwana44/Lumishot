@@ -1,6 +1,11 @@
 class_name Room
 extends Node2D
 
+signal room_cleared
+
+@onready var color_rect: ColorRect = $ColorRect
+@onready var door_container: Node2D = $"Door Container"
+
 const NORMAL_ROOM: int = 1
 const BOSS_ROOM: int = 2
 const LOOT_ROOM: int = 3
@@ -8,8 +13,6 @@ const STARTING_ROOM: int = 4
 
 static var room_scene: PackedScene = load("res://world/room.tscn")
 
-@onready var color_rect: ColorRect = $ColorRect
-@onready var door_container: Node2D = $"Door Container"
 
 var room_type: int
 var room_connection_locations: Array[Array]
@@ -32,6 +35,7 @@ func setup_room() -> void:
 	self.set_color_from_type()
 	self.color_rect.visible = true
 	self.create_walls()
+	self.room_cleared.connect(self.get_parent().room_cleared)
 
 func create_walls() -> void:
 	var points: PackedVector2Array = []
@@ -161,7 +165,8 @@ func set_color_from_type() -> void:
 			color_rect.color = Color.BLUE
 
 func enemy_defeated() -> void:
-	if len(enemies) == 1:
+	if len(enemies) == 0:
 		for child in self.door_container.get_children():
 			self.door_container.remove_child(child)
 		self.door_container.visible = false
+		self.room_cleared.emit()

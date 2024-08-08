@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://bumklc8o3q8wn" path="res://Tech Dungeon Roguelite - Asset Pack (DEMO)/Players/players blue x3.png" id="2_j5n47"]
 [ext_resource type="Texture2D" uid="uid://dour3wsh5630m" path="res://Player/Gun.png" id="3_j3kcd"]
 [ext_resource type="Texture2D" uid="uid://bg26pv11k0q33" path="res://Resources/Lighting/circle.png" id="5_6a88h"]
-[ext_resource type="AudioStream" uid="uid://bct54cp6y4cdv" path="res://sfx/footstep.mp3" id="6_43y7b"]
+[ext_resource type="AudioStream" uid="uid://nitvvwa70kep" path="res://sfx/footstep.mp3" id="6_43y7b"]
 [ext_resource type="Texture2D" uid="uid://bp0ce7tvptbig" path="res://Resources/Lighting/cone light 2.jpg" id="7_f2eov"]
 [ext_resource type="AudioStream" uid="uid://bggok6ieq4ts6" path="res://sfx/hurt.mp3" id="7_g322s"]
 

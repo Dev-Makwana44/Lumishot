@@ -176,7 +176,10 @@ func _on_face_frame_changed():
 func damage(damage: int):
 	self.health -= damage
 	if self.health <= 0:
+		self.room.enemies.erase(self)
+		self.drop_loot()
 		enemy_defeated.emit()
+		self.queue_free()
 	
 	var node: Line2D = Line2D.new()
 	node.points = PackedVector2Array([health_bar.points[1], health_bar.points[0] + Vector2(health / 100.0 * HEALTH_BAR_SIZE, 0)])

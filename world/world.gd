@@ -1,9 +1,7 @@
 extends Node2D
 
 var NUMBER_OF_ROOMS_GENERATED: int = 50
-#var NUMBER_OF_ROOMS_GENERATED: int = 15
 const PERCENTAGE_OF_MAIN_ROOMS: float = 0.3
-#const PERCENTAGE_OF_MAIN_ROOMS: float = 1
 const ROOM_SIZE_MIN: int = 300 * 1.5
 const ROOM_SIZE_MAX: int = 1500 * 1.5
 const ROOM_SEPARATION_SPEED: int = 300
@@ -39,7 +37,6 @@ func _ready():
 	var starting_time: int = Time.get_ticks_msec()
 	while true:
 		print("generating dungeon")
-		#if generate_dungeon(level):
 		if generate_dungeon2(level):
 			break
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
@@ -48,48 +45,6 @@ func _ready():
 	level_completion_screen.hide()
 
 func _process(delta):
-	if level_cleared and level_completion_screen.continue_game:
-		level_cleared = false
-		level_completion_screen.continue_game = false
-		level += 1
-		for room: Room in rooms:
-			self.remove_child(room)
-		for node in self.get_tree().get_nodes_in_group("dungeon"):
-			self.remove_child(node)
-		_ready()
-		level_completion_screen.hide()
-		player.game_paused = false
-	elif player.health <= 0 and loss_screen.restart_game:
-		player.health = player.MAX_HEALTH
-		loss_screen.restart_game = false
-		level = 1
-		for enemy in get_tree().get_nodes_in_group("enemies"):
-			enemy.queue_free()
-		for node in get_tree().get_nodes_in_group("dungeon"):
-			remove_child(node)
-		player.inventory = InventoryComponent.new()
-		player.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
-		player.set_inventory(player.inventory)
-		loss_screen.hide()
-		_ready()
-		player.game_paused = false
-
-	
-	for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
-		if enemy.health <= 0:
-			enemy.room.enemies.erase(enemy)
-			enemy.drop_loot()
-			enemy.queue_free()
-			var enemies_in_dungeon: bool = false
-			for room: Room in rooms:
-				if len(room.enemies) > 0:
-					enemies_in_dungeon = true
-					break
-			if not enemies_in_dungeon and player.health > 0:
-				#player.game_paused = true
-				level_completion_screen.show()
-				level_cleared = true
-	
 	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
 		if player.ammo[player.selected_ammo_index] > 0 and not player.game_paused:
 			player.time_since_shooting = 0.0
@@ -135,14 +90,6 @@ func _process(delta):
 			hud.set_grenade(hud.grenade_slot.item_data, player.grenades[player.selected_grenade_index])
 			if player.grenades[player.selected_grenade_index] == 0:
 				ui_container.select_grenade()
-	
-	if player.health != int(ui_container.hud.health_label.text):
-		if player.health <= 0:
-			loss_screen.show()
-			player.game_paused = true
-			for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
-				enemy.run = false
-		ui_container.hud.health_label.text = str(player.health)
 		
 func generate_dungeon(level: int) -> bool:
 	rooms = []
@@ -924,3 +871,46 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 					enemies[current].position -= direction * 50
 					enemies[other].position += direction * 50
 					not_done = true
+
+func room_cleared() -> void:
+	for room: Room in rooms:
+		if room.enemies:
+			return
+	if player.health > 0:
+		level_completion_screen.show()
+	
+func _on_level_completion_screen_level_complete():
+	level += 1
+	for room: Room in rooms:
+		self.remove_child(room)
+	for node in self.get_tree().get_nodes_in_group("dungeon"):
+		self.remove_child(node)
+	_ready()
+	player.game_paused = false
+
+func _on_player_player_recieved_damage():
+	if player.health <= 0:
+		loss_screen.show()
+		player.game_paused = true
+		for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
+			enemy.run = false
+	ui_container.hud.health_label.text = str(player.health)
+
+func _on_loss_screen_restart_game():
+	player.health = player.MAX_HEALTH
+	level = 1
+	for room: Room in rooms:
+		self.remove_child(room)
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		enemy.queue_free()
+	for node in get_tree().get_nodes_in_group("dungeon"):
+		remove_child(node)
+	for node in get_tree().get_nodes_in_group("player_bullets"):
+		remove_child(node)
+	for node in get_tree().get_nodes_in_group("enemy_bullets"):
+		remove_child(node)
+	player.inventory = InventoryComponent.new()
+	player.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
+	player.set_inventory(player.inventory)
+	_ready()
+	player.game_paused = false

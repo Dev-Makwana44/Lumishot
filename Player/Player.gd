@@ -1,6 +1,8 @@
 class_name Player
 extends CharacterBody2D
 
+signal player_recieved_damage
+
 const bullet_indices: Dictionary = {
 	'Bullet' : 0,
 	'Explosive Bullet' : 1,
@@ -168,6 +170,7 @@ func damage(damage: int) -> void:
 		time_since_damage = 0.0
 		hurt.pitch_scale = rng.randfn(1.0, 0.05)
 		hurt.play()
+		self.player_recieved_damage.emit()
 		if not self.damage_flash:
 			self.modulate.g /= 2
 			self.modulate.b /= 2

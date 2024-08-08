@@ -1,9 +1,7 @@
 class_name LevelCompletionScreen
 extends PanelContainer
 
-var continue_game: bool = false
-
-
+signal level_complete
 
 func _on_button_button_down():
-	continue_game = true
+	level_complete.emit()

@@ -423,15 +423,6 @@ func random_point_in_circle(radius: float) -> Vector2i:
 	var r: float = rand if rand <= 1 else 2 - rand
 	return Vector2i(radius * r * cos(theta), radius * r * sin(theta))
 
-func random_point_in_circle2(radius: float) -> Vector2:
-	var a = rng.randf()
-	var b = rng.randf()
-	if b < a:
-		var temp = a
-		a = b
-		b = temp
-	return Vector2((b * radius * cos(2 * PI * a/b)) / radius, (b * radius * sin(2 * PI * a/b)) / radius)
-
 func create_room_nodes(rooms: Array[Room], main_rooms: Array[Room]) -> void:
 	for room in rooms:
 		var room_node = ColorRect.new()
@@ -782,26 +773,6 @@ func create_dungeon_borders(rooms: Array[Room], hallways: Array[Hallway]):
 				line.add_to_group("dungeon")
 				occluder.add_to_group("dungeon")
 
-func close_room(room: Room) -> Array:
-	var static_body: StaticBody2D = StaticBody2D.new()
-	var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
-	collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
-	collision_polygon.polygon = PackedVector2Array([room.rect.position, Vector2(room.rect.end.x, room.rect.position.y), room.rect.end, Vector2(room.rect.position.x, room.rect.end.y)])
-	static_body.add_child(collision_polygon)
-	self.add_child(static_body)
-	var line: Line2D = Line2D.new()
-	line.width = 25
-	line.z_index = 6
-	line.default_color = Color.GRAY
-	line.points = collision_polygon.polygon + PackedVector2Array([collision_polygon.polygon[0]])
-	add_child(line)
-	var occluder: LightOccluder2D = LightOccluder2D.new()
-	occluder.occluder = OccluderPolygon2D.new()
-	occluder.occluder.closed = false
-	occluder.occluder.polygon = collision_polygon.polygon
-	add_child(occluder)
-	return [static_body, line, occluder]
-
 func room_comparison(a: Room, b: Room) -> bool: # sorts the rooms in ascending order by area
 	return a.rect.get_area() < b.rect.get_area()
 
@@ -878,13 +849,15 @@ func room_cleared() -> void:
 			return
 	if player.health > 0:
 		level_completion_screen.show()
-	
+
 func _on_level_completion_screen_level_complete():
 	level += 1
 	for room: Room in rooms:
 		self.remove_child(room)
 	for node in self.get_tree().get_nodes_in_group("dungeon"):
 		self.remove_child(node)
+	for enemy in self.get_tree().get_nodes_in_group("enemies"):
+		self.remove_child(enemy)
 	_ready()
 	player.game_paused = false
 

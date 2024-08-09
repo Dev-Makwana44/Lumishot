@@ -84,6 +84,8 @@ func _ready():
 		siren_lights_container.visible = true
 	
 	enemy_defeated.connect(room.enemy_defeated)
+	self.add_to_group("robots")
+	self.add_to_group("enemies")
 
 func _process(_delta):
 	if run:
@@ -100,7 +102,8 @@ func _process(_delta):
 						for siren_sprite in siren_container.get_children():
 							siren_sprite.play("alert")
 					alert = true
-				var query = PhysicsRayQueryParameters2D.create(self.position, area.get_parent().position)
+				#var query = PhysicsRayQueryParameters2D.create(self.position, area.get_parent().position)
+				var query = PhysicsRayQueryParameters2D.create(self.position + self.room.rect.position, area.get_parent().position)
 				var result = get_world_2d().direct_space_state.intersect_ray(query)
 				if result and result.collider is Player:
 					target_location = area.get_parent().position
@@ -110,6 +113,9 @@ func _process(_delta):
 			turret_face.play("idle")
 		else:
 			turret_face.play("firing")
+		
+		#if self.alert:
+			#print(self.target_location)
 
 func _physics_process(delta):
 	if run:
@@ -123,7 +129,7 @@ func _physics_process(delta):
 		
 		var target_rotation: float
 		if target_location != null:
-			target_rotation = self.position.angle_to_point(target_location)
+			target_rotation = (self.position + self.room.rect.position).angle_to_point(target_location)
 		else:
 			if alert:
 				target_rotation = turret_face.rotation + 0.1

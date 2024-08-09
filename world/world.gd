@@ -39,6 +39,8 @@ func _ready():
 		print("generating dungeon")
 		if generate_dungeon(level):
 			break
+		#for room: Room in rooms:
+			#self.remove_child(room)
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
 	
 	loss_screen.hide()
@@ -95,7 +97,7 @@ func generate_dungeon(level: int) -> bool:
 	rooms = []
 	
 	# Create rooms
-	for i in range(NUMBER_OF_ROOMS_GENERATED + 10 * level):
+	for i in range(NUMBER_OF_ROOMS_GENERATED + 7 * level):
 		var width: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var height: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var new_position: Vector2i = random_point_in_circle(5000 + 50 * level)
@@ -224,9 +226,11 @@ func generate_dungeon(level: int) -> bool:
 		
 		# spawn enemies
 		if room.room_type == Room.NORMAL_ROOM:
-			spawn_enemies(room, level)
+			#spawn_enemies(room, level)
+			room.spawn_enemies(level + 4)
 		elif room.room_type == Room.BOSS_ROOM:
-			spawn_enemies(room, level + 5)
+			#spawn_enemies(room, level + 5)
+			room.spawn_enemies(level + 9)
 		
 		# setup rooms
 		room.setup_room()

@@ -11,13 +11,15 @@ const BOSS_ROOM: int = 2
 const LOOT_ROOM: int = 3
 const STARTING_ROOM: int = 4
 
-static var room_scene: PackedScene = load("res://world/room.tscn")
+var enemy_scenes: Dictionary = {
+	1: [load("res://Enemies/turret.tscn") as PackedScene]
+}
 
+static var room_scene: PackedScene = load("res://world/room.tscn")
 
 var room_type: int
 var room_connection_locations: Array[Array]
 var rect: Rect2
-var door_points: PackedVector2Array
 
 var enemies: Dictionary = {}
 
@@ -38,8 +40,8 @@ func setup_room() -> void:
 	self.room_cleared.connect(self.get_parent().room_cleared)
 
 func create_walls() -> void:
-	var points: PackedVector2Array = []
-	self.door_points = PackedVector2Array()
+	var points: PackedVector2Array = PackedVector2Array()
+	var door_points: PackedVector2Array = PackedVector2Array()
 	
 	points.append(Vector2.ZERO)
 	for hallway: Hallway in self.room_connection_locations[Hallway.UP]:
@@ -99,8 +101,8 @@ func create_walls() -> void:
 		self.add_child(line)
 		self.add_child(occluder)
 	
-	for i in range(0, len(self.door_points), 2):
-		var polygon: PackedVector2Array = PackedVector2Array([self.door_points[i], self.door_points[i + 1]])
+	for i in range(0, len(door_points), 2):
+		var polygon: PackedVector2Array = PackedVector2Array([door_points[i], door_points[i + 1]])
 		var static_body: StaticBody2D = StaticBody2D.new()
 		static_body.set_collision_mask_value(4, true)
 		static_body.set_collision_layer_value(1, false)
@@ -185,3 +187,19 @@ func activate_enemies_in_adjacent_rooms() -> void:
 				for enemy: Enemy in hallway.a.enemies:
 					enemy.visible = true
 					enemy.run = true
+
+func spawn_enemies(points: int) -> void:
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	while points > 0:
+		var point_level: int = rng.randi_range(1, min(points, enemy_scenes.keys().min()))
+		var enemy: Enemy = enemy_scenes[point_level].pick_random().instantiate()
+		enemy.room = self
+		self.add_child(enemy)
+		self.enemies[enemy] = true
+		var enemy_size: Vector2 = enemy.get_size()
+		var x_pos = rng.randi_range(enemy_size.x, self.rect.size.x - enemy_size.x)
+		var y_pos = rng.randi_range(enemy_size.y, self.rect.size.y - enemy_size.y)
+		enemy.position = Vector2(x_pos, y_pos)
+		enemy.run = false
+		enemy.visible = false
+		points -= point_level

@@ -138,7 +138,7 @@ func create_walls() -> void:
 		self.add_child(area)
 
 func door_area_exited(area: Area2D) -> void:
-	if self.rect.has_point(area.get_parent().position):
+	if self.rect.has_point(area.get_parent().position): # entered room
 		area.get_parent().room = self
 		if self.enemies:
 			self.door_container.visible = true
@@ -147,7 +147,10 @@ func door_area_exited(area: Area2D) -> void:
 					child.set_collision_layer_value(1, true)
 				elif child is LightOccluder2D:
 					child.visible = true
-	else:
+	
+		self.activate_enemies_in_adjacent_rooms()
+		
+	else: # exited room
 		self.door_container.visible = false
 		for child in self.door_container.get_children():
 			if child is StaticBody2D:
@@ -170,3 +173,15 @@ func enemy_defeated() -> void:
 			self.door_container.remove_child(child)
 		self.door_container.visible = false
 		self.room_cleared.emit()
+
+func activate_enemies_in_adjacent_rooms() -> void:
+	for direction in range(len(self.room_connection_locations)):
+		for hallway: Hallway in self.room_connection_locations[direction]:
+			if self == hallway.a:
+				for enemy: Enemy in hallway.b.enemies:
+					enemy.visible = true
+					enemy.run = true
+			else:
+				for enemy: Enemy in hallway.a.enemies:
+					enemy.visible = true
+					enemy.run = true

@@ -37,7 +37,7 @@ func _ready():
 	var starting_time: int = Time.get_ticks_msec()
 	while true:
 		print("generating dungeon")
-		if generate_dungeon2(level):
+		if generate_dungeon(level):
 			break
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
 	
@@ -91,7 +91,7 @@ func _process(delta):
 			if player.grenades[player.selected_grenade_index] == 0:
 				ui_container.select_grenade()
 
-func generate_dungeon2(level: int) -> bool:
+func generate_dungeon(level: int) -> bool:
 	rooms = []
 	
 	# Create rooms
@@ -136,8 +136,14 @@ func generate_dungeon2(level: int) -> bool:
 			outer_rooms[mst_path.get_point_position(p)] = p
 
 	var outer_room_positions = outer_rooms.keys()
-	outer_room_positions.sort_custom(func (a: Vector2, b: Vector2) : a.length() > b.length())
-	var boss_room_position: Vector2 = outer_room_positions[0]
+	var max_position_distance: float = 0
+	var farthest_position = null
+	#outer_room_positions.sort_custom(func (a: Vector2, b: Vector2) : a.length() > b.length())
+	for position: Vector2 in outer_room_positions:
+		if position.length() > max_position_distance:
+			farthest_position = position
+			max_position_distance = position.length()
+	var boss_room_position: Vector2 = farthest_position
 	room_positions[boss_room_position].room_type = Room.BOSS_ROOM
 	
 	#Identify spawn room
@@ -221,10 +227,13 @@ func generate_dungeon2(level: int) -> bool:
 			spawn_enemies(room, level)
 		elif room.room_type == Room.BOSS_ROOM:
 			spawn_enemies(room, level + 5)
-	
+		
 		# setup rooms
 		room.setup_room()
-	
+
+	for room: Room in main_rooms:
+		if room.room_type == Room.STARTING_ROOM:
+			room.activate_enemies_in_adjacent_rooms()
 	rooms = main_rooms
 	draw_hallways(hallways)
 	create_dungeon_borders([], hallways)
@@ -645,7 +654,8 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 			turret.position = Vector2(x_pos, y_pos)
 			turret.add_to_group("robots")
 			turret.add_to_group("enemies")
-			turret.run = true
+			turret.run = false
+			turret.visible = false
 			spawning_room.enemies[turret] = true
 		else:
 			var turret: Turret = TURRET_SCENE.instantiate()
@@ -656,7 +666,8 @@ func spawn_enemies(spawning_room: Room, level: int) -> void:
 			turret.position = Vector2(x_pos, y_pos)
 			turret.add_to_group("enemies")
 			turret.add_to_group("robots")
-			turret.run = true
+			turret.run = false
+			turret.visible = false
 			spawning_room.enemies[turret] = true
 	
 	# use separation steering algorithm to prevent overlaps without having to 

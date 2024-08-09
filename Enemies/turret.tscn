@@ -269,6 +269,7 @@ width = 0.0
 
 [node name="ShapeCast2D" type="ShapeCast2D" parent="Face"]
 position = Vector2(16, 0)
+enabled = false
 shape = SubResource("RectangleShape2D_afkjc")
 target_position = Vector2(390, 0)
 max_results = 1

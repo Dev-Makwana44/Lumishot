@@ -146,6 +146,7 @@ func _physics_process(delta):
 func _on_face_frame_changed():
 	if turret_face.animation == "firing":
 		if turret_face.frame == 7 and not fired_this_animation:
+			shape_cast.force_shapecast_update()
 			if shape_cast.collision_result and !shape_cast.collision_result[0].collider is Player:
 				turret_face.frame = 6
 				return

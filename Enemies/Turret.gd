@@ -89,7 +89,6 @@ func _ready():
 
 func _process(_delta):
 	if run:
-		#target_location = null
 		var player_located: bool = false
 		for area in search_area.get_overlapping_areas():
 			if area.get_parent() is Player and (!area.get_parent().invisible or active_modules[INFRARED_LIGHT_MODULE]) and area.get_parent().room != null and area.get_parent().room == self.room:
@@ -102,7 +101,6 @@ func _process(_delta):
 						for siren_sprite in siren_container.get_children():
 							siren_sprite.play("alert")
 					alert = true
-				#var query = PhysicsRayQueryParameters2D.create(self.position, area.get_parent().position)
 				var query = PhysicsRayQueryParameters2D.create(self.position + self.room.rect.position, area.get_parent().position)
 				var result = get_world_2d().direct_space_state.intersect_ray(query)
 				if result and result.collider is Player:
@@ -114,9 +112,6 @@ func _process(_delta):
 		else:
 			turret_face.play("firing")
 		
-		#if self.alert:
-			#print(self.target_location)
-
 func _physics_process(delta):
 	if run:
 		if slowed:
@@ -130,9 +125,11 @@ func _physics_process(delta):
 		var target_rotation: float
 		if target_location != null:
 			target_rotation = (self.position + self.room.rect.position).angle_to_point(target_location)
+			turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.05)
 		else:
 			if alert:
-				target_rotation = turret_face.rotation + 0.1
+				target_rotation = turret_face.rotation + 0.075
+				turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.05)
 			else:
 				time_since_last_rotation += delta
 				if time_since_last_rotation >= TIME_BETWEEN_ROTATIONS:
@@ -141,14 +138,8 @@ func _physics_process(delta):
 					if current_rotation >= 2 * PI:
 						current_rotation -= 2 * PI
 				target_rotation = current_rotation
-		var rotation_difference = target_rotation - turret_face.rotation
-		if rotation_difference > PI:
-			rotation_difference -= 2 * PI
-		elif rotation_difference < -PI:
-			rotation_difference += 2 * PI
-		turret_face.rotation += min(rotation_speed * delta, abs(rotation_difference)) * sign(rotation_difference)
-		#sentry_turn.play()
-
+				turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.005)
+		
 func _on_face_frame_changed():
 	if turret_face.animation == "firing":
 		if turret_face.frame == 7 and not fired_this_animation:

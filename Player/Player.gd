@@ -36,6 +36,7 @@ const SHIELDING_DURATION: float = 10.0
 const INVISIBILITY_DURATION: float = 15.0
 const SPEED_BOOST_DURATION: float = 10.0
 const DAMAGE_FLASH_DURATION: float = 1.0
+const FROZEN_DURATION: float = 2.0
 var FIRE_RATE: float = 0.1
 const MAX_HEALTH: int = 100
 
@@ -57,6 +58,7 @@ var time_since_shielding: float = SHIELDING_DURATION
 var time_since_invisibility: float = INVISIBILITY_DURATION
 var time_since_speed_boost: float = SPEED_BOOST_DURATION
 var time_since_damage: float = DAMAGE_FLASH_DURATION
+var time_since_frozen: float = FROZEN_DURATION
 var inventory: InventoryComponent = InventoryComponent.new()
 var game_paused: bool = false
 var ammo: Array[int] = [0, 0, 0, 0, 0]
@@ -70,6 +72,7 @@ var shielding: bool = false
 var quantum_blinking: bool = false
 var speed_boost: bool = false
 var damage_flash: bool = false
+var frozen: bool = false
 
 var health: int = MAX_HEALTH
 var room: Room = null
@@ -82,7 +85,13 @@ func _ready():
 	set_inventory(self.inventory)
 
 func _physics_process(delta):
-	if not game_paused:
+	if frozen:
+		time_since_frozen += delta
+		if time_since_frozen >= FROZEN_DURATION:
+			frozen = false
+			self.modulate.r *= 2
+			sprite.speed_scale = 1
+	if not game_paused and not frozen:
 		var global_mouse_pos: Vector2 = get_global_mouse_position()
 		gun.look_at(global_mouse_pos)
 		light.look_at(global_mouse_pos)
@@ -222,7 +231,8 @@ func use_potion() -> bool:
 		return true
 	return false
 
-#func _on_area_2d_area_entered(other):
-	#if other.get_parent() is Bullet and other.get_parent().is_in_group("enemy_bullets") and other.name == "Collision Box":
-		#other.get_parent().queue_free()
-		#self.take_damage(5)
+func freeze() -> void:
+	frozen = true
+	time_since_frozen = 0.0
+	sprite.speed_scale = 0
+	self.modulate.r /= 2

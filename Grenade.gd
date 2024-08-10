@@ -10,6 +10,7 @@ const FLARE_DECAY: float = 0.0003
 const GRENADE: int = 0
 const CRYO_GRENADE: int = 1
 const FLARE: int = 2
+const MAX_TRAVEL_DISTANCE: float = 500.0
 
 static var scene = load("res://grenade.tscn") as PackedScene
 
@@ -23,11 +24,6 @@ var grenade_type: int
 var angle: float
 var distance_from_target: float = 500.0
 var exploded: bool = false
-
-#func _init(type: int, starting_angle: float):
-	#
-	#self.grenade_type = type
-	#self.angle = starting_angle
 
 static func new_grenade(type: int, starting_angle: float):
 	var grenade: Grenade = scene.instantiate()

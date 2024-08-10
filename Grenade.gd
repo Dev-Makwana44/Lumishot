@@ -64,11 +64,12 @@ func _physics_process(delta):
 
 func explode() -> void:
 	if grenade_type == GRENADE:
-		for enemy in self.area.get_overlapping_areas():
-			if enemy.get_parent() is Enemy:
-				enemy.get_parent().damage(50)
+		for entity in self.area.get_overlapping_areas():
+			#if enemy.get_parent() is Enemy:
+				entity.get_parent().damage(50)
 	elif grenade_type == CRYO_GRENADE:
-		for enemy in self.area.get_overlapping_areas():
-			if enemy.get_parent() is Enemy:
-				enemy.get_parent().damage(25)
-				enemy.get_parent().freeze()
+		for entity in self.area.get_overlapping_areas():
+			#if enemy.get_parent() is Enemy:
+				print(entity.get_parent())
+				entity.get_parent().damage(25)
+				entity.get_parent().freeze()

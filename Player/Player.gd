@@ -232,7 +232,8 @@ func use_potion() -> bool:
 	return false
 
 func freeze() -> void:
-	frozen = true
 	time_since_frozen = 0.0
-	sprite.speed_scale = 0
-	self.modulate.r /= 2
+	if not frozen:
+		frozen = true
+		sprite.speed_scale = 0
+		self.modulate.r /= 2

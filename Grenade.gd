@@ -53,16 +53,10 @@ func _physics_process(delta):
 			else:
 				self.explode()
 				self.queue_free()
-		#self.position += self.velocity
-		var collision = self.move_and_collide(self.velocity * delta)
-		if collision:
-			self.velocity = self.velocity.bounce(collision.get_normal())
-			#if temp % 100 == 0:
-			print("collision")
-		#if self.move_and_slide():
-			#self.velocity = self.velocity.bounce(self.get_last_slide_collision().get_normal())
-			#if temp % 100 == 0:
-				#print(self.get_last_slide_collision())
+		var vel = self.velocity
+		if self.move_and_slide():
+			self.velocity = vel.bounce(self.get_last_slide_collision().get_normal())
+			print(self.get_last_slide_collision().get_normal())
 		
 	if self.grenade_type == FLARE and self.light.energy > 0:
 		self.light.energy -= FLARE_DECAY

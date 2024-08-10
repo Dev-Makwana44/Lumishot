@@ -78,10 +78,8 @@ func _process(delta):
 	if Input.is_action_just_pressed("throw_grenade"):
 		if player.grenades[player.selected_grenade_index] > 0 and not player.game_paused:
 			var grenade_path = get_global_mouse_position() - player.position
-			#var grenade: Grenade = Grenade.new(player.selected_grenade_index, atan2(grenade_path.y, grenade_path.x))
 			var grenade: Grenade = Grenade.new_grenade(player.selected_grenade_index, atan2(grenade_path.y, grenade_path.x))
 			self.add_child(grenade)
-			#await grenade.is_node_ready()
 			grenade.position = player.position
 			grenade.z_index = 10
 			grenade.add_to_group("grenades")

@@ -84,6 +84,7 @@ func create_walls() -> void:
 		var polygon: PackedVector2Array = PackedVector2Array([points[i], points[i + 1]])
 		var static_body: StaticBody2D = StaticBody2D.new()
 		static_body.set_collision_mask_value(4, true)
+		static_body.set_collision_mask_value(7, true)
 		var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()
 		collision_polygon.build_mode = CollisionPolygon2D.BUILD_SEGMENTS
 		collision_polygon.polygon = polygon
@@ -105,6 +106,7 @@ func create_walls() -> void:
 		var polygon: PackedVector2Array = PackedVector2Array([door_points[i], door_points[i + 1]])
 		var static_body: StaticBody2D = StaticBody2D.new()
 		static_body.set_collision_mask_value(4, true)
+		static_body.set_collision_mask_value(7, true)
 		static_body.set_collision_layer_value(1, false)
 		static_body.set_collision_layer_value(6, true)
 		var collision_polygon: CollisionPolygon2D = CollisionPolygon2D.new()

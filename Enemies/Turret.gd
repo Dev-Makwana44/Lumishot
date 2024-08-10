@@ -126,19 +126,16 @@ func _physics_process(delta):
 		if target_location != null:
 			target_rotation = (self.position + self.room.rect.position).angle_to_point(target_location)
 			turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.05)
+		elif alert:
+			target_rotation = turret_face.rotation + 0.075
+			turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.05)
 		else:
-			if alert:
-				target_rotation = turret_face.rotation + 0.075
-				turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.05)
-			else:
-				time_since_last_rotation += delta
-				if time_since_last_rotation >= TIME_BETWEEN_ROTATIONS:
-					time_since_last_rotation = 0.0
-					current_rotation += PI/2
-					if current_rotation >= 2 * PI:
-						current_rotation -= 2 * PI
-				target_rotation = current_rotation
-				turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.005)
+			time_since_last_rotation += delta
+			if time_since_last_rotation >= TIME_BETWEEN_ROTATIONS:
+				time_since_last_rotation = 0.0
+				current_rotation += PI/2
+			target_rotation = current_rotation
+			turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.005)
 		
 func _on_face_frame_changed():
 	if turret_face.animation == "firing":

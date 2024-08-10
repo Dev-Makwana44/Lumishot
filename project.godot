@@ -111,6 +111,7 @@ use_potion={
 2d_physics/layer_4="Bullets"
 2d_physics/layer_5="Collectable"
 2d_physics/layer_6="Rooms and Hallways"
+2d_physics/layer_7="Grenades"
 
 [physics]
 

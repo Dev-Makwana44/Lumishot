@@ -39,8 +39,6 @@ func _ready():
 		print("generating dungeon")
 		if generate_dungeon(level):
 			break
-		#for room: Room in rooms:
-			#self.remove_child(room)
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
 	
 	loss_screen.hide()
@@ -228,9 +226,11 @@ func generate_dungeon(level: int) -> bool:
 		if room.room_type == Room.NORMAL_ROOM:
 			#spawn_enemies(room, level)
 			room.spawn_enemies(level + 4)
+			#room.spawn_enemies(level + 14)
 		elif room.room_type == Room.BOSS_ROOM:
 			#spawn_enemies(room, level + 5)
 			room.spawn_enemies(level + 9)
+			#room.spawn_enemies(level + 19)
 		
 		# setup rooms
 		room.setup_room()

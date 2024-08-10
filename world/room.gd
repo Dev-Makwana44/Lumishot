@@ -203,3 +203,17 @@ func spawn_enemies(points: int) -> void:
 		enemy.run = false
 		enemy.visible = false
 		points -= point_level
+	
+	var enemies_list = self.enemies.keys()
+	var not_done: bool = true
+	while not_done:
+		not_done = false
+		for current: int in range(len(enemies_list)):
+			var current_rect = Rect2(enemies_list[current].position - (enemies_list[current].get_size() / 2), enemies_list[current].get_size())
+			for other: int in range(len(enemies_list)):
+				var other_rect = Rect2(enemies_list[other].position - (enemies_list[other].get_size() / 2), enemies_list[other].get_size())
+				if current != other and current_rect.intersects(other_rect):
+					var direction: Vector2 = (enemies_list[other].position - enemies_list[current].position).normalized().round()
+					enemies_list[current].position -= direction * 50
+					enemies_list[other].position += direction * 50
+					not_done = true

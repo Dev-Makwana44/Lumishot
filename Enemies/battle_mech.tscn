@@ -505,17 +505,15 @@ script = ExtResource("1_r4yxd")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_42dty")
-animation = &"firing_laser"
+animation = &"shielding"
 autoplay = "idle"
-frame_progress = 0.938717
+frame_progress = 0.174137
 
 [node name="Laser Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(13, 15)
 sprite_frames = SubResource("SpriteFrames_1pts1")
 animation = &"firing"
 autoplay = "idle"
-frame = 2
-frame_progress = 0.152605
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false

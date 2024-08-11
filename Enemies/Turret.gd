@@ -48,6 +48,7 @@ var HEALTH_BAR_SIZE: float
 var health: int = 100
 var speed: float
 var target_location
+var target: Player
 var rotation_speed: float = PI * 2/3
 var time_since_last_rotation: float = 0.0
 var current_rotation: float = 0.0
@@ -105,6 +106,7 @@ func _process(_delta):
 				var result = get_world_2d().direct_space_state.intersect_ray(query)
 				if result and result.collider is Player:
 					target_location = area.get_parent().position
+					
 		if not player_located:
 			target_location = null
 		if target_location == null:
@@ -121,11 +123,20 @@ func _physics_process(delta):
 				rotation_speed = PI * 2/3
 				turret_face.speed_scale = 1
 				self.modulate.r = 1
+				if not alert:
+					if active_modules[SIREN_MODULE]:
+						sentry_siren.play()
+						for enemy: Enemy in room.enemies:
+							enemy.alert_enemy()
+						for siren_sprite in siren_container.get_children():
+							siren_sprite.play("alert")
+					alert = true
 		if turret_face.speed_scale != 0:
 			var target_rotation: float
 			if target_location != null:
 				target_rotation = (self.position + self.room.rect.position).angle_to_point(target_location)
 				turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.05)
+			
 			elif alert:
 				target_rotation = turret_face.rotation + 0.075
 				turret_face.rotation = lerp_angle(turret_face.rotation, target_rotation, 0.05)
@@ -182,7 +193,7 @@ func damage(damage: int):
 	node.default_color = Color.RED
 	node.z_index = 2
 	self.add_child(node)
-	if not alert:
+	if not alert and rotation_speed != 0:
 		if active_modules[SIREN_MODULE]:
 			sentry_siren.play()
 			for enemy: Enemy in room.enemies:

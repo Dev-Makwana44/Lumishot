@@ -10,7 +10,6 @@ const FLARE_DECAY: float = 0.0003
 const GRENADE: int = 0
 const CRYO_GRENADE: int = 1
 const FLARE: int = 2
-const MAX_TRAVEL_DISTANCE: float = 500.0
 
 static var scene = load("res://grenade.tscn") as PackedScene
 
@@ -22,9 +21,8 @@ var grenade_textures: Dictionary = {
 
 var grenade_type: int
 var angle: float
-var distance_from_target: float = 500.0
 var exploded: bool = false
-var time_until_explosion: float = 5.0
+var time_until_explosion: float = 2.0
 
 static func new_grenade(type: int, starting_angle: float):
 	var grenade: Grenade = scene.instantiate()
@@ -41,9 +39,7 @@ func _ready():
 func _physics_process(delta):
 	if not exploded:
 		self.time_until_explosion -= delta
-		self.rotation += delta
-		#self.distance_from_target -= (self.velocity * delta).length()
-		#if self.distance_from_target <= 0:
+		self.rotation += sqrt(delta * self.velocity.length()) / 10
 		if self.time_until_explosion <= 0:
 			if self.grenade_type == FLARE:
 				self.exploded = true
@@ -51,11 +47,9 @@ func _physics_process(delta):
 				self.explode()
 				self.queue_free()
 		self.velocity *= Vector2(1 - delta * 2, 1 - delta * 2)
-		self.velocity -= Vector2(delta * 1000, delta * 1000)
 		var vel = self.velocity
 		if self.move_and_slide():
 			self.velocity = vel.bounce(self.get_last_slide_collision().get_normal())
-			#print(self.get_last_slide_collision().get_normal())
 		
 	if self.grenade_type == FLARE and self.light.energy > 0:
 		self.light.energy -= FLARE_DECAY
@@ -64,11 +58,8 @@ func _physics_process(delta):
 func explode() -> void:
 	if grenade_type == GRENADE:
 		for entity in self.area.get_overlapping_areas():
-			#if enemy.get_parent() is Enemy:
-				entity.get_parent().damage(50)
+			entity.get_parent().damage(50)
 	elif grenade_type == CRYO_GRENADE:
 		for entity in self.area.get_overlapping_areas():
-			#if enemy.get_parent() is Enemy:
-				print(entity.get_parent())
-				entity.get_parent().damage(25)
-				entity.get_parent().freeze()
+			entity.get_parent().freeze()
+			entity.get_parent().damage(25)

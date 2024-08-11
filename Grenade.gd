@@ -24,6 +24,7 @@ var grenade_type: int
 var angle: float
 var distance_from_target: float = 500.0
 var exploded: bool = false
+var time_until_explosion: float = 5.0
 
 static func new_grenade(type: int, starting_angle: float):
 	var grenade: Grenade = scene.instantiate()
@@ -37,22 +38,24 @@ func _ready():
 	if not self.grenade_type == FLARE:
 		self.light.visible = false
 
-var temp: int = 0
 func _physics_process(delta):
-	temp += 1
 	if not exploded:
+		self.time_until_explosion -= delta
 		self.rotation += delta
-		self.distance_from_target -= (self.velocity * delta).length()
-		if self.distance_from_target <= 0:
+		#self.distance_from_target -= (self.velocity * delta).length()
+		#if self.distance_from_target <= 0:
+		if self.time_until_explosion <= 0:
 			if self.grenade_type == FLARE:
 				self.exploded = true
 			else:
 				self.explode()
 				self.queue_free()
+		self.velocity *= Vector2(1 - delta * 2, 1 - delta * 2)
+		self.velocity -= Vector2(delta * 1000, delta * 1000)
 		var vel = self.velocity
 		if self.move_and_slide():
 			self.velocity = vel.bounce(self.get_last_slide_collision().get_normal())
-			print(self.get_last_slide_collision().get_normal())
+			#print(self.get_last_slide_collision().get_normal())
 		
 	if self.grenade_type == FLARE and self.light.energy > 0:
 		self.light.energy -= FLARE_DECAY

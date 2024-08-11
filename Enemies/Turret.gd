@@ -79,6 +79,7 @@ func _ready():
 	if active_modules[LIGHT_MODULE]:
 		light.show()
 	if active_modules[INFRARED_LIGHT_MODULE]:
+		light.show()
 		light.color = Color(1, 0, 0)
 	if active_modules[SIREN_MODULE]:
 		siren_container.visible = true
@@ -106,7 +107,7 @@ func _process(_delta):
 				var result = get_world_2d().direct_space_state.intersect_ray(query)
 				if result and result.collider is Player:
 					target_location = area.get_parent().position
-					
+					target = area.get_parent()
 		if not player_located:
 			target_location = null
 		if target_location == null:
@@ -132,6 +133,7 @@ func _physics_process(delta):
 							siren_sprite.play("alert")
 					alert = true
 		if turret_face.speed_scale != 0:
+			
 			var target_rotation: float
 			if target_location != null:
 				target_rotation = (self.position + self.room.rect.position).angle_to_point(target_location)

@@ -206,11 +206,13 @@ func slow() -> void:
 	self.modulate.r /= 2
 
 func freeze() -> void:
-	slowed = true
 	time_since_slowed = 0.0
-	rotation_speed = 0
-	turret_face.speed_scale = 0
-	self.modulate.r /= 2
+	if not slowed:
+		slowed = true
+		rotation_speed = 0
+		turret_face.speed_scale = 0
+		self.modulate.r /= 2
+	
 
 func drop_loot() -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()

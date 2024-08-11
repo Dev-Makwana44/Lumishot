@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://cfsodffdvsin7"]
+[gd_scene load_steps=29 format=3 uid="uid://cfsodffdvsin7"]
 
 [ext_resource type="Script" path="res://Enemies/Turret.gd" id="1_3qx31"]
 [ext_resource type="Texture2D" uid="uid://cuhoxwjnj7otv" path="res://Enemies/Images/Turret Base.png" id="2_jo06s"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://sd5ifb84acgh" path="res://Enemies/Images/turret_siren_on.png" id="5_n0wrd"]
 [ext_resource type="Texture2D" uid="uid://bg26pv11k0q33" path="res://Resources/Lighting/circle.png" id="6_j4vaa"]
 [ext_resource type="AudioStream" uid="uid://f4dms3c8r32a" path="res://sfx/sentry_turn.mp3" id="6_yn66d"]
+[ext_resource type="Texture2D" uid="uid://brxc0h4bxyio1" path="res://Enemies/Images/turret_predictor_side_light2.png" id="7_rb4ur"]
 [ext_resource type="AudioStream" uid="uid://m5plymrlsct7" path="res://sfx/turret_shoot.mp3" id="7_w3jvj"]
 [ext_resource type="AudioStream" uid="uid://wnucdrocwlvb" path="res://sfx/turret_siren.mp3" id="8_fleoc"]
 
@@ -239,9 +240,118 @@ color = Color(1, 0.117647, 0.152941, 1)
 texture = ExtResource("6_j4vaa")
 texture_scale = 0.5
 
+[node name="Predictor Lights Container" type="Node2D" parent="."]
+visible = false
+scale = Vector2(0.333, 0.333)
+
+[node name="Predictor Light Sprite 1" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
+position = Vector2(-13.013, -43.0431)
+rotation = 1.5708
+scale = Vector2(2, 2)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 2" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
+position = Vector2(13.013, 43.043)
+rotation = -1.5708
+scale = Vector2(2, 2)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 3" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
+position = Vector2(-43.0431, 13.013)
+scale = Vector2(2, 2)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 4" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
+position = Vector2(43.043, -13.013)
+rotation = 3.14159
+scale = Vector2(2, 2)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 5" type="Sprite2D" parent="Predictor Lights Container"]
+position = Vector2(-19.019, -43.043)
+rotation = 1.5708
+scale = Vector2(2, 3)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 6" type="Sprite2D" parent="Predictor Lights Container"]
+position = Vector2(20.02, 43.043)
+rotation = -1.5708
+scale = Vector2(2, 3)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 7" type="Sprite2D" parent="Predictor Lights Container"]
+position = Vector2(-43.0431, 19.019)
+scale = Vector2(2, 3)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 8" type="Sprite2D" parent="Predictor Lights Container"]
+position = Vector2(43.043, -20.02)
+rotation = 3.14159
+scale = Vector2(2, 3)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 9" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
+position = Vector2(-26.026, -43.043)
+rotation = 1.5708
+scale = Vector2(2, 4)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 10" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
+position = Vector2(27.027, 43.043)
+rotation = -1.5708
+scale = Vector2(2, 4)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 11" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
+position = Vector2(-43.0431, 26.026)
+scale = Vector2(2, 4)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light Sprite 12" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
+position = Vector2(43.043, -26.026)
+rotation = 3.14159
+scale = Vector2(2, 4)
+texture = ExtResource("7_rb4ur")
+
+[node name="Predictor Light 1" type="PointLight2D" parent="Predictor Lights Container"]
+position = Vector2(2.93255e-05, -43.043)
+color = Color(0.117647, 1, 0.145098, 1)
+energy = 0.3
+texture = ExtResource("6_j4vaa")
+texture_scale = 0.5
+
+[node name="Predictor Light 2" type="PointLight2D" parent="Predictor Lights Container"]
+position = Vector2(43.0431, 3.8743e-05)
+color = Color(0.117647, 1, 0.145098, 1)
+energy = 0.3
+texture = ExtResource("6_j4vaa")
+texture_scale = 0.5
+
+[node name="Predictor Light 3" type="PointLight2D" parent="Predictor Lights Container"]
+position = Vector2(-43.043, 3.8743e-05)
+color = Color(0.117647, 1, 0.145098, 1)
+energy = 0.3
+texture = ExtResource("6_j4vaa")
+texture_scale = 0.5
+
+[node name="Predictor Light 4" type="PointLight2D" parent="Predictor Lights Container"]
+position = Vector2(3.43323e-05, 43.0431)
+color = Color(0.117647, 1, 0.145098, 1)
+energy = 0.3
+texture = ExtResource("6_j4vaa")
+texture_scale = 0.5
+
 [node name="Face" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_pxcbx")
-animation = &"idle"
+animation = &"firing"
 autoplay = "idle"
 
 [node name="Search Area" type="Area2D" parent="Face"]
@@ -252,7 +362,6 @@ collision_mask = 4
 polygon = PackedVector2Array(0, 0, 358.333, -131.333, 403, -80.6667, 412.333, 0.333333, 403, 69.6667, 360.667, 119.333)
 
 [node name="Cone Light2" type="PointLight2D" parent="Face"]
-visible = false
 light_mask = 2
 energy = 0.1
 range_z_max = 9

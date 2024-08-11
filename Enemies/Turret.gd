@@ -96,9 +96,11 @@ func _ready():
 	enemy_defeated.connect(room.enemy_defeated)
 	self.add_to_group("robots")
 	self.add_to_group("enemies")
-
+	
 func _process(_delta):
-	if run:
+	if run and turret_face.speed_scale != 0:
+		if active_modules[PREDICTOR_MODULE] and target != null:
+			return
 		var player_located: bool = false
 		for area in search_area.get_overlapping_areas():
 			if area.get_parent() is Player and (!area.get_parent().invisible or active_modules[INFRARED_LIGHT_MODULE]) and area.get_parent().room != null and area.get_parent().room == self.room:
@@ -212,7 +214,9 @@ func freeze() -> void:
 		rotation_speed = 0
 		turret_face.speed_scale = 0
 		self.modulate.r /= 2
-	
+	target_location = null
+	if active_modules[PREDICTOR_MODULE]:
+		target = null
 
 func drop_loot() -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()

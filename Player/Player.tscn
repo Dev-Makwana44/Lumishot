@@ -112,6 +112,9 @@ position = Vector2(0, -4)
 scale = Vector2(-1.28167, 1.18417)
 shape = SubResource("CapsuleShape2D_kg17a")
 
+[node name="AudioListener2D" type="AudioListener2D" parent="."]
+current = true
+
 [node name="footstep" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("6_43y7b")
 max_distance = 1e+10

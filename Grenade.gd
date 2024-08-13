@@ -6,7 +6,7 @@ extends CharacterBody2D
 @onready var area: Area2D = $Area2D
 
 const SPEED: int = 1000
-const FLARE_DECAY: float = 0.0003
+const FLARE_DECAY: float = 0.0001
 const GRENADE: int = 0
 const CRYO_GRENADE: int = 1
 const FLARE: int = 2
@@ -35,6 +35,10 @@ func _ready():
 	self.velocity = Vector2(SPEED * cos(self.angle), SPEED * sin(self.angle))
 	if not self.grenade_type == FLARE:
 		self.light.visible = false
+	#else:
+		#self.set_collision_layer_value(7, false)
+		##self.set_collision_mask_value(1, false)
+		#self.set_collision_mask_value(6, false)
 
 func _physics_process(delta):
 	if not exploded:

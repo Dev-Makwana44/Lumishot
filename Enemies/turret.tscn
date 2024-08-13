@@ -272,50 +272,50 @@ scale = Vector2(2, 2)
 texture = ExtResource("7_rb4ur")
 
 [node name="Predictor Light Sprite 5" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
 position = Vector2(-19.019, -43.043)
 rotation = 1.5708
 scale = Vector2(2, 3)
 texture = ExtResource("7_rb4ur")
 
 [node name="Predictor Light Sprite 6" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
 position = Vector2(20.02, 43.043)
 rotation = -1.5708
 scale = Vector2(2, 3)
 texture = ExtResource("7_rb4ur")
 
 [node name="Predictor Light Sprite 7" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
 position = Vector2(-43.0431, 19.019)
 scale = Vector2(2, 3)
 texture = ExtResource("7_rb4ur")
 
 [node name="Predictor Light Sprite 8" type="Sprite2D" parent="Predictor Lights Container"]
+visible = false
 position = Vector2(43.043, -20.02)
 rotation = 3.14159
 scale = Vector2(2, 3)
 texture = ExtResource("7_rb4ur")
 
 [node name="Predictor Light Sprite 9" type="Sprite2D" parent="Predictor Lights Container"]
-visible = false
 position = Vector2(-26.026, -43.043)
 rotation = 1.5708
 scale = Vector2(2, 4)
 texture = ExtResource("7_rb4ur")
 
 [node name="Predictor Light Sprite 10" type="Sprite2D" parent="Predictor Lights Container"]
-visible = false
 position = Vector2(27.027, 43.043)
 rotation = -1.5708
 scale = Vector2(2, 4)
 texture = ExtResource("7_rb4ur")
 
 [node name="Predictor Light Sprite 11" type="Sprite2D" parent="Predictor Lights Container"]
-visible = false
 position = Vector2(-43.0431, 26.026)
 scale = Vector2(2, 4)
 texture = ExtResource("7_rb4ur")
 
 [node name="Predictor Light Sprite 12" type="Sprite2D" parent="Predictor Lights Container"]
-visible = false
 position = Vector2(43.043, -26.026)
 rotation = 3.14159
 scale = Vector2(2, 4)

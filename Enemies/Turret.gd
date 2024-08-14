@@ -18,6 +18,7 @@ signal enemy_defeated
 @onready var siren_container: Node2D = $"Siren Container"
 @onready var siren_lights_container: Node2D = $"Siren Lights Container"
 @onready var predictor_lights_container: Node2D = $"Predictor Lights Container"
+@onready var slow_timer: Timer = $"Slow Timer"
 
 const COLLECTABLE_ITEM: PackedScene = preload("res://Collectables/collectable.tscn")
 const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
@@ -32,6 +33,7 @@ const INFRARED_LIGHT_MODULE_CHANCE: float = 0.25
 const SIREN_MODULE_CHANCE: float = 0.2
 const PREDICTOR_MODULE_CHANCE: float = 0.1
 
+const MAX_ROTATION_SPEED: float = PI * 2/3
 
 var loot_items: Array[ItemData] = [
 	load("res://Resources/Items/CraftingItems/Bioluminescent_Bacteria.tres"),
@@ -52,15 +54,12 @@ var HEALTH_BAR_SIZE: float
 var health: int = 100
 var speed: float
 var target: Player
-var rotation_speed: float = PI * 2/3
+var rotation_speed: float = self.MAX_ROTATION_SPEED
 var time_since_last_rotation: float = 0.0
 var current_rotation: float = 0.0
 var fired_this_animation: bool = false
 var alert: bool = false
 var active_modules: Array[bool] = [false, false, false, false]
-
-var time_since_slowed: float = SLOWNESS_DURATION
-var slowed: bool = false
 
 var run: bool = false
 var room: Room
@@ -122,23 +121,6 @@ func _on_search_area_area_exited(area) -> void:
 
 func _physics_process(delta) -> void:
 	if run:
-		if slowed:
-			time_since_slowed += delta
-			if time_since_slowed >= SLOWNESS_DURATION:
-				slowed = false
-				rotation_speed = PI * 2/3
-				turret_face.speed_scale = 1
-				self.modulate.r = 1
-				if not alert:
-					if active_modules[SIREN_MODULE]:
-						sentry_siren.play()
-						for enemy: Enemy in room.enemies:
-							enemy.alert_enemy()
-						for siren_sprite in siren_container.get_children():
-							siren_sprite.play("alert")
-					alert = true
-				for area: Area2D in self.search_area.get_overlapping_areas():
-					self._on_search_area_area_entered(area)
 		if turret_face.speed_scale != 0:
 			var target_rotation: float
 			if active_modules[PREDICTOR_MODULE] and target != null:
@@ -174,7 +156,7 @@ func predict_firing_direction(starting_position: Vector2, target_position: Vecto
 			break
 	return starting_position.angle_to_point(est_pos)
 
-func damage(damage: int):
+func damage(damage: int) -> void:
 	self.health -= damage
 	if self.health <= 0:
 		self.room.enemies.erase(self)
@@ -198,20 +180,18 @@ func damage(damage: int):
 		alert = true
 
 func slow() -> void:
-	time_since_slowed = 0.0
-	rotation_speed /= 2
-	turret_face.speed_scale /= 2
-	self.modulate.r /= 2
+	self.rotation_speed = min(self.rotation_speed, self.MAX_ROTATION_SPEED / 2)
+	self.turret_face.speed_scale = min(self.turret_face.speed_scale, 0.6)
+	self.modulate.r = 0.5
+	slow_timer.start()
 
 func freeze() -> void:
-	time_since_slowed = 0.0
-	if not slowed:
-		slowed = true
-		rotation_speed = 0
-		turret_face.speed_scale = 0
-		self.modulate.r /= 2
+	rotation_speed = 0
+	turret_face.speed_scale = 0
+	self.modulate.r = 0.5
 	target = null
 	turret_face.play("idle")
+	slow_timer.start()
 
 func drop_loot() -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -234,12 +214,12 @@ func alert_enemy() -> void:
 		for siren in siren_container.get_children():
 			siren.play("alert")
 	
-func _on_siren_1_frame_changed():
+func _on_siren_1_frame_changed() -> void:
 	if siren1.animation == "alert":
 		for light in siren_lights_container.get_children():
 			light.enabled = (siren1.frame == 1)
 
-func _on_face_frame_changed():
+func _on_face_frame_changed() -> void:
 	if turret_face.animation == "firing":
 		if turret_face.frame == 7 and not fired_this_animation:
 			shape_cast.force_shapecast_update()
@@ -270,3 +250,17 @@ func _on_face_frame_changed():
 			#sentry_turn.play()
 			pass
 
+func _on_slow_timer_timeout():
+	rotation_speed = self.MAX_ROTATION_SPEED
+	turret_face.speed_scale = 1
+	self.modulate.r = 1
+	if not alert:
+		if active_modules[SIREN_MODULE]:
+			sentry_siren.play()
+			for enemy: Enemy in room.enemies:
+				enemy.alert_enemy()
+			for siren_sprite in siren_container.get_children():
+				siren_sprite.play("alert")
+		alert = true
+	for area: Area2D in self.search_area.get_overlapping_areas():
+		self._on_search_area_area_entered(area)

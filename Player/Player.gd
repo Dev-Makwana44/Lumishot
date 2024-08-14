@@ -156,6 +156,7 @@ func _physics_process(delta):
 		
 		if Input.is_action_just_pressed("dash") and self.dash_available:
 			self.velocity = v * DASH_SPEED
+			self.dash_available = false
 			dash_timer.start()
 		
 		if dash_timer.is_stopped():

@@ -52,8 +52,12 @@ metadata/_edit_use_anchors_ = true
 [node name="gunshot" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("9_ifwjy")
 max_distance = 1e+10
+max_polyphony = 10
 
+[connection signal="bullet_fired" from="Player" to="." method="_on_player_bullet_fired"]
+[connection signal="grenade_used" from="Player" to="." method="_on_player_grenade_used"]
 [connection signal="player_health_changed" from="Player" to="." method="_on_player_player_health_changed"]
+[connection signal="potion_used" from="Player" to="." method="_on_player_potion_used"]
 [connection signal="pre_sort_children" from="UI_Container/Crafting UI" to="." method="_on_crafting_ui_pre_sort_children"]
 [connection signal="restart_game" from="UI_Container/Loss Screen" to="." method="_on_loss_screen_restart_game"]
 [connection signal="level_complete" from="UI_Container/Level Completion Screen" to="." method="_on_level_completion_screen_level_complete"]

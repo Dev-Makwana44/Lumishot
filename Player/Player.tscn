@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cakxa05kasxk6"]
+[gd_scene load_steps=17 format=3 uid="uid://cakxa05kasxk6"]
 
 [ext_resource type="Script" path="res://Player/Player.gd" id="1_mgulk"]
 [ext_resource type="Texture2D" uid="uid://bumklc8o3q8wn" path="res://Tech Dungeon Roguelite - Asset Pack (DEMO)/Players/players blue x3.png" id="2_j5n47"]
@@ -7,6 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://nitvvwa70kep" path="res://sfx/footstep.mp3" id="6_43y7b"]
 [ext_resource type="Texture2D" uid="uid://bp0ce7tvptbig" path="res://Resources/Lighting/cone light 2.jpg" id="7_f2eov"]
 [ext_resource type="AudioStream" uid="uid://bggok6ieq4ts6" path="res://sfx/hurt.mp3" id="7_g322s"]
+[ext_resource type="AudioStream" uid="uid://cvrrd44cxo6q8" path="res://sfx/gunshot.mp3" id="8_vv2yy"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7r2de"]
 atlas = ExtResource("2_j5n47")
@@ -151,6 +152,11 @@ one_shot = true
 [node name="Frozen Timer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="gunshot" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("8_vv2yy")
+max_distance = 1e+10
+max_polyphony = 10
 
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

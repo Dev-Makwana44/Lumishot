@@ -94,24 +94,21 @@ func _ready():
 	self.add_to_group("enemies")
 
 func _on_search_area_area_entered(area: Area2D) -> void:
-	if run and turret_face.speed_scale != 0:
-		if area.get_parent().room == self.room:
-			print('player in room')
-		if (area.get_parent().invisibility_timer.is_stopped() or active_modules[INFRARED_LIGHT_MODULE]) and area.get_parent().room == self.room:
-			if not alert:
-				if active_modules[SIREN_MODULE]:
-					sentry_siren.play()
-					for enemy: Enemy in self.room.enemies:
-						enemy.alert_enemy()
-					for siren_sprite: AnimatedSprite2D in siren_container.get_children():
-						siren_sprite.play("alert")
-				alert = true
-				rotation_timer.stop()
-			var query = PhysicsRayQueryParameters2D.create(self.position + self.room.rect.position, area.get_parent().position)
-			var result = get_world_2d().direct_space_state.intersect_ray(query)
-			if result and result.collider is Player:
-				target = area.get_parent()
-			turret_face.play("firing")
+	if run and turret_face.speed_scale != 0 and (area.get_parent().invisibility_timer.is_stopped() or active_modules[INFRARED_LIGHT_MODULE]) and area.get_parent().room == self.room:
+		if not alert:
+			if active_modules[SIREN_MODULE]:
+				sentry_siren.play()
+				for enemy: Enemy in self.room.enemies:
+					enemy.alert_enemy()
+				for siren_sprite: AnimatedSprite2D in siren_container.get_children():
+					siren_sprite.play("alert")
+			alert = true
+			rotation_timer.stop()
+		var query = PhysicsRayQueryParameters2D.create(self.position + self.room.rect.position, area.get_parent().position)
+		var result = get_world_2d().direct_space_state.intersect_ray(query)
+		if result and result.collider is Player:
+			target = area.get_parent()
+		turret_face.play("firing")
 
 func _on_search_area_area_exited(area) -> void:
 	if not active_modules[self.PREDICTOR_MODULE]:

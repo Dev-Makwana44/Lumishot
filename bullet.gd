@@ -4,7 +4,7 @@ extends CharacterBody2D
 static var BULLET_WIDTH: int = 14
 const SPEED: int = 1000
 
-var bullet_textures: Dictionary = {
+static var bullet_textures: Dictionary = {
 	0: load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData,
 	1: load("res://Resources/Items/CraftableItems/ExplosiveBullet.tres") as ItemData,
 	2: load("res://Resources/Items/CraftableItems/CryoBullet.tres") as ItemData,

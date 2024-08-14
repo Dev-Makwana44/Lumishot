@@ -2,6 +2,9 @@ class_name Player
 extends CharacterBody2D
 
 signal player_health_changed
+signal bullet_fired
+signal potion_used
+signal grenade_used
 
 const bullet_indices: Dictionary = {
 	'Bullet' : 0,
@@ -17,12 +20,26 @@ const grenade_indices: Dictionary = {
 	'Flare Grenade' : 2
 }
 
+var grenade_data: Dictionary = {
+	0: load("res://Resources/Items/CraftableItems/Grenade.tres") as ItemData,
+	1: load("res://Resources/Items/CraftableItems/CryoGrenade.tres") as ItemData,
+	2: load("res://Resources/Items/CraftableItems/FlareGrenade.tres") as ItemData
+}
+
 const potion_indices: Dictionary = {
 	'Health Potion' : 0,
 	'Energy Boost Potion' : 1,
 	'Invisibility Potion' : 2,
 	'Shielding Potion' : 3,
 	'Quantum Blink Potion' : 4
+}
+
+var potion_data: Dictionary = {
+	0: load("res://Resources/recipes/HealthPotionRecipe.tres") as ItemData,
+	1: load("res://Resources/Items/CraftableItems/EnergyBoostPotion.tres") as ItemData,
+	2: load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData,
+	3: load("res://Resources/Items/CraftableItems/ShieldingPotion.tres") as ItemData,
+	4: load("res://Resources/Items/CraftableItems/QuantumBlinkPotion.tres") as ItemData
 }
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -42,11 +59,13 @@ const potion_indices: Dictionary = {
 @onready var damage_flash_timer: Timer = $"Damage Flash Timer"
 @onready var frozen_timer: Timer = $"Frozen Timer"
 
+@onready var gunshot_sound: AudioStreamPlayer2D = $gunshot
+
+const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
 
 var SPEED: float = 500.0
 var FRICTION: float = SPEED / 10 # Dictates how fast the player accelerates. Usually going to be SPEED / 10 but might change if player is on different surfaces
 var DASH_SPEED: float = 2000.0
-#const FROZEN_DURATION: float = 2.0
 var FIRE_RATE: float = 0.1
 const MAX_HEALTH: int = 100
 
@@ -54,7 +73,6 @@ var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 var dash_available: bool = true
 var time_since_shooting: float = FIRE_RATE
-#var time_since_frozen: float = FROZEN_DURATION
 var inventory: InventoryComponent = InventoryComponent.new()
 var game_paused: bool = false
 var ammo: Array[int] = [0, 0, 0, 0, 0]
@@ -63,27 +81,52 @@ var potions: Array[int] = [0, 0, 0, 0, 0]
 var selected_ammo_index: int = 0
 var selected_grenade_index: int = 0
 var selected_potion_index: int = 0
-#var frozen: bool = false
 var health: int = MAX_HEALTH
 var room: Room = null
 
 func _ready():
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/HealthPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/ShieldingPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/EnergyBoostPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/QuantumBlinkPotion.tres") as ItemData, 3)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoGrenade.tres") as ItemData, 3)
 	set_inventory(self.inventory)
 
+func _process(delta) -> void:
+	if Input.is_action_pressed("fire_gun") and self.time_since_shooting > self.FIRE_RATE:
+		if self.ammo[self.selected_ammo_index] > 0 and not self.game_paused:
+			self.time_since_shooting = 0.0
+			var bullet: Bullet = BULLET_SCENE.instantiate()
+			self.add_sibling(bullet)
+			await bullet.is_node_ready()
+			bullet.set_collision_mask_value(2, true)
+			bullet.position = self.position
+			var bullet_path = get_global_mouse_position() - self.position
+			bullet.set_bullet_type(self.selected_ammo_index)
+			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
+			bullet.z_index = 9
+			bullet.add_to_group("player_bullets")
+			self.ammo[self.selected_ammo_index] -= 1
+			self.inventory.remove_items([bullet.bullet_textures[self.selected_ammo_index]])
+			gunshot_sound.pitch_scale = rng.randfn(1.0, 0.01)
+			gunshot_sound.play()
+			self.bullet_fired.emit()
+	
+	if Input.is_action_just_pressed("use_potion"):
+		if self.potions[self.selected_potion_index] > 0 and not self.game_paused and self.use_potion():
+			self.potions[self.selected_potion_index] -= 1
+			self.inventory.remove_items([self.potion_data[self.selected_potion_index]])
+			self.potion_used.emit()
+	
+	if Input.is_action_just_pressed("throw_grenade"):
+		if self.grenades[self.selected_grenade_index] > 0 and not self.game_paused:
+			var grenade_path = get_global_mouse_position() - self.position
+			var grenade: Grenade = Grenade.new_grenade(self.selected_grenade_index, atan2(grenade_path.y, grenade_path.x))
+			self.add_sibling(grenade)
+			grenade.position = self.position
+			grenade.z_index = 10
+			grenade.add_to_group("grenades")
+			self.grenades[self.selected_grenade_index] -= 1
+			self.inventory.remove_items([self.grenade_data[self.selected_grenade_index]])
+			self.grenade_used.emit()
+
 func _physics_process(delta):
-	#if frozen:
-		#time_since_frozen += delta
-		#if time_since_frozen >= FROZEN_DURATION:
-			#frozen = false
-			#self.modulate.r *= 2
-			#sprite.speed_scale = 1
 	if not game_paused and self.frozen_timer.is_stopped():
 		var global_mouse_pos: Vector2 = get_global_mouse_position()
 		gun.look_at(global_mouse_pos)
@@ -184,11 +227,6 @@ func use_potion() -> bool:
 	return false
 
 func freeze() -> void:
-	#time_since_frozen = 0.0
-	#if not frozen:
-		#frozen = true
-		#sprite.speed_scale = 0
-		#self.modulate.r /= 2
 	if self.frozen_timer.is_stopped():
 		self.sprite.speed_scale = 0
 		self.modulate.r /= 2

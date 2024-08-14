@@ -8,7 +8,6 @@ const ROOM_SEPARATION_SPEED: int = 300
 const MAIN_ROOM_SIZE_RATIO: float = 1.25
 
 const TURRET_SCENE: PackedScene = preload("res://Enemies/turret.tscn")
-const BULLET_SCENE: PackedScene = preload("res://bullet.tscn")
 
 @onready var player: Player = %Player
 @onready var hud: HUD = %HUD
@@ -43,51 +42,6 @@ func _ready():
 	
 	loss_screen.hide()
 	level_completion_screen.hide()
-
-func _process(delta):
-	if Input.is_action_pressed("fire_gun") and player.time_since_shooting > player.FIRE_RATE:
-		if player.ammo[player.selected_ammo_index] > 0 and not player.game_paused:
-			player.time_since_shooting = 0.0
-			var bullet: Bullet = BULLET_SCENE.instantiate()
-			self.add_child(bullet)
-			await bullet.is_node_ready()
-			bullet.set_collision_mask_value(2, true)
-			bullet.position = player.position
-			var bullet_path = get_global_mouse_position() - player.position
-			bullet.set_bullet_type(player.selected_ammo_index)
-			bullet.rotation = atan2(bullet_path.y, bullet_path.x) + rng.randfn(0.0, 0.025)
-			bullet.z_index = 9
-			bullet.add_to_group("player_bullets")
-			player.ammo[player.selected_ammo_index] -= 1
-			player.inventory.remove_items([bullet.bullet_textures[player.selected_ammo_index]])
-			hud.set_ammo(bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
-			if player.ammo[player.selected_ammo_index] == 0:
-				ui_container.select_ammo_up()
-			gunshot.pitch_scale = rng.randfn(1.0, 0.01)
-			gunshot.play()
-
-	if Input.is_action_just_pressed("use_potion"):
-		if player.potions[player.selected_potion_index] > 0 and not player.game_paused:
-			if player.use_potion():
-				player.potions[player.selected_potion_index] -= 1
-				player.inventory.remove_items([hud.potion_slot.item_data])
-				hud.set_potion(hud.potion_slot.item_data, player.potions[player.selected_potion_index])
-				if player.potions[player.selected_potion_index] == 0:
-					ui_container.select_potion()
-
-	if Input.is_action_just_pressed("throw_grenade"):
-		if player.grenades[player.selected_grenade_index] > 0 and not player.game_paused:
-			var grenade_path = get_global_mouse_position() - player.position
-			var grenade: Grenade = Grenade.new_grenade(player.selected_grenade_index, atan2(grenade_path.y, grenade_path.x))
-			self.add_child(grenade)
-			grenade.position = player.position
-			grenade.z_index = 10
-			grenade.add_to_group("grenades")
-			player.grenades[player.selected_grenade_index] -= 1
-			player.inventory.remove_items([hud.grenade_slot.item_data])
-			hud.set_grenade(hud.grenade_slot.item_data, player.grenades[player.selected_grenade_index])
-			if player.grenades[player.selected_grenade_index] == 0:
-				ui_container.select_grenade()
 
 func generate_dungeon(level: int) -> bool:
 	rooms = []
@@ -731,3 +685,18 @@ func _on_player_player_health_changed():
 		player.game_paused = true
 		for enemy: Enemy in get_tree().get_nodes_in_group("enemies"):
 			enemy.run = false
+
+func _on_player_bullet_fired():
+	hud.set_ammo(Bullet.bullet_textures[player.selected_ammo_index], player.ammo[player.selected_ammo_index])
+	if player.ammo[player.selected_ammo_index] == 0:
+		ui_container.select_ammo_up()
+
+func _on_player_potion_used():
+	hud.set_potion(hud.potion_slot.item_data, player.potions[player.selected_potion_index])
+	if player.potions[player.selected_potion_index] == 0:
+		ui_container.select_potion()
+
+func _on_player_grenade_used():
+	hud.set_grenade(hud.grenade_slot.item_data, player.grenades[player.selected_grenade_index])
+	if player.grenades[player.selected_grenade_index] == 0:
+		ui_container.select_grenade()

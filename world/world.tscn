@@ -14,6 +14,7 @@
 script = ExtResource("1_vfsft")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false
 color = Color(0, 0, 0, 1)
 
 [node name="Player" parent="." instance=ExtResource("2_l4l4n")]

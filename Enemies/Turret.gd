@@ -97,7 +97,7 @@ func _on_search_area_area_entered(area: Area2D) -> void:
 	if run and turret_face.speed_scale != 0:
 		if area.get_parent().room == self.room:
 			print('player in room')
-		if (!area.get_parent().invisible or active_modules[INFRARED_LIGHT_MODULE]) and area.get_parent().room == self.room:
+		if (area.get_parent().invisibility_timer.is_stopped() or active_modules[INFRARED_LIGHT_MODULE]) and area.get_parent().room == self.room:
 			if not alert:
 				if active_modules[SIREN_MODULE]:
 					sentry_siren.play()

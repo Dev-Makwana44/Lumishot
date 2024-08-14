@@ -146,13 +146,14 @@ func _physics_process(delta):
 		var v: Vector2 = Vector2(int(Input.is_action_pressed("move_left")) * -1 + int(Input.is_action_pressed("move_right")), -1 * int(Input.is_action_pressed("move_up")) + int(Input.is_action_pressed("move_down")))
 		v = v.normalized() # makes it so that strafing is not faster
 		
-		if v: 
+		if self.velocity: 
 			sprite.play("Run")
-			if sprite.frame % 2 == 1:
-				footstep.pitch_scale = rng.randfn(1.0, 0.1)
-				footstep.play()
+			if not self.sprite.frame_changed.is_connected(_on_animated_sprite_2d_frame_changed):
+				self.sprite.frame_changed.connect(_on_animated_sprite_2d_frame_changed)
 		else:
 			sprite.play("Idle")
+			if self.sprite.frame_changed.is_connected(_on_animated_sprite_2d_frame_changed):
+				self.sprite.frame_changed.disconnect(_on_animated_sprite_2d_frame_changed)
 		
 		if Input.is_action_just_pressed("dash") and self.dash_available:
 			self.velocity = v * DASH_SPEED
@@ -261,3 +262,8 @@ func _on_speed_boost_timer_timeout():
 func _on_frozen_timer_timeout():
 	self.sprite.speed_scale = 1
 	self.modulate.r *= 2
+
+func _on_animated_sprite_2d_frame_changed():
+	if sprite.animation == "Run" and sprite.frame % 2 == 1:
+		footstep.pitch_scale = rng.randfn(1.0, 0.1)
+		footstep.play()

@@ -86,6 +86,7 @@ var room: Room = null
 
 func _ready():
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
+	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData, 300)
 	set_inventory(self.inventory)
 
 func _process(delta) -> void:
@@ -216,6 +217,8 @@ func use_potion() -> bool:
 	elif selected_potion_index == 2 and self.invisibility_timer.is_stopped():
 		self.modulate.a /= 2
 		self.invisibility_timer.start()
+		for enemy: Enemy in self.room.enemies:
+			enemy.recheck_search_area()
 		return true
 	elif selected_potion_index == 3 and self.shielding_timer.is_stopped():
 		self.modulate.g /= 2
@@ -246,6 +249,8 @@ func _on_damage_flash_timer_timeout():
 
 func _on_invisibility_timer_timeout():
 	self.modulate.a *= 2
+	for enemy: Enemy in self.room.enemies:
+		enemy.recheck_search_area()
 
 func _on_quantum_blink_timer_timeout():
 	self.modulate.r *= 2

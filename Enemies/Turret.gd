@@ -254,8 +254,12 @@ func _on_slow_timer_timeout():
 				siren_sprite.play("alert")
 		alert = true
 		rotation_timer.stop()
-	for area: Area2D in self.search_area.get_overlapping_areas():
-		self._on_search_area_area_entered(area)
+	self.recheck_search_area()
 
 func _on_rotation_timer_timeout():
 	self.current_rotation += PI/2
+
+func recheck_search_area() -> void:
+	target = null
+	for area: Area2D in self.search_area.get_overlapping_areas():
+		self._on_search_area_area_entered(area)

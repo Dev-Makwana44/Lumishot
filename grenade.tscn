@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://p88ho0yr0pjg"]
+[gd_scene load_steps=8 format=3 uid="uid://p88ho0yr0pjg"]
 
 [ext_resource type="Script" path="res://Grenade.gd" id="1_u2xns"]
-[ext_resource type="Texture2D" uid="uid://bbeuuo6tlb3e1" path="res://Resources/Images/Grenade.png" id="2_nhtpi"]
+[ext_resource type="Texture2D" uid="uid://c1c87qsk8yl82" path="res://Resources/Images/Flare Grenade.png" id="2_cmvir"]
 [ext_resource type="Texture2D" uid="uid://bg26pv11k0q33" path="res://Resources/Lighting/circle.png" id="3_f5t5s"]
+[ext_resource type="Texture2D" uid="uid://bhit08cdngkqw" path="res://addons/kenney_particle_pack/star_01.png" id="4_8hxq1"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_tyfyl"]
 light_mode = 1
@@ -20,7 +21,7 @@ script = ExtResource("1_u2xns")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 material = SubResource("CanvasItemMaterial_tyfyl")
-texture = ExtResource("2_nhtpi")
+texture = ExtResource("2_cmvir")
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
 texture = ExtResource("3_f5t5s")
@@ -35,3 +36,21 @@ shape = SubResource("CircleShape2D_biiob")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_ey1ak")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+position = Vector2(0, -12)
+scale = Vector2(0.05, 0.05)
+amount = 20
+lifetime = 2.0
+speed_scale = 6.0
+texture = ExtResource("4_8hxq1")
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 400.0
+initial_velocity_max = 400.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.05
+scale_amount_max = 0.1
+color = Color(1, 0, 0, 1)
+hue_variation_max = 1.0

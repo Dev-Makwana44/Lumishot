@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://p88ho0yr0pjg"]
+[gd_scene load_steps=9 format=3 uid="uid://p88ho0yr0pjg"]
 
 [ext_resource type="Script" path="res://Grenade.gd" id="1_u2xns"]
 [ext_resource type="Texture2D" uid="uid://c1c87qsk8yl82" path="res://Resources/Images/Flare Grenade.png" id="2_cmvir"]
@@ -14,6 +14,9 @@ radius = 200.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_ey1ak"]
 radius = 15.1327
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_4vfyx"]
+light_mode = 1
+
 [node name="Grenade" type="CharacterBody2D"]
 collision_layer = 64
 collision_mask = 35
@@ -28,6 +31,7 @@ texture = ExtResource("3_f5t5s")
 texture_scale = 5.0
 
 [node name="Area2D" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 collision_mask = 6
 
@@ -35,9 +39,11 @@ collision_mask = 6
 shape = SubResource("CircleShape2D_biiob")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 shape = SubResource("CircleShape2D_ey1ak")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_4vfyx")
 position = Vector2(0, -12)
 scale = Vector2(0.05, 0.05)
 amount = 20
@@ -50,7 +56,7 @@ initial_velocity_min = 400.0
 initial_velocity_max = 400.0
 angle_min = -180.0
 angle_max = 180.0
-scale_amount_min = 0.05
+scale_amount_min = 0.01
 scale_amount_max = 0.1
 color = Color(1, 0, 0, 1)
 hue_variation_max = 1.0

@@ -4,9 +4,11 @@ extends CharacterBody2D
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var light: PointLight2D = $PointLight2D
 @onready var area: Area2D = $Area2D
+@onready var particles: CPUParticles2D = $CPUParticles2D
 
 const SPEED: int = 1000
 const FLARE_DECAY: float = 0.0001
+
 const GRENADE: int = 0
 const CRYO_GRENADE: int = 1
 const FLARE: int = 2
@@ -35,6 +37,7 @@ func _ready():
 	self.velocity = Vector2(SPEED * cos(self.angle), SPEED * sin(self.angle))
 	if not self.grenade_type == FLARE:
 		self.light.visible = false
+		self.particles.emitting = false
 	#else:
 		#self.set_collision_layer_value(7, false)
 		##self.set_collision_mask_value(1, false)
@@ -57,6 +60,10 @@ func _physics_process(delta):
 		
 	if self.grenade_type == FLARE and self.light.energy > 0:
 		self.light.energy -= FLARE_DECAY
+		self.particles.damping_min += 0.003
+		self.particles.scale_amount_max -= 0.000005
+	else:
+		self.particles.emitting = false
 	
 
 func explode() -> void:

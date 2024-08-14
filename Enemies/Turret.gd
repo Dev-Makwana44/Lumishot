@@ -4,7 +4,7 @@ extends Enemy
 signal enemy_defeated
 
 @onready var turret_face: AnimatedSprite2D = $Face
-#@onready var search_area: Area2D = $"Face/Search Area"
+@onready var search_area: Area2D = $"Face/Search Area"
 @onready var collision_box: Area2D = $"Collision Box"
 @onready var bullet_spawn_locations: Line2D = $"Face/Bullet Spawn Locations"
 @onready var health_bar: Line2D = $"Health Bar"
@@ -51,7 +51,6 @@ var HEALTH_BAR_SIZE: float
 
 var health: int = 100
 var speed: float
-#var target_location
 var target: Player
 var rotation_speed: float = PI * 2/3
 var time_since_last_rotation: float = 0.0
@@ -96,35 +95,6 @@ func _ready():
 	enemy_defeated.connect(room.enemy_defeated)
 	self.add_to_group("robots")
 	self.add_to_group("enemies")
-	
-#func _process(_delta):
-	#if run and turret_face.speed_scale != 0:
-		#if active_modules[PREDICTOR_MODULE] and target != null:
-			#return
-		#var player_located: bool = false
-		#for area in search_area.get_overlapping_areas():
-			#if area.get_parent() is Player and (!area.get_parent().invisible or active_modules[INFRARED_LIGHT_MODULE]) and area.get_parent().room != null and area.get_parent().room == self.room:
-				#player_located = true
-				#if not alert:
-					#if active_modules[SIREN_MODULE]:
-						#sentry_siren.play()
-						#for enemy: Enemy in room.enemies:
-							#enemy.alert_enemy()
-						#for siren_sprite in siren_container.get_children():
-							#siren_sprite.play("alert")
-					#alert = true
-				#var query = PhysicsRayQueryParameters2D.create(self.position + self.room.rect.position, area.get_parent().position)
-				#var result = get_world_2d().direct_space_state.intersect_ray(query)
-				#if result and result.collider is Player:
-					#target_location = area.get_parent().position
-					#if active_modules[PREDICTOR_MODULE]:
-						#target = area.get_parent()
-		#if not player_located:
-			#target_location = null
-		#if target_location != null or target != null:
-			#turret_face.play("firing")
-		#else:
-			#turret_face.play("idle")
 
 func _on_search_area_area_entered(area: Area2D) -> void:
 	if run and turret_face.speed_scale != 0:
@@ -167,6 +137,8 @@ func _physics_process(delta) -> void:
 						for siren_sprite in siren_container.get_children():
 							siren_sprite.play("alert")
 					alert = true
+				for area: Area2D in self.search_area.get_overlapping_areas():
+					self._on_search_area_area_entered(area)
 		if turret_face.speed_scale != 0:
 			var target_rotation: float
 			if active_modules[PREDICTOR_MODULE] and target != null:
@@ -240,8 +212,6 @@ func freeze() -> void:
 		self.modulate.r /= 2
 	target = null
 	turret_face.play("idle")
-	#if active_modules[PREDICTOR_MODULE]:
-		#target = null
 
 func drop_loot() -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()

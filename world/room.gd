@@ -131,10 +131,10 @@ func create_walls() -> void:
 		area.position = (polygon[0] + polygon[1]) / 2
 		if polygon[0].y - polygon[1].y == 0: # door is horizontal
 			collision_shape.shape = RectangleShape2D.new()
-			collision_shape.shape.size = Vector2(abs(polygon[1].x - polygon[0].x), 25)
+			collision_shape.shape.size = Vector2(abs(polygon[1].x - polygon[0].x), 1)
 		else:
 			collision_shape.shape = RectangleShape2D.new()
-			collision_shape.shape.size = Vector2(25, abs(polygon[1].y - polygon[0].y))
+			collision_shape.shape.size = Vector2(1, abs(polygon[1].y - polygon[0].y))
 		area.add_child(collision_shape)
 		area.set_collision_mask_value(1, false)
 		area.set_collision_mask_value(3, true)

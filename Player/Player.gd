@@ -79,9 +79,9 @@ var room: Room = null
 
 func _ready():
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Grenade.tres") as ItemData, 30)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoGrenade.tres") as ItemData, 30)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/FlareGrenade.tres") as ItemData, 30)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Grenade.tres") as ItemData, 30)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/CryoGrenade.tres") as ItemData, 30)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/FlareGrenade.tres") as ItemData, 30)
 	set_inventory(self.inventory)
 
 func _physics_process(delta):

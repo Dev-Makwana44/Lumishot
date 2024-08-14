@@ -408,9 +408,14 @@ max_distance = 1e+10
 wait_time = 5.0
 one_shot = true
 
+[node name="Rotation Timer" type="Timer" parent="."]
+wait_time = 2.5
+autostart = true
+
 [connection signal="area_entered" from="Collision Box" to="." method="_on_collision_box_area_entered"]
 [connection signal="frame_changed" from="Siren Container/Siren 1" to="." method="_on_siren_1_frame_changed"]
 [connection signal="frame_changed" from="Face" to="." method="_on_face_frame_changed"]
 [connection signal="area_entered" from="Face/Search Area" to="." method="_on_search_area_area_entered"]
 [connection signal="area_exited" from="Face/Search Area" to="." method="_on_search_area_area_exited"]
 [connection signal="timeout" from="Slow Timer" to="." method="_on_slow_timer_timeout"]
+[connection signal="timeout" from="Rotation Timer" to="." method="_on_rotation_timer_timeout"]

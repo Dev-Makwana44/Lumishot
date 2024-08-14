@@ -261,5 +261,6 @@ func _on_rotation_timer_timeout():
 
 func recheck_search_area() -> void:
 	target = null
+	self.turret_face.play("idle")
 	for area: Area2D in self.search_area.get_overlapping_areas():
 		self._on_search_area_area_entered(area)

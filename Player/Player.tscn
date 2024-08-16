@@ -88,7 +88,6 @@ texture = ExtResource("3_j3kcd")
 energy = 0.5
 shadow_enabled = true
 shadow_color = Color(0.233925, 0.233925, 0.233925, 0)
-shadow_item_cull_mask = 2
 texture = ExtResource("5_6a88h")
 
 [node name="Cone Light2" type="PointLight2D" parent="."]

@@ -86,7 +86,7 @@ var room: Room = null
 
 func _ready():
 	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/Bullet.tres") as ItemData, 300)
-	self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData, 300)
+	#self.inventory.add_item_with_amount(load("res://Resources/Items/CraftableItems/InvisibilityPotion.tres") as ItemData, 300)
 	set_inventory(self.inventory)
 
 func _process(delta) -> void:
@@ -171,7 +171,7 @@ func _physics_process(delta):
 		
 		move_and_slide()		
 
-func _unhandled_input(event):
+func _unhandled_input(event) -> void:
 	if event is InputEventKey:
 		if event.pressed and event.keycode == KEY_P:
 			camera.zoom *= 1.1
@@ -240,35 +240,35 @@ func freeze() -> void:
 func _on_dash_timer_timeout() -> void:
 	self.dash_cooldown_timer.start()
 
-func _on_dash_cooldown_timeout():
+func _on_dash_cooldown_timeout() -> void:
 	self.dash_available = true
 
-func _on_damage_flash_timer_timeout():
+func _on_damage_flash_timer_timeout() -> void:
 	self.modulate.g *= 2
 	self.modulate.b *= 2
 
-func _on_invisibility_timer_timeout():
+func _on_invisibility_timer_timeout() -> void:
 	self.modulate.a *= 2
 	for enemy: Enemy in self.room.enemies:
 		enemy.recheck_search_area()
 
-func _on_quantum_blink_timer_timeout():
+func _on_quantum_blink_timer_timeout() -> void:
 	self.modulate.r *= 2
 
-func _on_shielding_timer_timeout():
+func _on_shielding_timer_timeout() -> void:
 	self.modulate.g *= 2
 	self.modulate.b = 1
 
-func _on_speed_boost_timer_timeout():
+func _on_speed_boost_timer_timeout() -> void:
 	SPEED /= 2
 	DASH_SPEED /= 2
 	FIRE_RATE *= 2
 
-func _on_frozen_timer_timeout():
+func _on_frozen_timer_timeout() -> void:
 	self.sprite.speed_scale = 1
 	self.modulate.r *= 2
 
-func _on_animated_sprite_2d_frame_changed():
+func _on_animated_sprite_2d_frame_changed() -> void:
 	if sprite.animation == "Run" and sprite.frame % 2 == 1:
 		footstep.pitch_scale = rng.randfn(1.0, 0.1)
 		footstep.play()

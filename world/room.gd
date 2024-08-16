@@ -216,6 +216,6 @@ func spawn_enemies(points: int) -> void:
 				var other_rect = Rect2(enemies_list[other].position - (enemies_list[other].get_size() / 2), enemies_list[other].get_size())
 				if current != other and current_rect.intersects(other_rect):
 					var direction: Vector2 = (enemies_list[other].position - enemies_list[current].position).normalized().round()
-					enemies_list[current].position -= direction * 50
-					enemies_list[other].position += direction * 50
+					enemies_list[current].position -= direction * 100
+					enemies_list[other].position += direction * 100
 					not_done = true

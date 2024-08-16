@@ -505,9 +505,9 @@ script = ExtResource("1_r4yxd")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_42dty")
-animation = &"shielding"
+animation = &"firing_laser"
 autoplay = "idle"
-frame_progress = 0.0772836
+frame_progress = 0.434611
 
 [node name="Laser Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(13, 15)

@@ -226,13 +226,6 @@ func _get_right_points() -> PackedVector2Array:
 				angle += 2 * PI
 			angle = 2 * PI - angle
 			var direction2: int = snapped(angle / (PI / 2), 1) % 4
-			#var dct = {}
-			#dct[0] = "RIGHT"
-			#dct[1] = "UP"
-			#dct[2] = "LEFT"
-			#dct[3] = "DOWN"
-			#print(dct[direction1])
-			#print(dct[direction2])
 			
 			if direction1 == LEFT and direction2 == UP:
 				return PackedVector2Array([(self.lines[0].points[0] - Vector2(0, self.lines[0].width / 2)), (self.lines[0].points[1] + Vector2(self.lines[0].width, -self.lines[0].width / 2)), (self.lines[1].points[1] + Vector2(self.lines[1].width / 2, 0))])

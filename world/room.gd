@@ -37,7 +37,7 @@ func setup_room() -> void:
 	self.set_color_from_type()
 	self.color_rect.visible = true
 	self.create_walls()
-	self.room_cleared.connect(self.get_parent().room_cleared)
+	self.room_cleared.connect(self.get_parent()._on_room_cleared)
 
 func create_walls() -> void:
 	var points: PackedVector2Array = PackedVector2Array()
@@ -178,18 +178,6 @@ func enemy_defeated() -> void:
 		self.door_container.visible = false
 		self.room_cleared.emit()
 
-func activate_enemies_in_adjacent_rooms() -> void:
-	for direction in range(len(self.room_connection_locations)):
-		for hallway: Hallway in self.room_connection_locations[direction]:
-			if self == hallway.a:
-				for enemy: Enemy in hallway.b.enemies:
-					enemy.visible = true
-					enemy.run = true
-			else:
-				for enemy: Enemy in hallway.a.enemies:
-					enemy.visible = true
-					enemy.run = true
-
 func spawn_enemies_in_adjacent_rooms() -> void:
 	for direction in range(len(self.room_connection_locations)):
 		for hallway: Hallway in self.room_connection_locations[direction]:
@@ -206,27 +194,25 @@ func spawn_enemies(points: int) -> void:
 		var point_level: int = rng.randi_range(1, min(points, enemy_scenes.keys().min()))
 		var enemy: Enemy = enemy_scenes[point_level].pick_random().instantiate()
 		enemy.room = self
-		self.call_deferred("add_child", enemy)# self.add_child(enemy)
+		self.call_deferred("add_child", enemy)
 		await enemy.ready
 		self.enemies[enemy] = true
 		var enemy_size: Vector2 = enemy.get_size()
 		var x_pos = rng.randi_range(enemy_size.x, self.rect.size.x - enemy_size.x)
 		var y_pos = rng.randi_range(enemy_size.y, self.rect.size.y - enemy_size.y)
 		enemy.position = Vector2(x_pos, y_pos)
-		#enemy.run = false
-		#enemy.visible = false
 		points -= point_level
 	
-	var enemies_list = self.enemies.keys()
-	var not_done: bool = true
-	while not_done:
-		not_done = false
+	var enemies_list: Array = self.enemies.keys()
+	var separating: bool = true
+	while separating:
+		separating = false
 		for current: int in range(len(enemies_list)):
-			var current_rect = Rect2(enemies_list[current].position - (enemies_list[current].get_size() / 2), enemies_list[current].get_size())
+			var current_rect: Rect2 = Rect2(enemies_list[current].position - (enemies_list[current].get_size() / 2), enemies_list[current].get_size())
 			for other: int in range(len(enemies_list)):
-				var other_rect = Rect2(enemies_list[other].position - (enemies_list[other].get_size() / 2), enemies_list[other].get_size())
+				var other_rect: Rect2 = Rect2(enemies_list[other].position - (enemies_list[other].get_size() / 2), enemies_list[other].get_size())
 				if current != other and current_rect.intersects(other_rect):
 					var direction: Vector2 = (enemies_list[other].position - enemies_list[current].position).normalized().round()
 					enemies_list[current].position -= direction * 100
 					enemies_list[other].position += direction * 100
-					not_done = true
+					separating = true

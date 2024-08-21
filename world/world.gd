@@ -176,21 +176,12 @@ func generate_dungeon() -> bool:
 			if Geometry2D.intersect_polygons(hallway_polygon, room_polygon):
 				return false
 		
-		# spawn enemies
-		#if room.room_type == Room.NORMAL_ROOM:
-			#room.spawn_enemies(level + 4)
-		#elif room.room_type == Room.BOSS_ROOM:
-			#room.spawn_enemies(level + 9)
-		
 		# setup rooms
 		room.setup_room()
 		
 		if room.room_type == Room.STARTING_ROOM:
 			room.spawn_enemies_in_adjacent_rooms()
 
-	#for room: Room in main_rooms:
-		#if room.room_type == Room.STARTING_ROOM:
-			#room.activate_enemies_in_adjacent_rooms()
 	rooms = main_rooms
 	draw_hallways(hallways)
 	create_dungeon_borders([], hallways)
@@ -600,49 +591,49 @@ func create_astar(rooms: Array) -> CustomAStar:
 		rooms.erase(min_p)
 	return path
 
-func spawn_enemies(spawning_room: Room, level: int) -> void:
-	for i in range(rng.randi_range(2 + level, 7 + level)):
-		if rng.randi_range(0, 1) == 0:
-			var turret: Turret = TURRET_SCENE.instantiate()
-			turret.room = spawning_room
-			self.add_child(turret)
-			var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
-			var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
-			turret.position = Vector2(x_pos, y_pos)
-			turret.add_to_group("robots")
-			turret.add_to_group("enemies")
-			turret.run = false
-			turret.visible = false
-			spawning_room.enemies[turret] = true
-		else:
-			var turret: Turret = TURRET_SCENE.instantiate()
-			turret.room = spawning_room
-			self.add_child(turret)
-			var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
-			var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
-			turret.position = Vector2(x_pos, y_pos)
-			turret.add_to_group("enemies")
-			turret.add_to_group("robots")
-			turret.run = false
-			turret.visible = false
-			spawning_room.enemies[turret] = true
-	
-	# use separation steering algorithm to prevent overlaps without having to 
-	var not_done: bool = true
-	var enemies = spawning_room.enemies.keys()
-	while not_done:
-		not_done = false
-		for current: int in range(len(enemies)):
-			var current_rect = Rect2(enemies[current].position - (enemies[current].get_size() / 2), enemies[current].get_size())
-			for other: int in range(len(enemies)):
-				var other_rect = Rect2(enemies[other].position - (enemies[other].get_size() / 2), enemies[other].get_size())
-				if current != other and current_rect.intersects(other_rect):
-					var direction: Vector2 = (enemies[other].position - enemies[current].position).normalized().round()
-					enemies[current].position -= direction * 50
-					enemies[other].position += direction * 50
-					not_done = true
+#func spawn_enemies(spawning_room: Room, level: int) -> void:
+	#for i in range(rng.randi_range(2 + level, 7 + level)):
+		#if rng.randi_range(0, 1) == 0:
+			#var turret: Turret = TURRET_SCENE.instantiate()
+			#turret.room = spawning_room
+			#self.add_child(turret)
+			#var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
+			#var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
+			#turret.position = Vector2(x_pos, y_pos)
+			#turret.add_to_group("robots")
+			#turret.add_to_group("enemies")
+			#turret.run = false
+			#turret.visible = false
+			#spawning_room.enemies[turret] = true
+		#else:
+			#var turret: Turret = TURRET_SCENE.instantiate()
+			#turret.room = spawning_room
+			#self.add_child(turret)
+			#var x_pos = rng.randi_range(spawning_room.rect.position.x + turret.get_size().x, spawning_room.rect.end.x - turret.get_size().x)
+			#var y_pos = rng.randi_range(spawning_room.rect.position.y + turret.get_size().y, spawning_room.rect.end.y - turret.get_size().y)
+			#turret.position = Vector2(x_pos, y_pos)
+			#turret.add_to_group("enemies")
+			#turret.add_to_group("robots")
+			#turret.run = false
+			#turret.visible = false
+			#spawning_room.enemies[turret] = true
+	#
+	## use separation steering algorithm to prevent overlaps without having to 
+	#var not_done: bool = true
+	#var enemies = spawning_room.enemies.keys()
+	#while not_done:
+		#not_done = false
+		#for current: int in range(len(enemies)):
+			#var current_rect = Rect2(enemies[current].position - (enemies[current].get_size() / 2), enemies[current].get_size())
+			#for other: int in range(len(enemies)):
+				#var other_rect = Rect2(enemies[other].position - (enemies[other].get_size() / 2), enemies[other].get_size())
+				#if current != other and current_rect.intersects(other_rect):
+					#var direction: Vector2 = (enemies[other].position - enemies[current].position).normalized().round()
+					#enemies[current].position -= direction * 50
+					#enemies[other].position += direction * 50
+					#not_done = true
 
-func room_cleared() -> void:
+func _on_room_cleared() -> void:
 	for room: Room in rooms:
 		if room.enemies:
 			return

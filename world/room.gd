@@ -23,7 +23,7 @@ var rect: Rect2
 
 var enemies: Dictionary = {}
 
-static func new_room(width: int, height: int, x_pos: int, y_pos: int, level: int) -> Room:
+static func new_room(width: int, height: int, x_pos: int, y_pos: int) -> Room:
 	var room: Room = room_scene.instantiate()
 	room.rect = Rect2(x_pos, y_pos, width, height)
 	room.room_type = NORMAL_ROOM
@@ -152,7 +152,7 @@ func door_area_exited(area: Area2D) -> void:
 				elif child is LightOccluder2D:
 					child.visible = true
 	
-		self.activate_enemies_in_adjacent_rooms()
+		self.spawn_enemies_in_adjacent_rooms()
 		
 	else: # exited room
 		self.door_container.visible = false
@@ -190,20 +190,31 @@ func activate_enemies_in_adjacent_rooms() -> void:
 					enemy.visible = true
 					enemy.run = true
 
+func spawn_enemies_in_adjacent_rooms() -> void:
+	for direction in range(len(self.room_connection_locations)):
+		for hallway: Hallway in self.room_connection_locations[direction]:
+			if self == hallway.a:
+				if hallway.b.room_type != Room.STARTING_ROOM:
+					hallway.b.spawn_enemies(World.level + 4 + 5 * int(hallway.b.room_type == Room.BOSS_ROOM))
+			else:
+				if hallway.a.room_type != Room.STARTING_ROOM:
+					hallway.a.spawn_enemies(World.level + 4 + 5 * int(hallway.b.room_type == Room.BOSS_ROOM))
+
 func spawn_enemies(points: int) -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	while points > 0:
 		var point_level: int = rng.randi_range(1, min(points, enemy_scenes.keys().min()))
 		var enemy: Enemy = enemy_scenes[point_level].pick_random().instantiate()
 		enemy.room = self
-		self.add_child(enemy)
+		self.call_deferred("add_child", enemy)# self.add_child(enemy)
+		await enemy.ready
 		self.enemies[enemy] = true
 		var enemy_size: Vector2 = enemy.get_size()
 		var x_pos = rng.randi_range(enemy_size.x, self.rect.size.x - enemy_size.x)
 		var y_pos = rng.randi_range(enemy_size.y, self.rect.size.y - enemy_size.y)
 		enemy.position = Vector2(x_pos, y_pos)
-		enemy.run = false
-		enemy.visible = false
+		#enemy.run = false
+		#enemy.visible = false
 		points -= point_level
 	
 	var enemies_list = self.enemies.keys()

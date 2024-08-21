@@ -1,3 +1,4 @@
+class_name World
 extends Node2D
 
 var NUMBER_OF_ROOMS_GENERATED: int = 50
@@ -16,9 +17,10 @@ const TURRET_SCENE: PackedScene = preload("res://Enemies/turret.tscn")
 @onready var level_completion_screen: LevelCompletionScreen = %"Level Completion Screen"
 @onready var gunshot = $gunshot
 
+static var level: int = 1
+
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var new_walls: Array
-var level: int = 1
 var hallways: Array[Hallway] = []
 var level_cleared: bool = false
 var rooms: Array[Room] = []
@@ -36,14 +38,14 @@ func _ready():
 	var starting_time: int = Time.get_ticks_msec()
 	while true:
 		print("generating dungeon")
-		if generate_dungeon(level):
+		if generate_dungeon():
 			break
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
 	
 	loss_screen.hide()
 	level_completion_screen.hide()
 
-func generate_dungeon(level: int) -> bool:
+func generate_dungeon() -> bool:
 	rooms = []
 	
 	# Create rooms
@@ -51,7 +53,7 @@ func generate_dungeon(level: int) -> bool:
 		var width: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var height: int = rng.randi_range(ROOM_SIZE_MIN, ROOM_SIZE_MAX)
 		var new_position: Vector2i = random_point_in_circle(5000 + 50 * level)
-		rooms.append(Room.new_room(width, height, new_position.x, new_position.y, level))
+		rooms.append(Room.new_room(width, height, new_position.x, new_position.y))
 	
 	# separate rooms
 	rooms = separate_rooms(rooms, ROOM_SEPARATION_SPEED)
@@ -131,25 +133,25 @@ func generate_dungeon(level: int) -> bool:
 				if len(room_connections[direction]) == 1:
 					if direction % 2 == 0: # originally horizontal
 						if connected_room.rect.get_center().y < room.rect.get_center().y:
-							if len(room_connections[1]) == 1:
-								return false
-							else:
+							#if len(room_connections[1]) == 1:
+								#return false
+							#else:
 								room_connections[1].append(connected_room)
 						else:
-							if len(room_connections[3]) == 1:
-								return false
-							else:
+							#if len(room_connections[3]) == 1:
+								#return false
+							#else:
 								room_connections[3].append(connected_room)
 					else:
 						if connected_room.rect.get_center().x > room.rect.get_center().x:
-							if len(room_connections[0]) == 1:
-								return false
-							else:
+							#if len(room_connections[0]) == 1:
+								#return false
+							#else:
 								room_connections[0].append(connected_room)
 						else:
-							if len(room_connections[2]) == 1:
-								return false
-							else:
+							#if len(room_connections[2]) == 1:
+								#return false
+							#else:
 								room_connections[2].append(connected_room)
 				else:
 					room_connections[direction].append(connected_room)
@@ -175,21 +177,20 @@ func generate_dungeon(level: int) -> bool:
 				return false
 		
 		# spawn enemies
-		if room.room_type == Room.NORMAL_ROOM:
-			#spawn_enemies(room, level)
-			room.spawn_enemies(level + 4)
-			#room.spawn_enemies(level + 14)
-		elif room.room_type == Room.BOSS_ROOM:
-			#spawn_enemies(room, level + 5)
-			room.spawn_enemies(level + 9)
-			#room.spawn_enemies(level + 19)
+		#if room.room_type == Room.NORMAL_ROOM:
+			#room.spawn_enemies(level + 4)
+		#elif room.room_type == Room.BOSS_ROOM:
+			#room.spawn_enemies(level + 9)
 		
 		# setup rooms
 		room.setup_room()
-
-	for room: Room in main_rooms:
+		
 		if room.room_type == Room.STARTING_ROOM:
-			room.activate_enemies_in_adjacent_rooms()
+			room.spawn_enemies_in_adjacent_rooms()
+
+	#for room: Room in main_rooms:
+		#if room.room_type == Room.STARTING_ROOM:
+			#room.activate_enemies_in_adjacent_rooms()
 	rooms = main_rooms
 	draw_hallways(hallways)
 	create_dungeon_borders([], hallways)

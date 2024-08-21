@@ -59,7 +59,7 @@ var fired_this_animation: bool = false
 var alert: bool = false
 var active_modules: Array[bool] = [false, false, false, false]
 
-var run: bool = false
+var run: bool = true
 var room: Room
 
 func _ready():

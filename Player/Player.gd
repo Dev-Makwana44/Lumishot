@@ -95,7 +95,6 @@ func _process(delta) -> void:
 			self.time_since_shooting = 0.0
 			var bullet: Bullet = BULLET_SCENE.instantiate()
 			self.add_sibling(bullet)
-			await bullet.is_node_ready()
 			bullet.set_collision_mask_value(2, true)
 			bullet.position = self.position
 			var bullet_path = get_global_mouse_position() - self.position

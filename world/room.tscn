@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://world/room.gd" id="1_v687y"]
 
-[node name="Room" type="Node2D"]
+[node name="Room" type="Node2D" groups=["dungeon"]]
 script = ExtResource("1_v687y")
 
 [node name="ColorRect" type="ColorRect" parent="."]

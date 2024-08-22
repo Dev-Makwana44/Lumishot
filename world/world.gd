@@ -3,12 +3,9 @@ extends Node2D
 
 var NUMBER_OF_ROOMS_GENERATED: int = 50
 const PERCENTAGE_OF_MAIN_ROOMS: float = 0.3
-const ROOM_SIZE_MIN: int = 300 * 1.5
-const ROOM_SIZE_MAX: int = 1500 * 1.5
+const ROOM_SIZE_MIN: int = 450
+const ROOM_SIZE_MAX: int = 2250
 const ROOM_SEPARATION_SPEED: int = 300
-const MAIN_ROOM_SIZE_RATIO: float = 1.25
-
-const TURRET_SCENE: PackedScene = preload("res://Enemies/turret.tscn")
 
 @onready var player: Player = %Player
 @onready var hud: HUD = %HUD
@@ -40,6 +37,8 @@ func _ready():
 		print("generating dungeon")
 		if generate_dungeon():
 			break
+		for child in self.get_tree().get_nodes_in_group("dungeon"):
+			self.remove_child(child)
 	print("Time to generate level: " + str(Time.get_ticks_msec() - starting_time) + " milliseconds")
 	
 	loss_screen.hide()
@@ -133,26 +132,14 @@ func generate_dungeon() -> bool:
 				if len(room_connections[direction]) == 1:
 					if direction % 2 == 0: # originally horizontal
 						if connected_room.rect.get_center().y < room.rect.get_center().y:
-							#if len(room_connections[1]) == 1:
-								#return false
-							#else:
-								room_connections[1].append(connected_room)
+							room_connections[1].append(connected_room)
 						else:
-							#if len(room_connections[3]) == 1:
-								#return false
-							#else:
-								room_connections[3].append(connected_room)
+							room_connections[3].append(connected_room)
 					else:
 						if connected_room.rect.get_center().x > room.rect.get_center().x:
-							#if len(room_connections[0]) == 1:
-								#return false
-							#else:
-								room_connections[0].append(connected_room)
+							room_connections[0].append(connected_room)
 						else:
-							#if len(room_connections[2]) == 1:
-								#return false
-							#else:
-								room_connections[2].append(connected_room)
+							room_connections[2].append(connected_room)
 				else:
 					room_connections[direction].append(connected_room)
 				hallway_connections[[room, connected_room]] = true
@@ -179,6 +166,7 @@ func generate_dungeon() -> bool:
 		# setup rooms
 		room.setup_room()
 		
+		# spawn enemies in first room
 		if room.room_type == Room.STARTING_ROOM:
 			room.spawn_enemies_in_adjacent_rooms()
 
@@ -188,7 +176,6 @@ func generate_dungeon() -> bool:
 	return true
 
 func generate_mst(vertices: Array, edges: Array) -> Array[Delaunay.Edge]:
-	#var mst_edges: Array[Delaunay.Edge] = [] # set of edges in the mst
 	var mst_edges: Dictionary = {}
 	var mst_vertices: Dictionary = {} # set of vertices that have been added to the mst
 	var available_edges: Dictionary = {} # set of edges that are available to be added to the mst
@@ -209,7 +196,6 @@ func generate_mst(vertices: Array, edges: Array) -> Array[Delaunay.Edge]:
 		best_edges.sort_custom(edges_comparison)
 		for edge: Delaunay.Edge in best_edges:
 			if edge.a not in mst_vertices or edge.b not in mst_vertices:
-				#mst_edges.append(edge)
 				mst_edges[edge] = true
 				available_edges.erase(edge)
 				mst_vertices[edge.a] = true

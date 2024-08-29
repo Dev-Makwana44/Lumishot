@@ -76,9 +76,9 @@ layout_mode = 2
 [node name="Start Button" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(0, 0, 0.784314, 1)
 theme_override_colors/font_hover_color = Color(0.594923, 0.615058, 0.82478, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0.784314, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("4_rxcqo")
 theme_override_font_sizes/font_size = 60
 text = "Play Game"
@@ -86,9 +86,9 @@ text = "Play Game"
 [node name="Quit Button" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(0, 0, 1, 1)
 theme_override_colors/font_hover_color = Color(0.725823, 0.317173, 0.337948, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 1, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("4_rxcqo")
 theme_override_font_sizes/font_size = 60
 text = "Quit
